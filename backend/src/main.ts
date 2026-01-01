@@ -1,12 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
+
+  // Serve static files from uploads folder
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads/',
+  });
 
   // Enable CORS
   app.enableCors({
@@ -26,11 +34,45 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api');
 
+  // Swagger setup
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('EduConnect API')
+    .setDescription('Interactive LMS Platform - Backend API Documentation')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .addTag('Auth', 'Authentication & Authorization')
+    .addTag('Users', 'User Management')
+    .addTag('Classes', 'Class Management')
+    .addTag('Files', 'File Upload & Management')
+    .addTag('Assignments', 'Assignment & Submissions')
+    .addTag('Materials', 'Learning Materials')
+    .addTag('Live Sessions', 'Real-time Sessions')
+    .addTag('Chat', 'Chat Messages')
+    .addTag('Notifications', 'User Notifications')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+
   const port = configService.get('PORT') || 3000;
   await app.listen(port);
 
   console.log(`🚀 EduConnect Backend running on: http://localhost:${port}`);
-  console.log(`📚 API Docs: http://localhost:${port}/api`);
+  console.log(`📚 API Docs: http://localhost:${port}/docs`);
 }
 
 bootstrap();
