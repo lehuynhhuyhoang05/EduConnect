@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -46,6 +47,7 @@ const FILE_CONFIG = {
 
 @Injectable()
 export class FilesService {
+  private readonly logger = new Logger(FilesService.name);
   private uploadDir: string;
 
   constructor(
@@ -126,7 +128,9 @@ export class FilesService {
       uploadedBy: user.id,
     });
 
-    return this.fileRepository.save(file);
+    const savedFile = await this.fileRepository.save(file);
+    this.logger.log(`File uploaded: ${fileData.originalname} (${fileData.size} bytes) by user ${user.id}`);
+    return savedFile;
   }
 
   /**
@@ -279,6 +283,7 @@ export class FilesService {
 
     // Delete from database
     await this.fileRepository.remove(file);
+    this.logger.log(`File deleted: ${file.originalName} by user ${user.id}`);
   }
 
   /**
