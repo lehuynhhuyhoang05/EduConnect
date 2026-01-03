@@ -6,17 +6,21 @@ import {
   MaxLength,
   Min,
   Max,
+  ValidateIf,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class CreateSubmissionDto {
   @ApiProperty({ example: '/uploads/submission-file.pdf', required: false })
-  @IsOptional()
+  @ValidateIf((o) => !o.content)
+  @IsNotEmpty({ message: 'Phải có file hoặc nội dung bài làm' })
   @IsString()
   @MaxLength(500)
   fileUrl?: string;
 
   @ApiProperty({ example: 'Nội dung bài làm của sinh viên...', required: false })
-  @IsOptional()
+  @ValidateIf((o) => !o.fileUrl)
+  @IsNotEmpty({ message: 'Phải có file hoặc nội dung bài làm' })
   @IsString()
   content?: string;
 }

@@ -56,6 +56,9 @@ export class Submission {
   @Column({ name: 'graded_by', type: 'int', unsigned: true, nullable: true })
   gradedBy: number;
 
+  @Column({ name: 'is_late', type: 'boolean', default: false })
+  isLate: boolean;
+
   // Relations
   @ManyToOne(() => Assignment, (assignment) => assignment.submissions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'assignment_id' })

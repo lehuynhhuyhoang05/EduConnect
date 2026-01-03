@@ -185,4 +185,27 @@ export class AssignmentsController {
   ) {
     return this.assignmentsService.getAssignmentStats(assignmentId, user);
   }
+
+  @Get('assignments/:id/export-grades')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Export assignment grades as CSV (Teacher only)' })
+  @ApiResponse({ status: 200, description: 'CSV file content' })
+  async exportGrades(
+    @Param('id', ParseIntPipe) assignmentId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.assignmentsService.exportGrades(assignmentId, user);
+  }
+
+  @Post('assignments/:id/bulk-grade')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Grade multiple submissions at once (Teacher only)' })
+  @ApiResponse({ status: 200, description: 'Bulk grading completed' })
+  async bulkGradeSubmissions(
+    @Param('id', ParseIntPipe) assignmentId: number,
+    @Body() bulkGradeDto: { grades: Array<{ submissionId: number; score: number; feedback?: string }> },
+    @CurrentUser() user: User,
+  ) {
+    return this.assignmentsService.bulkGradeSubmissions(assignmentId, bulkGradeDto.grades, user);
+  }
 }

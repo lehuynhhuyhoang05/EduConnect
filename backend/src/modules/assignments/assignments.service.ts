@@ -118,6 +118,13 @@ export class AssignmentsService {
         .innerJoin('userClass.members', 'member', 'member.userId = :userId', { userId: user.id });
     }
 
+    // Filter by isActive (default show only active)
+    if (isActive !== undefined) {
+      queryBuilder.andWhere('assignment.isActive = :isActive', { isActive });
+    } else {
+      queryBuilder.andWhere('assignment.isActive = :isActive', { isActive: true });
+    }
+
     const [assignments, total] = await queryBuilder
       .select([
         'assignment.id',
@@ -233,9 +240,21 @@ export class AssignmentsService {
       throw new ForbiddenException('Chỉ người tạo mới có thể xóa bài tập');
     }
 
-    // Hard delete
-    await this.assignmentRepository.remove(assignment);
-    this.logger.log(`Assignment deleted: ${assignment.title} by teacher ${teacher.id}`);
+    // Check if there are graded submissions
+    const gradedCount = await this.submissionRepository.count({
+      where: { assignmentId: id, status: SubmissionStatus.GRADED },
+    });
+
+    if (gradedCount > 0) {
+      // Soft delete if has graded submissions
+      assignment.isActive = false;
+      await this.assignmentRepository.save(assignment);
+      this.logger.log(`Assignment deactivated: ${assignment.title} by teacher ${teacher.id}`);
+    } else {
+      // Hard delete if no graded submissions
+      await this.assignmentRepository.remove(assignment);
+      this.logger.log(`Assignment deleted: ${assignment.title} by teacher ${teacher.id}`);
+    }
   }
 
   // ===================== SUBMISSION CRUD =====================
@@ -287,6 +306,12 @@ export class AssignmentsService {
         existingSubmission.content = submitDto.content ?? existingSubmission.content;
         existingSubmission.status = SubmissionStatus.SUBMITTED;
         existingSubmission.submittedAt = new Date();
+        existingSubmission.isLate = isLate;
+        // Reset score and feedback on resubmission
+        existingSubmission.score = null;
+        existingSubmission.feedback = null;
+        existingSubmission.gradedAt = null;
+        existingSubmission.gradedBy = null;
         submission = await manager.save(Submission, existingSubmission);
       } else {
         // Create new submission
@@ -296,6 +321,7 @@ export class AssignmentsService {
           fileUrl: submitDto.fileUrl,
           content: submitDto.content,
           status: SubmissionStatus.SUBMITTED,
+          isLate,
         });
         submission = await manager.save(Submission, submission);
 
@@ -508,18 +534,134 @@ export class AssignmentsService {
       .groupBy('submission.status')
       .getRawMany();
 
-    const totalMembers = assignment.class.memberCount - 1; // Exclude teacher
+    // Get actual student count from class_members table
+    const studentCount = await this.dataSource
+      .createQueryBuilder()
+      .select('COUNT(*)', 'count')
+      .from('class_members', 'cm')
+      .where('cm.class_id = :classId', { classId: assignment.classId })
+      .andWhere('cm.role = :role', { role: 'STUDENT' })
+      .getRawOne();
+
+    const totalStudents = parseInt(studentCount.count || '0');
     const totalSubmissions = assignment.submissionCount;
+    const notSubmitted = totalStudents - totalSubmissions;
 
     return {
       assignmentId,
       title: assignment.title,
       deadline: assignment.deadline,
       maxScore: assignment.maxScore,
-      totalMembers,
+      isOverdue: new Date() > assignment.deadline,
+      totalStudents,
       totalSubmissions,
-      notSubmitted: totalMembers - totalSubmissions,
-      byStatus: stats,
+      notSubmitted,
+      submissionRate: totalStudents > 0 ? ((totalSubmissions / totalStudents) * 100).toFixed(2) + '%' : '0%',
+      byStatus: stats.map(s => ({
+        status: s.status,
+        count: parseInt(s.count),
+        avgScore: s.avgScore ? parseFloat(s.avgScore).toFixed(2) : null,
+      })),
     };
+  }
+
+  /**
+   * Export assignment grades as CSV (Teacher only)
+   */
+  async exportGrades(assignmentId: number, teacher: User): Promise<string> {
+    const assignment = await this.assignmentRepository.findOne({
+      where: { id: assignmentId },
+    });
+
+    if (!assignment) {
+      throw new NotFoundException('Bài tập không tồn tại');
+    }
+
+    const isTeacher = await this.classesService.isTeacher(assignment.classId, teacher.id);
+    if (!isTeacher) {
+      throw new ForbiddenException('Chỉ giáo viên mới có thể xuất điểm');
+    }
+
+    const submissions = await this.submissionRepository
+      .createQueryBuilder('submission')
+      .leftJoinAndSelect('submission.student', 'student')
+      .where('submission.assignmentId = :assignmentId', { assignmentId })
+      .orderBy('student.fullName', 'ASC')
+      .getMany();
+
+    // Generate CSV
+    const headers = ['STT', 'Họ tên', 'Email', 'Trạng thái', 'Điểm', 'Nộp trễ', 'Ngày nộp', 'Nhận xét'];
+    const rows = submissions.map((s, index) => [
+      index + 1,
+      s.student.fullName,
+      s.student.email,
+      s.status,
+      s.score ?? 'Chưa chấm',
+      s.isLate ? 'Có' : 'Không',
+      s.submittedAt.toISOString(),
+      (s.feedback || '').replace(/,/g, ';').replace(/\n/g, ' '),
+    ]);
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    return csv;
+  }
+
+  /**
+   * Bulk grade submissions (Teacher only)
+   */
+  async bulkGradeSubmissions(
+    assignmentId: number,
+    grades: Array<{ submissionId: number; score: number; feedback?: string }>,
+    teacher: User,
+  ): Promise<{ success: number; failed: number; errors: any[] }> {
+    const assignment = await this.assignmentRepository.findOne({
+      where: { id: assignmentId },
+    });
+
+    if (!assignment) {
+      throw new NotFoundException('Bài tập không tồn tại');
+    }
+
+    const isTeacher = await this.classesService.isTeacher(assignment.classId, teacher.id);
+    if (!isTeacher) {
+      throw new ForbiddenException('Chỉ giáo viên của lớp mới có thể chấm điểm');
+    }
+
+    const results = { success: 0, failed: 0, errors: [] as any[] };
+
+    for (const grade of grades) {
+      try {
+        const submission = await this.submissionRepository.findOne({
+          where: { id: grade.submissionId, assignmentId },
+        });
+
+        if (!submission) {
+          results.failed++;
+          results.errors.push({ submissionId: grade.submissionId, error: 'Không tìm thấy bài nộp' });
+          continue;
+        }
+
+        if (grade.score > assignment.maxScore) {
+          results.failed++;
+          results.errors.push({ submissionId: grade.submissionId, error: `Điểm vượt quá ${assignment.maxScore}` });
+          continue;
+        }
+
+        submission.score = grade.score;
+        submission.feedback = grade.feedback ?? null;
+        submission.status = SubmissionStatus.GRADED;
+        submission.gradedAt = new Date();
+        submission.gradedBy = teacher.id;
+
+        await this.submissionRepository.save(submission);
+        results.success++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({ submissionId: grade.submissionId, error: error.message });
+      }
+    }
+
+    this.logger.log(`Bulk graded ${results.success}/${grades.length} submissions for assignment ${assignmentId}`);
+    return results;
   }
 }

@@ -41,6 +41,9 @@ export class Assignment {
   @Column({ name: 'submission_count', type: 'int', unsigned: true, default: 0 })
   submissionCount: number;
 
+  @Column({ name: 'is_active', type: 'boolean', default: true })
+  isActive: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
