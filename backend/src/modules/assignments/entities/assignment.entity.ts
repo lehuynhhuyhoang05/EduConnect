@@ -29,10 +29,10 @@ export class Assignment {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ name: 'due_date', type: 'timestamp' })
-  dueDate: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  deadline: Date;
 
-  @Column({ name: 'max_score', type: 'decimal', precision: 5, scale: 2, default: 100 })
+  @Column({ name: 'max_score', type: 'decimal', precision: 5, scale: 2, unsigned: true, default: 100 })
   maxScore: number;
 
   @Column({ name: 'attachment_url', type: 'varchar', length: 500, nullable: true })
@@ -40,9 +40,6 @@ export class Assignment {
 
   @Column({ name: 'submission_count', type: 'int', unsigned: true, default: 0 })
   submissionCount: number;
-
-  @Column({ name: 'is_active', type: 'tinyint', width: 1, default: 1 })
-  isActive: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

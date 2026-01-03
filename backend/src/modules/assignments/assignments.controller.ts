@@ -31,7 +31,7 @@ import { CurrentUser, Roles } from '@modules/auth/decorators';
 import { User, UserRole } from '@modules/users/entities/user.entity';
 
 @ApiTags('Assignments')
-@Controller()
+@Controller('')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class AssignmentsController {

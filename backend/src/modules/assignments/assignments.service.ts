@@ -60,8 +60,8 @@ export class AssignmentsService {
     }
 
     // Validate due date is in future
-    const dueDate = new Date(createDto.dueDate);
-    if (dueDate <= new Date()) {
+    const deadline = new Date(createDto.dueDate);
+    if (deadline <= new Date()) {
       throw new BadRequestException('Hạn nộp phải sau thời điểm hiện tại');
     }
 
@@ -70,7 +70,7 @@ export class AssignmentsService {
       createdBy: teacher.id,
       title: createDto.title,
       description: createDto.description,
-      dueDate,
+      deadline,
       maxScore: createDto.maxScore || 100,
       attachmentUrl: createDto.attachmentUrl,
     });
@@ -105,22 +105,14 @@ export class AssignmentsService {
         .innerJoin('class.members', 'member', 'member.userId = :userId', { userId: user.id });
     }
 
-    // Default: only active assignments
-    if (isActive === undefined) {
-      queryBuilder.andWhere('assignment.isActive = :active', { active: true });
-    } else {
-      queryBuilder.andWhere('assignment.isActive = :isActive', { isActive });
-    }
-
     const [assignments, total] = await queryBuilder
       .select([
         'assignment.id',
         'assignment.title',
         'assignment.description',
-        'assignment.dueDate',
+        'assignment.deadline',
         'assignment.maxScore',
         'assignment.submissionCount',
-        'assignment.isActive',
         'assignment.createdAt',
         'class.id',
         'class.name',
@@ -129,7 +121,7 @@ export class AssignmentsService {
       ])
       .skip((page - 1) * limit)
       .take(limit)
-      .orderBy('assignment.dueDate', 'ASC')
+      .orderBy('assignment.deadline', 'ASC')
       .getManyAndCount();
 
     return {
@@ -175,7 +167,7 @@ export class AssignmentsService {
       ...assignment,
       creator: this.sanitizeUser(assignment.creator),
       mySubmission,
-      isOverdue: new Date() > assignment.dueDate,
+      isOverdue: new Date() > assignment.deadline,
     };
   }
 
@@ -198,11 +190,11 @@ export class AssignmentsService {
 
     // Validate new due date if provided
     if (updateDto.dueDate) {
-      const newDueDate = new Date(updateDto.dueDate);
-      if (newDueDate <= new Date()) {
+      const newDeadline = new Date(updateDto.dueDate);
+      if (newDeadline <= new Date()) {
         throw new BadRequestException('Hạn nộp mới phải sau thời điểm hiện tại');
       }
-      assignment.dueDate = newDueDate;
+      assignment.deadline = newDeadline;
     }
 
     Object.assign(assignment, {
@@ -228,10 +220,9 @@ export class AssignmentsService {
       throw new ForbiddenException('Chỉ người tạo mới có thể xóa bài tập');
     }
 
-    // Soft delete
-    assignment.isActive = false;
-    await this.assignmentRepository.save(assignment);
-    this.logger.log(`Assignment deactivated: ${assignment.title} by teacher ${teacher.id}`);
+    // Hard delete
+    await this.assignmentRepository.remove(assignment);
+    this.logger.log(`Assignment deleted: ${assignment.title} by teacher ${teacher.id}`);
   }
 
   // ===================== SUBMISSION CRUD =====================
@@ -245,11 +236,11 @@ export class AssignmentsService {
     student: User,
   ): Promise<Submission> {
     const assignment = await this.assignmentRepository.findOne({
-      where: { id: assignmentId, isActive: true },
+      where: { id: assignmentId },
     });
 
     if (!assignment) {
-      throw new NotFoundException('Bài tập không tồn tại hoặc đã bị xóa');
+      throw new NotFoundException('Bài tập không tồn tại');
     }
 
     // Verify student is member of class
@@ -271,7 +262,7 @@ export class AssignmentsService {
     }
 
     // Check deadline (allow late submission with warning)
-    const isLate = new Date() > assignment.dueDate;
+    const isLate = new Date() > assignment.deadline;
 
     // Use transaction
     return this.dataSource.transaction(async (manager) => {
@@ -363,7 +354,7 @@ export class AssignmentsService {
       data: submissions.map((s) => ({
         ...s,
         student: this.sanitizeUser(s.student),
-        isLate: s.submittedAt > assignment.dueDate,
+        isLate: s.submittedAt > assignment.deadline,
       })),
       meta: {
         total,
@@ -510,7 +501,7 @@ export class AssignmentsService {
     return {
       assignmentId,
       title: assignment.title,
-      dueDate: assignment.dueDate,
+      deadline: assignment.deadline,
       maxScore: assignment.maxScore,
       totalMembers,
       totalSubmissions,
