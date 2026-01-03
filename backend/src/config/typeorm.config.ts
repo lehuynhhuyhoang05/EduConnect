@@ -7,11 +7,22 @@ import { Class, ClassMember } from '@modules/classes/entities';
 import { File } from '@modules/files/entities';
 import { Assignment } from '@modules/assignments/entities/assignment.entity';
 import { Submission } from '@modules/assignments/entities/submission.entity';
+import { LiveSession, LiveSessionParticipant } from '@modules/live-sessions/entities';
 
 dotenv.config();
 
 // Explicitly list entities to avoid path issues with non-ASCII characters
-const entities = [User, RefreshToken, Class, ClassMember, File, Assignment, Submission];
+const entities = [
+  User, 
+  RefreshToken, 
+  Class, 
+  ClassMember, 
+  File, 
+  Assignment, 
+  Submission,
+  LiveSession,
+  LiveSessionParticipant,
+];
 
 export const typeOrmConfig = (): TypeOrmModuleOptions => ({
   type: 'mysql',

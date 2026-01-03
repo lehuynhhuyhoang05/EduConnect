@@ -11,6 +11,7 @@ import { UsersModule } from './modules/users/users.module';
 import { ClassesModule } from './modules/classes/classes.module';
 import { FilesModule } from './modules/files/files.module';
 import { AssignmentsModule } from './modules/assignments/assignments.module';
+import { LiveSessionsModule } from './modules/live-sessions/live-sessions.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AssignmentsModule } from './modules/assignments/assignments.module';
     ClassesModule,
     FilesModule,
     AssignmentsModule,
+    LiveSessionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
