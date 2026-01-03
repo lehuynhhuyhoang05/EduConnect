@@ -17,7 +17,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto, QueryUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto, QueryUserDto, ChangePasswordDto } from './dto';
 import { JwtAuthGuard, RolesGuard } from '../auth/guards';
 import { Roles, CurrentUser } from '../auth/decorators';
 import { User, UserRole } from './entities/user.entity';
@@ -100,11 +100,21 @@ export class UsersController {
 
   @Delete(':id')
   @Roles(UserRole.TEACHER)
-  @ApiOperation({ summary: 'Delete user (Teacher only)' })
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiOperation({ summary: 'Deactivate user - soft delete (Teacher only)' })
+  @ApiResponse({ status: 200, description: 'User deactivated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async remove(@Param('id', ParseIntPipe) id: number) {
-    await this.usersService.remove(id);
-    return { message: 'User đã được xóa' };
+    return this.usersService.softDelete(id);
+  }
+
+  @Put('change-password')
+  @ApiOperation({ summary: 'Change current user password' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid current password or same password' })
+  async changePassword(
+    @CurrentUser() user: User,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.usersService.changePassword(user.id, changePasswordDto);
   }
 }

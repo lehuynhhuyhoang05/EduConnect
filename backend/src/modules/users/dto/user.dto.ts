@@ -93,3 +93,16 @@ export class QueryUserDto {
   @Type(() => Number)
   limit?: number = 10;
 }
+
+export class ChangePasswordDto {
+  @ApiProperty({ example: 'OldPassword123!', description: 'Current password' })
+  @IsString()
+  @MinLength(1, { message: 'Mật khẩu hiện tại không được để trống' })
+  currentPassword: string;
+
+  @ApiProperty({ example: 'NewPassword456!', description: 'New password (min 8 chars, uppercase, lowercase, number)' })
+  @IsString()
+  @MinLength(8, { message: 'Mật khẩu mới phải có ít nhất 8 ký tự' })
+  @MaxLength(100)
+  newPassword: string;
+}

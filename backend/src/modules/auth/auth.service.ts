@@ -240,8 +240,8 @@ export class AuthService {
     const result = await this.refreshTokenRepository
       .createQueryBuilder()
       .delete()
-      .where('expires_at < :now', { now: new Date() })
-      .orWhere('is_revoked = :revoked', { revoked: true })
+      .where('expiresAt < :now', { now: new Date() })
+      .orWhere('isRevoked = :revoked', { revoked: true })
       .execute();
 
     const deleted = result.affected || 0;

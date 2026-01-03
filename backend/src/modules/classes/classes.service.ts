@@ -4,6 +4,7 @@ import {
   ConflictException,
   ForbiddenException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
@@ -14,6 +15,8 @@ import { User, UserRole } from '@modules/users/entities/user.entity';
 
 @Injectable()
 export class ClassesService {
+  private readonly logger = new Logger(ClassesService.name);
+
   constructor(
     @InjectRepository(Class)
     private readonly classRepository: Repository<Class>,
@@ -98,6 +101,7 @@ export class ClassesService {
       });
       await manager.save(ClassMember, teacherMember);
 
+      this.logger.log(`Class created: ${savedClass.name} (${savedClass.classCode}) by teacher ${teacher.id}`);
       return savedClass;
     });
   }
