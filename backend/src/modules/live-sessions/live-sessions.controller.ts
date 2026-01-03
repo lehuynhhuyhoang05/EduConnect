@@ -23,6 +23,10 @@ import { NetworkDiagnosticsService } from './network-diagnostics.service';
 import { BreakoutRoomsService } from './breakout-rooms.service';
 import { RealTimePollsService } from './realtime-polls.service';
 import { SessionAnalyticsService } from './session-analytics.service';
+import { RecordingService } from './recording.service';
+import { ConnectionQualityService } from './connection-quality.service';
+import { SmartReconnectionService } from './smart-reconnection.service';
+import { AttendanceTrackingService } from './attendance-tracking.service';
 import {
   CreateLiveSessionDto,
   UpdateLiveSessionDto,
@@ -46,6 +50,10 @@ export class LiveSessionsController {
     private readonly breakoutRoomsService: BreakoutRoomsService,
     private readonly pollsService: RealTimePollsService,
     private readonly analyticsService: SessionAnalyticsService,
+    private readonly recordingService: RecordingService,
+    private readonly connectionQualityService: ConnectionQualityService,
+    private readonly reconnectionService: SmartReconnectionService,
+    private readonly attendanceService: AttendanceTrackingService,
   ) {}
 
   // ===================== SESSION CRUD =====================
@@ -552,5 +560,215 @@ export class LiveSessionsController {
   @ApiResponse({ status: 200, description: 'Exported analytics' })
   exportSessionAnalytics(@Param('id', ParseIntPipe) sessionId: number) {
     return this.analyticsService.exportAnalytics(sessionId);
+  }
+
+  // ===================== RECORDING =====================
+
+  @Post('sessions/:id/recording/start')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Start recording session (Host only)' })
+  @ApiResponse({ status: 200, description: 'Recording started' })
+  startRecording(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+    @Body() settings?: { quality?: 'low' | 'medium' | 'high' },
+  ) {
+    return this.recordingService.startRecording(sessionId, user.id, settings);
+  }
+
+  @Post('sessions/:id/recording/stop')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Stop recording session' })
+  @ApiResponse({ status: 200, description: 'Recording stopped' })
+  stopRecording(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.recordingService.stopRecording(sessionId, user.id);
+  }
+
+  @Get('sessions/:id/recording/status')
+  @ApiOperation({ summary: 'Get recording status' })
+  @ApiResponse({ status: 200, description: 'Recording status' })
+  getRecordingStatus(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.recordingService.getRecordingStatus(sessionId);
+  }
+
+  @Get('sessions/:id/recordings')
+  @ApiOperation({ summary: 'Get all recordings for a session' })
+  @ApiResponse({ status: 200, description: 'Session recordings' })
+  getSessionRecordings(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.recordingService.getSessionRecordings(sessionId);
+  }
+
+  // ===================== CONNECTION QUALITY =====================
+
+  @Post('sessions/:id/quality/report')
+  @ApiOperation({ summary: 'Report connection quality stats' })
+  @ApiResponse({ status: 200, description: 'Stats recorded' })
+  reportConnectionQuality(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+    @Body() stats: any,
+  ) {
+    this.connectionQualityService.reportStats(sessionId, user.id, stats);
+    return { success: true };
+  }
+
+  @Get('sessions/:id/quality')
+  @ApiOperation({ summary: 'Get own connection quality' })
+  @ApiResponse({ status: 200, description: 'Connection quality' })
+  getConnectionQuality(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.connectionQualityService.getParticipantQuality(sessionId, user.id);
+  }
+
+  @Get('sessions/:id/quality/all')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Get all participants connection quality (Host only)' })
+  @ApiResponse({ status: 200, description: 'All participants quality' })
+  getAllConnectionQuality(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.connectionQualityService.getSessionQuality(sessionId);
+  }
+
+  @Get('sessions/:id/quality/recommendations')
+  @ApiOperation({ summary: 'Get network recommendations' })
+  @ApiResponse({ status: 200, description: 'Network recommendations' })
+  getNetworkRecommendations(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.connectionQualityService.getRecommendations(sessionId, user.id);
+  }
+
+  // ===================== SMART RECONNECTION =====================
+
+  @Post('sessions/:id/reconnect/token')
+  @ApiOperation({ summary: 'Generate reconnection token' })
+  @ApiResponse({ status: 200, description: 'Reconnection token' })
+  generateReconnectionToken(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+    @Body() mediaState: { audio: boolean; video: boolean; screen: boolean },
+  ) {
+    const token = this.reconnectionService.generateReconnectionToken(
+      user.id,
+      sessionId,
+      `session-${sessionId}`,
+      mediaState,
+    );
+    return { token };
+  }
+
+  @Post('sessions/reconnect')
+  @ApiOperation({ summary: 'Attempt reconnection with token' })
+  @ApiResponse({ status: 200, description: 'Reconnection result' })
+  attemptReconnection(@Body() data: { token: string }) {
+    return this.reconnectionService.attemptReconnection(data.token);
+  }
+
+  @Get('sessions/:id/disconnected')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Get temporarily disconnected users (Host only)' })
+  @ApiResponse({ status: 200, description: 'Disconnected users list' })
+  getDisconnectedUsers(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.reconnectionService.getDisconnectedUsers(sessionId);
+  }
+
+  // ===================== ATTENDANCE =====================
+
+  @Post('sessions/:id/attendance/start')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Start attendance tracking (Host only)' })
+  @ApiResponse({ status: 200, description: 'Attendance tracking started' })
+  startAttendance(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+    @Body() settings?: {
+      method?: 'auto' | 'code' | 'manual';
+      lateThresholdMinutes?: number;
+      allowLateCheckIn?: boolean;
+    },
+  ) {
+    return this.attendanceService.startAttendance(sessionId, 0, user.id, settings);
+  }
+
+  @Post('sessions/:id/attendance/close')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Close attendance (Host only)' })
+  @ApiResponse({ status: 200, description: 'Attendance closed' })
+  closeAttendance(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.attendanceService.closeAttendance(sessionId);
+  }
+
+  @Get('sessions/:id/attendance/code')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Get current check-in code (Host only)' })
+  @ApiResponse({ status: 200, description: 'Check-in code' })
+  getAttendanceCode(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.attendanceService.getCurrentCode(sessionId);
+  }
+
+  @Post('sessions/:id/attendance/check-in')
+  @ApiOperation({ summary: 'Check-in with code' })
+  @ApiResponse({ status: 200, description: 'Check-in result' })
+  checkInWithCode(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+    @Body() data: { code: string },
+  ) {
+    return this.attendanceService.checkInWithCode(
+      sessionId,
+      user.id,
+      data.code,
+      user.fullName,
+    );
+  }
+
+  @Post('sessions/:id/attendance/manual')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Manual check-in by teacher' })
+  @ApiResponse({ status: 200, description: 'Manual check-in result' })
+  manualCheckIn(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+    @Body() data: { userId: number; status: 'present' | 'late' | 'absent' | 'excused'; notes?: string },
+  ) {
+    return this.attendanceService.manualCheckIn(
+      sessionId,
+      user.id,
+      data.userId,
+      data.status,
+      data.notes,
+    );
+  }
+
+  @Get('sessions/:id/attendance')
+  @ApiOperation({ summary: 'Get attendance records' })
+  @ApiResponse({ status: 200, description: 'Attendance records' })
+  getAttendance(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.attendanceService.getSessionAttendance(sessionId);
+  }
+
+  @Get('sessions/:id/attendance/summary')
+  @ApiOperation({ summary: 'Get attendance summary' })
+  @ApiResponse({ status: 200, description: 'Attendance summary' })
+  getAttendanceSummary(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.attendanceService.getAttendanceSummary(sessionId);
+  }
+
+  @Get('sessions/:id/attendance/export')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Export attendance to CSV' })
+  @ApiResponse({ status: 200, description: 'CSV data' })
+  exportAttendance(@Param('id', ParseIntPipe) sessionId: number, @Res() res: Response) {
+    const csv = this.attendanceService.exportToCSV(sessionId);
+    res.set({
+      'Content-Type': 'text/csv',
+      'Content-Disposition': `attachment; filename="attendance-${sessionId}.csv"`,
+    });
+    res.send(csv);
   }
 }

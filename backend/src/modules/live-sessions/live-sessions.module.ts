@@ -8,6 +8,10 @@ import { NetworkDiagnosticsService } from './network-diagnostics.service';
 import { BreakoutRoomsService } from './breakout-rooms.service';
 import { RealTimePollsService } from './realtime-polls.service';
 import { SessionAnalyticsService } from './session-analytics.service';
+import { RecordingService } from './recording.service';
+import { ConnectionQualityService } from './connection-quality.service';
+import { SmartReconnectionService } from './smart-reconnection.service';
+import { AttendanceTrackingService } from './attendance-tracking.service';
 import { LiveSession, LiveSessionParticipant } from './entities';
 import { ClassesModule } from '@modules/classes/classes.module';
 import { User } from '@modules/users/entities/user.entity';
@@ -30,6 +34,10 @@ import { LoggerModule } from '@common/logger/logger.module';
     BreakoutRoomsService,
     RealTimePollsService,
     SessionAnalyticsService,
+    RecordingService,
+    ConnectionQualityService,
+    SmartReconnectionService,
+    AttendanceTrackingService,
   ],
   exports: [
     LiveSessionsService, 
@@ -38,6 +46,10 @@ import { LoggerModule } from '@common/logger/logger.module';
     BreakoutRoomsService,
     RealTimePollsService,
     SessionAnalyticsService,
+    RecordingService,
+    ConnectionQualityService,
+    SmartReconnectionService,
+    AttendanceTrackingService,
   ],
 })
 export class LiveSessionsModule {}
