@@ -5,11 +5,13 @@ import { User } from '@modules/users/entities/user.entity';
 import { RefreshToken } from '@modules/auth/entities/refresh-token.entity';
 import { Class, ClassMember } from '@modules/classes/entities';
 import { File } from '@modules/files/entities';
+import { Assignment } from '@modules/assignments/entities/assignment.entity';
+import { Submission } from '@modules/assignments/entities/submission.entity';
 
 dotenv.config();
 
 // Explicitly list entities to avoid path issues with non-ASCII characters
-const entities = [User, RefreshToken, Class, ClassMember, File];
+const entities = [User, RefreshToken, Class, ClassMember, File, Assignment, Submission];
 
 export const typeOrmConfig = (): TypeOrmModuleOptions => ({
   type: 'mysql',

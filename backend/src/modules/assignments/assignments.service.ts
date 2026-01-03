@@ -53,31 +53,43 @@ export class AssignmentsService {
     createDto: CreateAssignmentDto,
     teacher: User,
   ): Promise<Assignment> {
-    // Verify teacher owns the class
-    const isTeacher = await this.classesService.isTeacher(classId, teacher.id);
-    if (!isTeacher) {
-      throw new ForbiddenException('Chỉ giáo viên của lớp mới có thể tạo bài tập');
+    try {
+      this.logger.debug(`Creating assignment in class ${classId} by teacher ${teacher.id}`);
+      
+      // Verify teacher owns the class
+      const isTeacher = await this.classesService.isTeacher(classId, teacher.id);
+      this.logger.debug(`isTeacher check result: ${isTeacher}`);
+      
+      if (!isTeacher) {
+        throw new ForbiddenException('Chỉ giáo viên của lớp mới có thể tạo bài tập');
+      }
+
+      // Validate due date is in future
+      const deadline = new Date(createDto.dueDate);
+      this.logger.debug(`Deadline: ${deadline}, Now: ${new Date()}`);
+      
+      if (deadline <= new Date()) {
+        throw new BadRequestException('Hạn nộp phải sau thời điểm hiện tại');
+      }
+
+      const assignment = this.assignmentRepository.create({
+        classId,
+        createdBy: teacher.id,
+        title: createDto.title,
+        description: createDto.description,
+        deadline,
+        maxScore: createDto.maxScore || 100,
+        attachmentUrl: createDto.attachmentUrl,
+      });
+
+      this.logger.debug(`Saving assignment: ${JSON.stringify(assignment)}`);
+      const saved = await this.assignmentRepository.save(assignment);
+      this.logger.log(`Assignment created: ${saved.title} in class ${classId} by teacher ${teacher.id}`);
+      return saved;
+    } catch (error) {
+      this.logger.error(`Error creating assignment: ${error.message}`, error.stack);
+      throw error;
     }
-
-    // Validate due date is in future
-    const deadline = new Date(createDto.dueDate);
-    if (deadline <= new Date()) {
-      throw new BadRequestException('Hạn nộp phải sau thời điểm hiện tại');
-    }
-
-    const assignment = this.assignmentRepository.create({
-      classId,
-      createdBy: teacher.id,
-      title: createDto.title,
-      description: createDto.description,
-      deadline,
-      maxScore: createDto.maxScore || 100,
-      attachmentUrl: createDto.attachmentUrl,
-    });
-
-    const saved = await this.assignmentRepository.save(assignment);
-    this.logger.log(`Assignment created: ${saved.title} in class ${classId} by teacher ${teacher.id}`);
-    return saved;
   }
 
   /**
@@ -102,7 +114,8 @@ export class AssignmentsService {
     } else {
       // Only show assignments from classes user is member of
       queryBuilder
-        .innerJoin('class.members', 'member', 'member.userId = :userId', { userId: user.id });
+        .innerJoin('assignment.class', 'userClass')
+        .innerJoin('userClass.members', 'member', 'member.userId = :userId', { userId: user.id });
     }
 
     const [assignments, total] = await queryBuilder
