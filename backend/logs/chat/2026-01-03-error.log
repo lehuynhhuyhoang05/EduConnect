@@ -1,0 +1,14 @@
+[2026-01-03T03:45:44.695Z] [ERROR] [chat] [ChatModule] searchMessages failed
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "error": "Provided \"take\" value is not a number. Please provide a numeric value.",
+    "stack": "TypeORMError: Provided \"take\" value is not a number. Please provide a numeric value.\n    at SelectQueryBuilder.take (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\typeorm\\query-builder\\src\\query-builder\\SelectQueryBuilder.ts:1495:19)\n    at ChatService.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7152:18)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ChatController.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7309:19)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T03:48:04.722Z] [ERROR] [chat] [ChatModule] searchMessages failed
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "error": "Provided \"take\" value is not a number. Please provide a numeric value.",
+    "stack": "TypeORMError: Provided \"take\" value is not a number. Please provide a numeric value.\n    at SelectQueryBuilder.take (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\typeorm\\query-builder\\src\\query-builder\\SelectQueryBuilder.ts:1495:19)\n    at ChatService.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7152:18)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ChatController.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7309:30)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }

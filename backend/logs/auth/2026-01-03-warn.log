@@ -1,0 +1,29 @@
+[2026-01-03T05:32:19.608Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "charlie@bookswap.com"
+  }
+[2026-01-03T05:40:04.586Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:40:05.125Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:40:11.392Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:47:11.670Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:47:13.785Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }

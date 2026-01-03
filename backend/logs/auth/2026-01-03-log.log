@@ -1,0 +1,333 @@
+[2026-01-03T03:45:44.329Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:48:04.544Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:49:37.597Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:51:52.590Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:52:04.524Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:52:51.155Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:52:51.255Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:52:51.614Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 25,
+    "email": "chattest_703724679@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:52:51.715Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 25,
+    "email": "chattest_703724679@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:08.307Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:46.686Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:46.791Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:47.148Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 26,
+    "email": "chattest_362099034@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:47.245Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "chattest_362099034@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:54.099Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:54.202Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:54.426Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 27,
+    "email": "teacher2_567107663@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:54.535Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "teacher2_567107663@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:55.191Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 28,
+    "email": "user3_208592480@test.com",
+    "role": "STUDENT",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:55.291Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 28,
+    "email": "user3_208592480@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:54:22.789Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:55:18.242Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:56:53.206Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:01.285Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:32.500Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:51.588Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:51.690Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:51.925Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 29,
+    "email": "teacher2_1358641146@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:52.021Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 29,
+    "email": "teacher2_1358641146@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:52.714Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 30,
+    "email": "user3_848621567@test.com",
+    "role": "STUDENT",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:52.813Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 30,
+    "email": "user3_848621567@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:22.139Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:22.349Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:22.873Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 31,
+    "email": "teacher2_969307492@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:23.028Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 31,
+    "email": "teacher2_969307492@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:24.159Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 32,
+    "email": "user3_1348445546@test.com",
+    "role": "STUDENT",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:24.288Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 32,
+    "email": "user3_1348445546@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T04:01:50.977Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T04:01:51.075Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T04:01:51.430Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 33,
+    "email": "chattest_1813383557@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T04:01:51.528Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 33,
+    "email": "chattest_1813383557@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T05:41:18.936Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T05:41:19.989Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T05:42:39.243Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T05:47:27.750Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T05:51:16.681Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:06:20.946Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:09:16.973Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:12:10.398Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 3,
+    "email": "student1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:13:01.488Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:24:47.427Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:25:46.778Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 3,
+    "email": "student1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:33:15.744Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:33:56.355Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 3,
+    "email": "student1@edu.vn",
+    "ipAddress": "::1"
+  }

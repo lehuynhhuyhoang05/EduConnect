@@ -1,0 +1,1056 @@
+[2026-01-03T03:45:44.329Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:45:44.669Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "limit": null
+  }
+[2026-01-03T03:45:44.680Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16
+    ]
+  }
+[2026-01-03T03:45:44.695Z] [ERROR] [chat] [ChatModule] searchMessages failed
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "error": "Provided \"take\" value is not a number. Please provide a numeric value.",
+    "stack": "TypeORMError: Provided \"take\" value is not a number. Please provide a numeric value.\n    at SelectQueryBuilder.take (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\typeorm\\query-builder\\src\\query-builder\\SelectQueryBuilder.ts:1495:19)\n    at ChatService.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7152:18)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ChatController.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7309:19)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T03:48:04.544Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:48:04.692Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "limit": null
+  }
+[2026-01-03T03:48:04.706Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16
+    ]
+  }
+[2026-01-03T03:48:04.722Z] [ERROR] [chat] [ChatModule] searchMessages failed
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "error": "Provided \"take\" value is not a number. Please provide a numeric value.",
+    "stack": "TypeORMError: Provided \"take\" value is not a number. Please provide a numeric value.\n    at SelectQueryBuilder.take (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\typeorm\\query-builder\\src\\query-builder\\SelectQueryBuilder.ts:1495:19)\n    at ChatService.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7152:18)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ChatController.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7309:30)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T03:49:37.597Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:51:52.590Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:51:52.765Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T03:51:52.780Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16
+    ]
+  }
+[2026-01-03T03:51:52.786Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "test",
+    "messagesFound": 0
+  }
+[2026-01-03T03:51:52.889Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 9
+  }
+[2026-01-03T03:51:52.900Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 9,
+    "classCount": 10
+  }
+[2026-01-03T03:51:52.936Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 9,
+    "roomCount": 10
+  }
+[2026-01-03T03:52:04.524Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:52:04.724Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T03:52:04.736Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16
+    ]
+  }
+[2026-01-03T03:52:04.740Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "test",
+    "messagesFound": 0
+  }
+[2026-01-03T03:52:04.836Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 9
+  }
+[2026-01-03T03:52:04.848Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 9,
+    "classCount": 10
+  }
+[2026-01-03T03:52:04.886Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 9,
+    "roomCount": 10
+  }
+[2026-01-03T03:52:12.897Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T03:52:12.907Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16
+    ]
+  }
+[2026-01-03T03:52:12.912Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "test",
+    "messagesFound": 0
+  }
+[2026-01-03T03:52:51.155Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:52:51.255Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:52:51.291Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 26,
+    "name": "Chat Test Class 2009178237",
+    "classCode": "NFSEYG",
+    "teacherId": 9
+  }
+[2026-01-03T03:52:51.332Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 9
+  }
+[2026-01-03T03:52:51.342Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 9,
+    "classCount": 10
+  }
+[2026-01-03T03:52:51.377Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 9,
+    "roomCount": 10
+  }
+[2026-01-03T03:52:51.391Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 10
+  }
+[2026-01-03T03:52:51.398Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 10,
+    "classCount": 10
+  }
+[2026-01-03T03:52:51.431Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 10,
+    "roomCount": 10
+  }
+[2026-01-03T03:52:51.459Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "13",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T03:52:51.484Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "14",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T03:52:51.512Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "15",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T03:52:51.614Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 25,
+    "email": "chattest_703724679@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:52:51.715Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 25,
+    "email": "chattest_703724679@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:52:51.938Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "16",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T03:52:51.980Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "Hello",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T03:52:51.990Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      26,
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17
+    ]
+  }
+[2026-01-03T03:52:52.000Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "Hello",
+    "messagesFound": 3
+  }
+[2026-01-03T03:52:52.035Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "17",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "image"
+  }
+[2026-01-03T03:52:52.062Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "18",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "file"
+  }
+[2026-01-03T03:53:08.307Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:46.686Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:46.791Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:46.825Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 27,
+    "name": "Chat Test Class 2098927144",
+    "classCode": "Q1O7OE",
+    "teacherId": 9
+  }
+[2026-01-03T03:53:46.865Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 9
+  }
+[2026-01-03T03:53:46.875Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 9,
+    "classCount": 10
+  }
+[2026-01-03T03:53:46.912Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 9,
+    "roomCount": 10
+  }
+[2026-01-03T03:53:46.922Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 10
+  }
+[2026-01-03T03:53:46.931Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 10,
+    "classCount": 10
+  }
+[2026-01-03T03:53:46.969Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 10,
+    "roomCount": 10
+  }
+[2026-01-03T03:53:46.999Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "19",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T03:53:47.022Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "20",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T03:53:47.048Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "21",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T03:53:47.148Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 26,
+    "email": "chattest_362099034@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:47.245Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "chattest_362099034@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:47.463Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "22",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T03:53:47.518Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "Hello",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T03:53:47.529Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      27,
+      26,
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18
+    ]
+  }
+[2026-01-03T03:53:47.538Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "Hello",
+    "messagesFound": 4
+  }
+[2026-01-03T03:53:47.573Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "23",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "image"
+  }
+[2026-01-03T03:53:47.598Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "24",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "file"
+  }
+[2026-01-03T03:53:54.099Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:54.202Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:54.235Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 28,
+    "name": "Session Test Class 429479904",
+    "classCode": "LQCP0Y",
+    "teacherId": 9
+  }
+[2026-01-03T03:53:54.331Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 29,
+    "name": "Other Class",
+    "classCode": "L19JCN",
+    "teacherId": 9
+  }
+[2026-01-03T03:53:54.426Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 27,
+    "email": "teacher2_567107663@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:54.535Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "teacher2_567107663@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:54.588Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 25,
+    "roomId": "20d76936-8eac-481d-8e09-a61a91a13fb6",
+    "classId": 28,
+    "hostId": 9,
+    "title": "Auth Test Session"
+  }
+[2026-01-03T03:53:54.879Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 26,
+    "roomId": "d01e12f6-d067-4007-8752-c60b70805a50",
+    "classId": 28,
+    "hostId": 9,
+    "title": "Delete Test Session"
+  }
+[2026-01-03T03:53:54.948Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 27,
+    "roomId": "b8dac5f3-b90a-4ccc-b0fe-dddb9c36b4f6",
+    "classId": 28,
+    "hostId": 9,
+    "title": "Kick Test Session"
+  }
+[2026-01-03T03:53:55.064Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 28,
+    "roomId": "46b7ef98-8a3c-496f-ace1-bf473f90bd36",
+    "classId": 28,
+    "hostId": 9,
+    "title": "Small Capacity Session"
+  }
+[2026-01-03T03:53:55.191Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 28,
+    "email": "user3_208592480@test.com",
+    "role": "STUDENT",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:53:55.291Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 28,
+    "email": "user3_208592480@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:54:22.789Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:55:18.242Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:56:53.206Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:01.285Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:32.500Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:32.859Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 29,
+    "roomId": "7d4fabb6-b9bf-4c65-8bd9-deceb4732933",
+    "classId": 29,
+    "hostId": 9,
+    "title": "End Test Session"
+  }
+[2026-01-03T03:57:51.588Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:51.690Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:51.721Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 30,
+    "name": "Session Test Class 597444070",
+    "classCode": "6YFERM",
+    "teacherId": 9
+  }
+[2026-01-03T03:57:51.828Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 31,
+    "name": "Other Class",
+    "classCode": "9VL8UE",
+    "teacherId": 9
+  }
+[2026-01-03T03:57:51.925Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 29,
+    "email": "teacher2_1358641146@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:52.021Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 29,
+    "email": "teacher2_1358641146@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:52.061Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 30,
+    "roomId": "40a4e8f5-3a81-4c1b-9e36-880453707c35",
+    "classId": 30,
+    "hostId": 9,
+    "title": "Auth Test Session"
+  }
+[2026-01-03T03:57:52.310Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 31,
+    "roomId": "9f2dd441-c339-435d-9098-105f09467c13",
+    "classId": 30,
+    "hostId": 9,
+    "title": "Delete Test Session"
+  }
+[2026-01-03T03:57:52.389Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 32,
+    "roomId": "c029c8e4-baf7-4aec-85de-0550fe8ba6b6",
+    "classId": 30,
+    "hostId": 9,
+    "title": "Kick Test Session"
+  }
+[2026-01-03T03:57:52.551Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 33,
+    "roomId": "28c517c5-15ef-4295-8fd2-99e56b23792a",
+    "classId": 30,
+    "hostId": 9,
+    "title": "Small Capacity Session"
+  }
+[2026-01-03T03:57:52.714Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 30,
+    "email": "user3_848621567@test.com",
+    "role": "STUDENT",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:57:52.813Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 30,
+    "email": "user3_848621567@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:22.139Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:22.349Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:22.440Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 32,
+    "name": "Session Test Class 1943277327",
+    "classCode": "MJRJCA",
+    "teacherId": 9
+  }
+[2026-01-03T03:59:22.695Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 33,
+    "name": "Other Class",
+    "classCode": "244919",
+    "teacherId": 9
+  }
+[2026-01-03T03:59:22.873Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 31,
+    "email": "teacher2_969307492@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:23.028Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 31,
+    "email": "teacher2_969307492@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:23.097Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 34,
+    "roomId": "1152b4c5-2a61-4aff-a498-97c657543b6a",
+    "classId": 32,
+    "hostId": 9,
+    "title": "Auth Test Session"
+  }
+[2026-01-03T03:59:23.190Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 34,
+    "teacherId": 9
+  }
+[2026-01-03T03:59:23.202Z] [ERROR] [live-sessions] [LiveSessionsModule] endSession failed
+  Data: {
+    "sessionId": 34,
+    "teacherId": 9,
+    "error": "Phiên học chưa bắt đầu hoặc đã kết thúc",
+    "stack": "BadRequestException: Phiên học chưa bắt đầu hoặc đã kết thúc\n    at LiveSessionsService.endSession (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:5946:23)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T03:59:23.458Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 34,
+    "teacherId": 9
+  }
+[2026-01-03T03:59:23.480Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 34,
+    "roomId": "1152b4c5-2a61-4aff-a498-97c657543b6a"
+  }
+[2026-01-03T03:59:23.565Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 35,
+    "roomId": "2bafd897-fa43-447e-99ed-2910369efc6b",
+    "classId": 32,
+    "hostId": 9,
+    "title": "Delete Test Session"
+  }
+[2026-01-03T03:59:23.662Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 35,
+    "teacherId": 9
+  }
+[2026-01-03T03:59:23.751Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 36,
+    "roomId": "701a8ab6-f324-4557-88a6-2ea66ac0ba22",
+    "classId": 32,
+    "hostId": 9,
+    "title": "Kick Test Session"
+  }
+[2026-01-03T03:59:23.919Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 36,
+    "teacherId": 9
+  }
+[2026-01-03T03:59:23.926Z] [ERROR] [live-sessions] [LiveSessionsModule] endSession failed
+  Data: {
+    "sessionId": 36,
+    "teacherId": 9,
+    "error": "Phiên học chưa bắt đầu hoặc đã kết thúc",
+    "stack": "BadRequestException: Phiên học chưa bắt đầu hoặc đã kết thúc\n    at LiveSessionsService.endSession (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:5946:23)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T03:59:23.983Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 37,
+    "roomId": "512aea62-1af3-4dfd-b663-4c52b2762e3f",
+    "classId": 32,
+    "hostId": 9,
+    "title": "Small Capacity Session"
+  }
+[2026-01-03T03:59:24.159Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 32,
+    "email": "user3_1348445546@test.com",
+    "role": "STUDENT",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:24.288Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 32,
+    "email": "user3_1348445546@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T03:59:24.361Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 37,
+    "teacherId": 9
+  }
+[2026-01-03T03:59:24.368Z] [ERROR] [live-sessions] [LiveSessionsModule] endSession failed
+  Data: {
+    "sessionId": 37,
+    "teacherId": 9,
+    "error": "Phiên học chưa bắt đầu hoặc đã kết thúc",
+    "stack": "BadRequestException: Phiên học chưa bắt đầu hoặc đã kết thúc\n    at LiveSessionsService.endSession (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:5946:23)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T04:01:50.977Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 9,
+    "email": "testteacher@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T04:01:51.075Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 10,
+    "email": "teststudent@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T04:01:51.103Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 34,
+    "name": "Chat Test Class 1602419858",
+    "classCode": "ZBDXWA",
+    "teacherId": 9
+  }
+[2026-01-03T04:01:51.145Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 9
+  }
+[2026-01-03T04:01:51.157Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 9,
+    "classCount": 10
+  }
+[2026-01-03T04:01:51.201Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 9,
+    "roomCount": 10
+  }
+[2026-01-03T04:01:51.211Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 10
+  }
+[2026-01-03T04:01:51.220Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 10,
+    "classCount": 10
+  }
+[2026-01-03T04:01:51.259Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 10,
+    "roomCount": 10
+  }
+[2026-01-03T04:01:51.283Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "25",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T04:01:51.311Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "26",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T04:01:51.335Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "27",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T04:01:51.430Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 33,
+    "email": "chattest_1813383557@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-03T04:01:51.528Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 33,
+    "email": "chattest_1813383557@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-03T04:01:51.758Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "28",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T04:01:51.801Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "Hello",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T04:01:51.812Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      34,
+      33,
+      32,
+      31,
+      30,
+      29,
+      28,
+      27,
+      26,
+      25
+    ]
+  }
+[2026-01-03T04:01:51.824Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "Hello",
+    "messagesFound": 4
+  }
+[2026-01-03T04:01:51.869Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "29",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "image"
+  }
+[2026-01-03T04:01:51.895Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "30",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "file"
+  }
+[2026-01-03T05:32:19.608Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "charlie@bookswap.com"
+  }
+[2026-01-03T05:40:04.586Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:40:05.125Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:40:11.392Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:41:18.936Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T05:41:19.989Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T05:42:39.243Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T05:47:11.670Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:47:13.785Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:47:27.750Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T05:51:16.681Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:06:20.946Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:09:16.973Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:12:10.398Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 3,
+    "email": "student1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:13:01.488Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:24:47.427Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:25:46.778Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 3,
+    "email": "student1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:33:15.744Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 1,
+    "email": "teacher1@edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-03T06:33:56.355Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 3,
+    "email": "student1@edu.vn",
+    "ipAddress": "::1"
+  }

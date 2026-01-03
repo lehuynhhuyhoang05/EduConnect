@@ -15,6 +15,7 @@ import { randomBytes } from 'crypto';
 import { User } from '@modules/users/entities/user.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { RegisterDto, LoginDto } from './dto';
+import { FileLoggerService } from '@common/logger/file-logger.service';
 
 export interface JwtPayload {
   sub: number; // user id (INT)
@@ -43,6 +44,7 @@ export class AuthService {
     private readonly refreshTokenRepository: Repository<RefreshToken>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly fileLogger: FileLoggerService,
   ) {}
 
   async register(
@@ -73,6 +75,12 @@ export class AuthService {
     await this.userRepository.save(user);
 
     this.logger.log(`New user registered: ${user.email} (${user.role})`);
+    this.fileLogger.auth('log', 'User registered', {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      ipAddress: requestInfo?.ipAddress,
+    });
 
     // Generate tokens
     const tokens = await this.generateTokens(user, requestInfo);
@@ -94,12 +102,14 @@ export class AuthService {
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       this.logger.warn(`Failed login attempt for non-existent email: ${email}`);
+      this.fileLogger.auth('warn', 'Login failed - user not found', { email });
       throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
     }
 
     // Check if user is active
     if (!user.isActive) {
       this.logger.warn(`Login attempt for deactivated account: ${email}`);
+      this.fileLogger.auth('warn', 'Login failed - account deactivated', { email, userId: user.id });
       throw new ForbiddenException('Tài khoản đã bị vô hiệu hóa');
     }
 
@@ -107,6 +117,7 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
       this.logger.warn(`Failed login attempt - wrong password: ${email}`);
+      this.fileLogger.auth('warn', 'Login failed - wrong password', { email, userId: user.id });
       throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
     }
 
@@ -115,6 +126,11 @@ export class AuthService {
     await this.userRepository.save(user);
 
     this.logger.log(`User logged in: ${user.email} from ${requestInfo?.ipAddress || 'unknown'}`);
+    this.fileLogger.auth('log', 'User logged in', {
+      userId: user.id,
+      email: user.email,
+      ipAddress: requestInfo?.ipAddress,
+    });
 
     // Generate tokens
     const tokens = await this.generateTokens(user, requestInfo);

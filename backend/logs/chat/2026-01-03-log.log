@@ -1,0 +1,462 @@
+[2026-01-03T03:45:44.669Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "limit": null
+  }
+[2026-01-03T03:45:44.680Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16
+    ]
+  }
+[2026-01-03T03:48:04.692Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "limit": null
+  }
+[2026-01-03T03:48:04.706Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16
+    ]
+  }
+[2026-01-03T03:51:52.765Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T03:51:52.780Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16
+    ]
+  }
+[2026-01-03T03:51:52.786Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "test",
+    "messagesFound": 0
+  }
+[2026-01-03T03:51:52.889Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 9
+  }
+[2026-01-03T03:51:52.900Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 9,
+    "classCount": 10
+  }
+[2026-01-03T03:51:52.936Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 9,
+    "roomCount": 10
+  }
+[2026-01-03T03:52:04.724Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T03:52:04.736Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16
+    ]
+  }
+[2026-01-03T03:52:04.740Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "test",
+    "messagesFound": 0
+  }
+[2026-01-03T03:52:04.836Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 9
+  }
+[2026-01-03T03:52:04.848Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 9,
+    "classCount": 10
+  }
+[2026-01-03T03:52:04.886Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 9,
+    "roomCount": 10
+  }
+[2026-01-03T03:52:12.897Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T03:52:12.907Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16
+    ]
+  }
+[2026-01-03T03:52:12.912Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "test",
+    "messagesFound": 0
+  }
+[2026-01-03T03:52:51.332Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 9
+  }
+[2026-01-03T03:52:51.342Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 9,
+    "classCount": 10
+  }
+[2026-01-03T03:52:51.377Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 9,
+    "roomCount": 10
+  }
+[2026-01-03T03:52:51.391Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 10
+  }
+[2026-01-03T03:52:51.398Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 10,
+    "classCount": 10
+  }
+[2026-01-03T03:52:51.431Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 10,
+    "roomCount": 10
+  }
+[2026-01-03T03:52:51.459Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "13",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T03:52:51.484Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "14",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T03:52:51.512Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "15",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T03:52:51.938Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "16",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T03:52:51.980Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "Hello",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T03:52:51.990Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      26,
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17
+    ]
+  }
+[2026-01-03T03:52:52.000Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "Hello",
+    "messagesFound": 3
+  }
+[2026-01-03T03:52:52.035Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "17",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "image"
+  }
+[2026-01-03T03:52:52.062Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "18",
+    "roomId": "26",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "file"
+  }
+[2026-01-03T03:53:46.865Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 9
+  }
+[2026-01-03T03:53:46.875Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 9,
+    "classCount": 10
+  }
+[2026-01-03T03:53:46.912Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 9,
+    "roomCount": 10
+  }
+[2026-01-03T03:53:46.922Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 10
+  }
+[2026-01-03T03:53:46.931Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 10,
+    "classCount": 10
+  }
+[2026-01-03T03:53:46.969Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 10,
+    "roomCount": 10
+  }
+[2026-01-03T03:53:46.999Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "19",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T03:53:47.022Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "20",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T03:53:47.048Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "21",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T03:53:47.463Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "22",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T03:53:47.518Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "Hello",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T03:53:47.529Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      27,
+      26,
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18
+    ]
+  }
+[2026-01-03T03:53:47.538Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "Hello",
+    "messagesFound": 4
+  }
+[2026-01-03T03:53:47.573Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "23",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "image"
+  }
+[2026-01-03T03:53:47.598Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "24",
+    "roomId": "27",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "file"
+  }
+[2026-01-03T04:01:51.145Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 9
+  }
+[2026-01-03T04:01:51.157Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 9,
+    "classCount": 10
+  }
+[2026-01-03T04:01:51.201Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 9,
+    "roomCount": 10
+  }
+[2026-01-03T04:01:51.211Z] [LOG] [chat] [ChatModule] getChatRooms called
+  Data: {
+    "userId": 10
+  }
+[2026-01-03T04:01:51.220Z] [LOG] [chat] [ChatModule] Classes fetched for rooms
+  Data: {
+    "userId": 10,
+    "classCount": 10
+  }
+[2026-01-03T04:01:51.259Z] [LOG] [chat] [ChatModule] Chat rooms built
+  Data: {
+    "userId": 10,
+    "roomCount": 10
+  }
+[2026-01-03T04:01:51.283Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "25",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T04:01:51.311Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "26",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T04:01:51.335Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "27",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "text"
+  }
+[2026-01-03T04:01:51.758Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "28",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 10,
+    "messageType": "text"
+  }
+[2026-01-03T04:01:51.801Z] [LOG] [chat] [ChatModule] searchMessages called
+  Data: {
+    "searchQuery": "Hello",
+    "userId": 9,
+    "limit": 50
+  }
+[2026-01-03T04:01:51.812Z] [LOG] [chat] [ChatModule] Classes found for search
+  Data: {
+    "count": 10,
+    "classIds": [
+      34,
+      33,
+      32,
+      31,
+      30,
+      29,
+      28,
+      27,
+      26,
+      25
+    ]
+  }
+[2026-01-03T04:01:51.824Z] [LOG] [chat] [ChatModule] Search results
+  Data: {
+    "query": "Hello",
+    "messagesFound": 4
+  }
+[2026-01-03T04:01:51.869Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "29",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "image"
+  }
+[2026-01-03T04:01:51.895Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "30",
+    "roomId": "34",
+    "roomType": "class",
+    "senderId": 9,
+    "messageType": "file"
+  }

@@ -12,6 +12,7 @@ import { randomBytes } from 'crypto';
 import { Class, ClassMember, ClassRole } from './entities';
 import { CreateClassDto, UpdateClassDto, JoinClassDto, QueryClassDto } from './dto';
 import { User, UserRole } from '@modules/users/entities/user.entity';
+import { FileLoggerService } from '@common/logger/file-logger.service';
 
 @Injectable()
 export class ClassesService {
@@ -23,6 +24,7 @@ export class ClassesService {
     @InjectRepository(ClassMember)
     private readonly memberRepository: Repository<ClassMember>,
     private readonly dataSource: DataSource,
+    private readonly fileLogger: FileLoggerService,
   ) {}
 
   /**
@@ -102,6 +104,12 @@ export class ClassesService {
       await manager.save(ClassMember, teacherMember);
 
       this.logger.log(`Class created: ${savedClass.name} (${savedClass.classCode}) by teacher ${teacher.id}`);
+      this.fileLogger.classes('log', 'Class created', {
+        classId: savedClass.id,
+        name: savedClass.name,
+        classCode: savedClass.classCode,
+        teacherId: teacher.id,
+      });
       return savedClass;
     });
   }

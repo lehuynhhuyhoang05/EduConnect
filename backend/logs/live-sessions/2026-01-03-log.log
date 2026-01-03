@@ -1,0 +1,134 @@
+[2026-01-03T03:53:54.588Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 25,
+    "roomId": "20d76936-8eac-481d-8e09-a61a91a13fb6",
+    "classId": 28,
+    "hostId": 9,
+    "title": "Auth Test Session"
+  }
+[2026-01-03T03:53:54.879Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 26,
+    "roomId": "d01e12f6-d067-4007-8752-c60b70805a50",
+    "classId": 28,
+    "hostId": 9,
+    "title": "Delete Test Session"
+  }
+[2026-01-03T03:53:54.948Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 27,
+    "roomId": "b8dac5f3-b90a-4ccc-b0fe-dddb9c36b4f6",
+    "classId": 28,
+    "hostId": 9,
+    "title": "Kick Test Session"
+  }
+[2026-01-03T03:53:55.064Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 28,
+    "roomId": "46b7ef98-8a3c-496f-ace1-bf473f90bd36",
+    "classId": 28,
+    "hostId": 9,
+    "title": "Small Capacity Session"
+  }
+[2026-01-03T03:57:32.859Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 29,
+    "roomId": "7d4fabb6-b9bf-4c65-8bd9-deceb4732933",
+    "classId": 29,
+    "hostId": 9,
+    "title": "End Test Session"
+  }
+[2026-01-03T03:57:52.061Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 30,
+    "roomId": "40a4e8f5-3a81-4c1b-9e36-880453707c35",
+    "classId": 30,
+    "hostId": 9,
+    "title": "Auth Test Session"
+  }
+[2026-01-03T03:57:52.310Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 31,
+    "roomId": "9f2dd441-c339-435d-9098-105f09467c13",
+    "classId": 30,
+    "hostId": 9,
+    "title": "Delete Test Session"
+  }
+[2026-01-03T03:57:52.389Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 32,
+    "roomId": "c029c8e4-baf7-4aec-85de-0550fe8ba6b6",
+    "classId": 30,
+    "hostId": 9,
+    "title": "Kick Test Session"
+  }
+[2026-01-03T03:57:52.551Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 33,
+    "roomId": "28c517c5-15ef-4295-8fd2-99e56b23792a",
+    "classId": 30,
+    "hostId": 9,
+    "title": "Small Capacity Session"
+  }
+[2026-01-03T03:59:23.097Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 34,
+    "roomId": "1152b4c5-2a61-4aff-a498-97c657543b6a",
+    "classId": 32,
+    "hostId": 9,
+    "title": "Auth Test Session"
+  }
+[2026-01-03T03:59:23.190Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 34,
+    "teacherId": 9
+  }
+[2026-01-03T03:59:23.458Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 34,
+    "teacherId": 9
+  }
+[2026-01-03T03:59:23.480Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 34,
+    "roomId": "1152b4c5-2a61-4aff-a498-97c657543b6a"
+  }
+[2026-01-03T03:59:23.565Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 35,
+    "roomId": "2bafd897-fa43-447e-99ed-2910369efc6b",
+    "classId": 32,
+    "hostId": 9,
+    "title": "Delete Test Session"
+  }
+[2026-01-03T03:59:23.662Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 35,
+    "teacherId": 9
+  }
+[2026-01-03T03:59:23.751Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 36,
+    "roomId": "701a8ab6-f324-4557-88a6-2ea66ac0ba22",
+    "classId": 32,
+    "hostId": 9,
+    "title": "Kick Test Session"
+  }
+[2026-01-03T03:59:23.919Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 36,
+    "teacherId": 9
+  }
+[2026-01-03T03:59:23.983Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 37,
+    "roomId": "512aea62-1af3-4dfd-b663-4c52b2762e3f",
+    "classId": 32,
+    "hostId": 9,
+    "title": "Small Capacity Session"
+  }
+[2026-01-03T03:59:24.361Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 37,
+    "teacherId": 9
+  }

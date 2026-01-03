@@ -8,6 +8,9 @@ import { File } from '@modules/files/entities';
 import { Assignment } from '@modules/assignments/entities/assignment.entity';
 import { Submission } from '@modules/assignments/entities/submission.entity';
 import { LiveSession, LiveSessionParticipant } from '@modules/live-sessions/entities';
+import { ChatMessage } from '@modules/chat/entities/chat-message.entity';
+import { WhiteboardStroke } from '@modules/whiteboard/entities';
+import { Notification } from '@modules/notifications/entities';
 
 dotenv.config();
 
@@ -22,6 +25,9 @@ const entities = [
   Submission,
   LiveSession,
   LiveSessionParticipant,
+  ChatMessage,
+  WhiteboardStroke,
+  Notification,
 ];
 
 export const typeOrmConfig = (): TypeOrmModuleOptions => ({

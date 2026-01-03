@@ -1,0 +1,64 @@
+[2026-01-03T03:45:44.695Z] [ERROR] [chat] [ChatModule] searchMessages failed
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "error": "Provided \"take\" value is not a number. Please provide a numeric value.",
+    "stack": "TypeORMError: Provided \"take\" value is not a number. Please provide a numeric value.\n    at SelectQueryBuilder.take (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\typeorm\\query-builder\\src\\query-builder\\SelectQueryBuilder.ts:1495:19)\n    at ChatService.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7152:18)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ChatController.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7309:19)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T03:48:04.722Z] [ERROR] [chat] [ChatModule] searchMessages failed
+  Data: {
+    "searchQuery": "test",
+    "userId": 9,
+    "error": "Provided \"take\" value is not a number. Please provide a numeric value.",
+    "stack": "TypeORMError: Provided \"take\" value is not a number. Please provide a numeric value.\n    at SelectQueryBuilder.take (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\typeorm\\query-builder\\src\\query-builder\\SelectQueryBuilder.ts:1495:19)\n    at ChatService.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7152:18)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ChatController.searchMessages (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:7309:30)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T03:59:23.202Z] [ERROR] [live-sessions] [LiveSessionsModule] endSession failed
+  Data: {
+    "sessionId": 34,
+    "teacherId": 9,
+    "error": "Phiên học chưa bắt đầu hoặc đã kết thúc",
+    "stack": "BadRequestException: Phiên học chưa bắt đầu hoặc đã kết thúc\n    at LiveSessionsService.endSession (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:5946:23)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T03:59:23.926Z] [ERROR] [live-sessions] [LiveSessionsModule] endSession failed
+  Data: {
+    "sessionId": 36,
+    "teacherId": 9,
+    "error": "Phiên học chưa bắt đầu hoặc đã kết thúc",
+    "stack": "BadRequestException: Phiên học chưa bắt đầu hoặc đã kết thúc\n    at LiveSessionsService.endSession (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:5946:23)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T03:59:24.368Z] [ERROR] [live-sessions] [LiveSessionsModule] endSession failed
+  Data: {
+    "sessionId": 37,
+    "teacherId": 9,
+    "error": "Phiên học chưa bắt đầu hoặc đã kết thúc",
+    "stack": "BadRequestException: Phiên học chưa bắt đầu hoặc đã kết thúc\n    at LiveSessionsService.endSession (C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\dist\\main.js:5946:23)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Study\\LTM\\Nhom14-Nền tảng học trực tuyến tương tác tích hợp LMS\\backend\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+  }
+[2026-01-03T05:32:19.608Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "charlie@bookswap.com"
+  }
+[2026-01-03T05:40:04.586Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:40:05.125Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:40:11.392Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:47:11.670Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
+[2026-01-03T05:47:13.785Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "teacher1@edu.vn",
+    "userId": 1
+  }
