@@ -1,8 +1,23 @@
 import { useState } from 'react'
 import './App.css'
+import LiveSessionDemo from './pages/LiveSessionDemo'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [showDemo, setShowDemo] = useState(false)
+
+  if (showDemo) {
+    return (
+      <div>
+        <button
+          onClick={() => setShowDemo(false)}
+          className="fixed top-4 left-4 z-50 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+        >
+          ← Về trang chính
+        </button>
+        <LiveSessionDemo />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -21,10 +36,10 @@ function App() {
           
           <div className="space-y-4">
             <button
-              onClick={() => setCount((count) => count + 1)}
-              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200"
+              onClick={() => setShowDemo(true)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200"
             >
-              Count is {count}
+              🎓 Demo Live Session
             </button>
             
             <div className="text-left text-sm text-gray-600 space-y-2">
