@@ -4,19 +4,40 @@ import { JwtModule } from '@nestjs/jwt';
 import { LiveSessionsController } from './live-sessions.controller';
 import { LiveSessionsService } from './live-sessions.service';
 import { LiveSessionsGateway } from './live-sessions.gateway';
+import { NetworkDiagnosticsService } from './network-diagnostics.service';
+import { BreakoutRoomsService } from './breakout-rooms.service';
+import { RealTimePollsService } from './realtime-polls.service';
+import { SessionAnalyticsService } from './session-analytics.service';
 import { LiveSession, LiveSessionParticipant } from './entities';
 import { ClassesModule } from '@modules/classes/classes.module';
+import { User } from '@modules/users/entities/user.entity';
+import { LoggerModule } from '@common/logger/logger.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([LiveSession, LiveSessionParticipant]),
+    TypeOrmModule.forFeature([LiveSession, LiveSessionParticipant, User]),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'your-secret-key',
     }),
     ClassesModule,
+    LoggerModule,
   ],
   controllers: [LiveSessionsController],
-  providers: [LiveSessionsService, LiveSessionsGateway],
-  exports: [LiveSessionsService, LiveSessionsGateway],
+  providers: [
+    LiveSessionsService, 
+    LiveSessionsGateway, 
+    NetworkDiagnosticsService,
+    BreakoutRoomsService,
+    RealTimePollsService,
+    SessionAnalyticsService,
+  ],
+  exports: [
+    LiveSessionsService, 
+    LiveSessionsGateway, 
+    NetworkDiagnosticsService,
+    BreakoutRoomsService,
+    RealTimePollsService,
+    SessionAnalyticsService,
+  ],
 })
 export class LiveSessionsModule {}

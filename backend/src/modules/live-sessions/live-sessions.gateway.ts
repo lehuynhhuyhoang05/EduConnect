@@ -10,9 +10,13 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger, UseGuards, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { LiveSessionsService } from './live-sessions.service';
 import { ConnectionQuality } from './entities';
+import { User } from '@modules/users/entities/user.entity';
+import { FileLoggerService } from '@common/logger/file-logger.service';
 
 interface AuthenticatedSocket extends Socket {
   userId?: number;
@@ -20,9 +24,12 @@ interface AuthenticatedSocket extends Socket {
 }
 
 interface SignalingMessage {
+  roomId: string;
   targetUserId: number;
   type: 'offer' | 'answer' | 'ice-candidate';
-  payload: any;
+  sdp?: any;
+  candidate?: any;
+  payload?: any; // Generic payload for signal forwarding
 }
 
 interface MediaStateMessage {
@@ -30,6 +37,18 @@ interface MediaStateMessage {
   audio: boolean;
   video: boolean;
   screen?: boolean;
+}
+
+interface WaitingUser {
+  userId: number;
+  socketId: string;
+  userName?: string;
+  requestedAt: Date;
+}
+
+interface HandRaiseInfo {
+  userId: number;
+  raisedAt: Date;
 }
 
 @WebSocketGateway({
@@ -54,10 +73,19 @@ export class LiveSessionsGateway
   private socketUserMap = new Map<string, number>();
   // Map roomId -> Set of userIds
   private roomParticipants = new Map<string, Set<number>>();
+  // Map roomId -> waiting room users
+  private waitingRoom = new Map<string, WaitingUser[]>();
+  // Map roomId -> rooms that have waiting room enabled
+  private waitingRoomEnabled = new Map<string, boolean>();
+  // Map roomId -> users with raised hands
+  private raisedHands = new Map<string, HandRaiseInfo[]>();
 
   constructor(
     private readonly jwtService: JwtService,
     private readonly liveSessionsService: LiveSessionsService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly fileLogger: FileLoggerService,
   ) {}
 
   afterInit(server: Server) {
@@ -102,6 +130,31 @@ export class LiveSessionsGateway
       this.userSocketMap.delete(userId);
       this.socketUserMap.delete(client.id);
 
+      // Remove from waiting room if present
+      if (client.roomId) {
+        const waitingUsers = this.waitingRoom.get(client.roomId);
+        if (waitingUsers) {
+          const index = waitingUsers.findIndex(u => u.userId === userId);
+          if (index > -1) {
+            waitingUsers.splice(index, 1);
+          }
+        }
+
+        // Remove raised hand if present
+        const raisedHands = this.raisedHands.get(client.roomId);
+        if (raisedHands) {
+          const handIndex = raisedHands.findIndex(h => h.userId === userId);
+          if (handIndex > -1) {
+            raisedHands.splice(handIndex, 1);
+            // Notify room about lowered hand
+            this.server.to(client.roomId).emit('hand-lowered', {
+              userId,
+              timestamp: new Date().toISOString(),
+            });
+          }
+        }
+      }
+
       // Leave all rooms and notify participants
       if (client.roomId) {
         const roomParticipants = this.roomParticipants.get(client.roomId);
@@ -126,9 +179,9 @@ export class LiveSessionsGateway
   @SubscribeMessage('join-room')
   async handleJoinRoom(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { roomId: string; sessionId: number },
+    @MessageBody() data: { roomId: string; sessionId: number; userName?: string },
   ) {
-    const { roomId, sessionId } = data;
+    const { roomId, sessionId, userName } = data;
     const userId = client.userId;
 
     if (!userId) {
@@ -136,6 +189,49 @@ export class LiveSessionsGateway
     }
 
     try {
+      // Check if waiting room is enabled and user is not host
+      const session = await this.liveSessionsService.findById(sessionId);
+      const isHost = session && session.hostId === userId;
+      
+      if (this.waitingRoomEnabled.get(roomId) && !isHost) {
+        // Add to waiting room
+        if (!this.waitingRoom.has(roomId)) {
+          this.waitingRoom.set(roomId, []);
+        }
+        
+        const waitingUsers = this.waitingRoom.get(roomId);
+        const alreadyWaiting = waitingUsers.some(u => u.userId === userId);
+        
+        if (!alreadyWaiting) {
+          waitingUsers.push({
+            userId,
+            socketId: client.id,
+            userName,
+            requestedAt: new Date(),
+          });
+          
+          // Notify host about new waiting user
+          const hostSocketId = this.userSocketMap.get(session.hostId);
+          if (hostSocketId) {
+            this.server.to(hostSocketId).emit('user-waiting', {
+              userId,
+              userName,
+              socketId: client.id,
+              roomId,
+              timestamp: new Date().toISOString(),
+            });
+          }
+          
+          this.logger.log(`User ${userId} added to waiting room for ${roomId}`);
+        }
+        
+        return {
+          success: true,
+          waiting: true,
+          message: 'Đang chờ host chấp nhận',
+        };
+      }
+
       // Join the socket room
       await client.join(roomId);
       client.roomId = roomId;
@@ -247,6 +343,7 @@ export class LiveSessionsGateway
     @MessageBody() data: { targetUserId: number; sdp: RTCSessionDescriptionInit },
   ) {
     return this.handleSignal(client, {
+      roomId: client.roomId || '',
       targetUserId: data.targetUserId,
       type: 'offer',
       payload: data.sdp,
@@ -259,6 +356,7 @@ export class LiveSessionsGateway
     @MessageBody() data: { targetUserId: number; sdp: RTCSessionDescriptionInit },
   ) {
     return this.handleSignal(client, {
+      roomId: client.roomId || '',
       targetUserId: data.targetUserId,
       type: 'answer',
       payload: data.sdp,
@@ -271,6 +369,7 @@ export class LiveSessionsGateway
     @MessageBody() data: { targetUserId: number; candidate: RTCIceCandidate },
   ) {
     return this.handleSignal(client, {
+      roomId: client.roomId || '',
       targetUserId: data.targetUserId,
       type: 'ice-candidate',
       payload: data.candidate,
@@ -291,16 +390,28 @@ export class LiveSessionsGateway
       return { success: false, error: 'Invalid state' };
     }
 
-    // Broadcast media state to all in room
-    client.to(roomId).emit('media-state-changed', {
+    // Get user info
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    // Broadcast media state to all in room (including sender for confirmation)
+    const payload = {
       userId,
+      userName: user?.fullName || `User ${userId}`,
       audio,
       video,
       screen,
       timestamp: new Date().toISOString(),
-    });
+    };
 
-    return { success: true };
+    // Broadcast to others
+    client.to(roomId).emit('media-state-updated', payload);
+    
+    // Also emit back to sender for confirmation
+    client.emit('media-state-updated', payload);
+
+    this.logger.log(`[MEDIA] User ${userId} (${user?.fullName}): Mic=${audio}, Cam=${video}, Screen=${screen} in room ${roomId}`);
+
+    return { success: true, state: payload };
   }
 
   @SubscribeMessage('screen-share-start')
@@ -309,14 +420,24 @@ export class LiveSessionsGateway
     @MessageBody() data: { roomId: string },
   ) {
     const userId = client.userId;
+    const user = await this.userRepository.findOne({ where: { id: userId } });
     
-    client.to(data.roomId).emit('screen-share-started', {
+    const payload = {
       userId,
+      userName: user?.fullName || `User ${userId}`,
       timestamp: new Date().toISOString(),
+    };
+
+    client.to(data.roomId).emit('screen-share-started', payload);
+
+    this.logger.log(`[SCREEN SHARE] User ${userId} (${user?.fullName}) STARTED screen sharing in room ${data.roomId}`);
+    this.fileLogger.liveSessions('log', 'Screen share started', {
+      userId,
+      userName: user?.fullName,
+      roomId: data.roomId,
     });
 
-    this.logger.log(`User ${userId} started screen sharing in room ${data.roomId}`);
-    return { success: true };
+    return { success: true, message: 'Screen share started' };
   }
 
   @SubscribeMessage('screen-share-stop')
@@ -325,14 +446,24 @@ export class LiveSessionsGateway
     @MessageBody() data: { roomId: string },
   ) {
     const userId = client.userId;
+    const user = await this.userRepository.findOne({ where: { id: userId } });
     
-    client.to(data.roomId).emit('screen-share-stopped', {
+    const payload = {
       userId,
+      userName: user?.fullName || `User ${userId}`,
       timestamp: new Date().toISOString(),
+    };
+
+    client.to(data.roomId).emit('screen-share-stopped', payload);
+
+    this.logger.log(`[SCREEN SHARE] User ${userId} (${user?.fullName}) STOPPED screen sharing in room ${data.roomId}`);
+    this.fileLogger.liveSessions('log', 'Screen share stopped', {
+      userId,
+      userName: user?.fullName,
+      roomId: data.roomId,
     });
 
-    this.logger.log(`User ${userId} stopped screen sharing in room ${data.roomId}`);
-    return { success: true };
+    return { success: true, message: 'Screen share stopped' };
   }
 
   // ===================== HOST CONTROLS =====================
@@ -410,8 +541,400 @@ export class LiveSessionsGateway
 
     // Clean up room
     this.roomParticipants.delete(data.roomId);
+    this.waitingRoom.delete(data.roomId);
+    this.waitingRoomEnabled.delete(data.roomId);
+    this.raisedHands.delete(data.roomId);
 
     this.logger.log(`Session ${data.sessionId} ended by host ${hostId}`);
+
+    return { success: true };
+  }
+
+  // ===================== HAND RAISE =====================
+
+  @SubscribeMessage('raise-hand')
+  async handleRaiseHand(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string },
+  ) {
+    const userId = client.userId;
+    const { roomId } = data;
+
+    if (!userId || !roomId) {
+      return { success: false, error: 'Invalid request' };
+    }
+
+    // Initialize raised hands for room if not exists
+    if (!this.raisedHands.has(roomId)) {
+      this.raisedHands.set(roomId, []);
+    }
+
+    const hands = this.raisedHands.get(roomId);
+    const alreadyRaised = hands.some(h => h.userId === userId);
+
+    if (!alreadyRaised) {
+      hands.push({
+        userId,
+        raisedAt: new Date(),
+      });
+
+      // Broadcast to room
+      this.server.to(roomId).emit('hand-raised', {
+        userId,
+        timestamp: new Date().toISOString(),
+        order: hands.length, // Position in queue
+      });
+
+      this.logger.log(`User ${userId} raised hand in room ${roomId}`);
+    }
+
+    return { success: true, order: hands.length };
+  }
+
+  @SubscribeMessage('lower-hand')
+  async handleLowerHand(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string; targetUserId?: number },
+  ) {
+    const userId = client.userId;
+    const { roomId, targetUserId } = data;
+    const targetId = targetUserId || userId; // Host can lower others' hands
+
+    if (!roomId) {
+      return { success: false, error: 'Invalid request' };
+    }
+
+    const hands = this.raisedHands.get(roomId);
+    if (hands) {
+      const index = hands.findIndex(h => h.userId === targetId);
+      if (index > -1) {
+        hands.splice(index, 1);
+
+        // Broadcast to room
+        this.server.to(roomId).emit('hand-lowered', {
+          userId: targetId,
+          byUserId: userId,
+          timestamp: new Date().toISOString(),
+        });
+
+        this.logger.log(`Hand lowered for user ${targetId} in room ${roomId}`);
+      }
+    }
+
+    return { success: true };
+  }
+
+  @SubscribeMessage('get-raised-hands')
+  async handleGetRaisedHands(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string },
+  ) {
+    const hands = this.raisedHands.get(data.roomId) || [];
+    return { 
+      success: true, 
+      hands: hands.map((h, index) => ({
+        userId: h.userId,
+        raisedAt: h.raisedAt.toISOString(),
+        order: index + 1,
+      })),
+    };
+  }
+
+  // ===================== MUTE ALL =====================
+
+  @SubscribeMessage('mute-all')
+  async handleMuteAll(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string; mute: boolean; exceptHost?: boolean },
+  ) {
+    const hostId = client.userId;
+    const { roomId, mute, exceptHost = true } = data;
+
+    // Get all participants in room
+    const participants = this.roomParticipants.get(roomId);
+    if (!participants) {
+      return { success: false, error: 'Room not found' };
+    }
+
+    // Notify each participant
+    for (const participantId of participants) {
+      // Skip host if exceptHost is true
+      if (exceptHost && participantId === hostId) continue;
+
+      const socketId = this.userSocketMap.get(participantId);
+      if (socketId) {
+        this.server.to(socketId).emit('force-mute', {
+          fromHostId: hostId,
+          mute,
+          isGlobal: true,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
+
+    // Broadcast to room that mute all was triggered
+    this.server.to(roomId).emit('mute-all-triggered', {
+      byHostId: hostId,
+      mute,
+      exceptHost,
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logger.log(`Host ${hostId} ${mute ? 'muted' : 'unmuted'} all in room ${roomId}`);
+
+    return { success: true, affectedCount: exceptHost ? participants.size - 1 : participants.size };
+  }
+
+  // ===================== DISABLE CAMERA =====================
+
+  @SubscribeMessage('disable-camera')
+  async handleDisableCamera(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string; targetUserId: number; disable: boolean },
+  ) {
+    const hostId = client.userId;
+    const { roomId, targetUserId, disable } = data;
+
+    const targetSocketId = this.userSocketMap.get(targetUserId);
+
+    if (targetSocketId) {
+      // Notify the target user to disable camera
+      this.server.to(targetSocketId).emit('force-disable-camera', {
+        fromHostId: hostId,
+        disable,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Notify room about camera state change
+      this.server.to(roomId).emit('participant-camera-disabled', {
+        userId: targetUserId,
+        byHostId: hostId,
+        disabled: disable,
+        timestamp: new Date().toISOString(),
+      });
+
+      this.logger.log(`Host ${hostId} ${disable ? 'disabled' : 'enabled'} camera for user ${targetUserId}`);
+    }
+
+    return { success: true };
+  }
+
+  @SubscribeMessage('disable-all-cameras')
+  async handleDisableAllCameras(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string; disable: boolean; exceptHost?: boolean },
+  ) {
+    const hostId = client.userId;
+    const { roomId, disable, exceptHost = true } = data;
+
+    const participants = this.roomParticipants.get(roomId);
+    if (!participants) {
+      return { success: false, error: 'Room not found' };
+    }
+
+    for (const participantId of participants) {
+      if (exceptHost && participantId === hostId) continue;
+
+      const socketId = this.userSocketMap.get(participantId);
+      if (socketId) {
+        this.server.to(socketId).emit('force-disable-camera', {
+          fromHostId: hostId,
+          disable,
+          isGlobal: true,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
+
+    this.server.to(roomId).emit('disable-all-cameras-triggered', {
+      byHostId: hostId,
+      disabled: disable,
+      exceptHost,
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logger.log(`Host ${hostId} ${disable ? 'disabled' : 'enabled'} all cameras in room ${roomId}`);
+
+    return { success: true };
+  }
+
+  // ===================== WAITING ROOM =====================
+
+  @SubscribeMessage('enable-waiting-room')
+  async handleEnableWaitingRoom(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string; enabled: boolean },
+  ) {
+    const hostId = client.userId;
+    const { roomId, enabled } = data;
+
+    this.waitingRoomEnabled.set(roomId, enabled);
+
+    // Notify room about waiting room status
+    this.server.to(roomId).emit('waiting-room-status', {
+      enabled,
+      byHostId: hostId,
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logger.log(`Host ${hostId} ${enabled ? 'enabled' : 'disabled'} waiting room for ${roomId}`);
+
+    // If disabled, admit all waiting users
+    if (!enabled) {
+      const waitingUsers = this.waitingRoom.get(roomId) || [];
+      for (const user of waitingUsers) {
+        await this.admitUserFromWaitingRoom(roomId, user.userId, hostId);
+      }
+      this.waitingRoom.set(roomId, []);
+    }
+
+    return { success: true };
+  }
+
+  @SubscribeMessage('get-waiting-users')
+  async handleGetWaitingUsers(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string },
+  ) {
+    const waitingUsers = this.waitingRoom.get(data.roomId) || [];
+    return {
+      success: true,
+      users: waitingUsers.map(u => ({
+        userId: u.userId,
+        userName: u.userName,
+        socketId: u.socketId,
+        requestedAt: u.requestedAt.toISOString(),
+      })),
+    };
+  }
+
+  @SubscribeMessage('admit-user')
+  async handleAdmitUser(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string; targetUserId: number },
+  ) {
+    const hostId = client.userId;
+    const { roomId, targetUserId } = data;
+
+    const result = await this.admitUserFromWaitingRoom(roomId, targetUserId, hostId);
+    return result;
+  }
+
+  @SubscribeMessage('admit-all-users')
+  async handleAdmitAllUsers(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string },
+  ) {
+    const hostId = client.userId;
+    const { roomId } = data;
+
+    const waitingUsers = this.waitingRoom.get(roomId) || [];
+    let admittedCount = 0;
+
+    for (const user of waitingUsers) {
+      const result = await this.admitUserFromWaitingRoom(roomId, user.userId, hostId);
+      if (result.success) admittedCount++;
+    }
+
+    this.waitingRoom.set(roomId, []);
+
+    return { success: true, admittedCount };
+  }
+
+  @SubscribeMessage('deny-user')
+  async handleDenyUser(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string; targetUserId: number; reason?: string },
+  ) {
+    const hostId = client.userId;
+    const { roomId, targetUserId, reason } = data;
+
+    const waitingUsers = this.waitingRoom.get(roomId);
+    if (!waitingUsers) {
+      return { success: false, error: 'No waiting room found' };
+    }
+
+    const userIndex = waitingUsers.findIndex(u => u.userId === targetUserId);
+    if (userIndex === -1) {
+      return { success: false, error: 'User not in waiting room' };
+    }
+
+    const deniedUser = waitingUsers[userIndex];
+    waitingUsers.splice(userIndex, 1);
+
+    // Notify the denied user
+    if (deniedUser.socketId) {
+      this.server.to(deniedUser.socketId).emit('admission-denied', {
+        byHostId: hostId,
+        reason: reason || 'Host đã từ chối yêu cầu tham gia',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    this.logger.log(`Host ${hostId} denied user ${targetUserId} from room ${roomId}`);
+
+    return { success: true };
+  }
+
+  private async admitUserFromWaitingRoom(roomId: string, userId: number, hostId: number) {
+    const waitingUsers = this.waitingRoom.get(roomId);
+    if (!waitingUsers) {
+      return { success: false, error: 'No waiting room found' };
+    }
+
+    const userIndex = waitingUsers.findIndex(u => u.userId === userId);
+    if (userIndex === -1) {
+      return { success: false, error: 'User not in waiting room' };
+    }
+
+    const admittedUser = waitingUsers[userIndex];
+    waitingUsers.splice(userIndex, 1);
+
+    // Get the user's socket and admit them to the room
+    const userSocket = this.server.sockets.sockets.get(admittedUser.socketId) as AuthenticatedSocket;
+    if (userSocket) {
+      await userSocket.join(roomId);
+      userSocket.roomId = roomId;
+
+      // Track participant
+      if (!this.roomParticipants.has(roomId)) {
+        this.roomParticipants.set(roomId, new Set());
+      }
+      this.roomParticipants.get(roomId).add(userId);
+
+      // Notify the admitted user
+      userSocket.emit('admission-granted', {
+        byHostId: hostId,
+        roomId,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Get existing participants
+      const existingParticipants = Array.from(this.roomParticipants.get(roomId))
+        .filter(id => id !== userId)
+        .map(id => ({
+          userId: id,
+          socketId: this.userSocketMap.get(id),
+        }));
+
+      // Send participants list to admitted user
+      userSocket.emit('room-joined', {
+        roomId,
+        participants: existingParticipants,
+      });
+
+      // Notify others in room
+      this.server.to(roomId).emit('user-joined', {
+        userId,
+        userName: admittedUser.userName,
+        socketId: admittedUser.socketId,
+        roomId,
+        fromWaitingRoom: true,
+        timestamp: new Date().toISOString(),
+      });
+
+      this.logger.log(`Host ${hostId} admitted user ${userId} to room ${roomId}`);
+    }
 
     return { success: true };
   }
@@ -459,6 +982,97 @@ export class LiveSessionsGateway
       timestamp: new Date().toISOString(),
     });
 
+    return { success: true };
+  }
+
+  // ===================== WEBRTC SIGNALING =====================
+
+  @SubscribeMessage('webrtc-offer')
+  async handleWebRTCOffer(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: SignalingMessage,
+  ) {
+    const fromUserId = client.userId;
+    const { roomId, targetUserId, sdp } = data;
+
+    if (!fromUserId || !roomId || !targetUserId || !sdp) {
+      return { success: false, error: 'Invalid offer data' };
+    }
+
+    const targetSocketId = this.userSocketMap.get(targetUserId);
+    if (!targetSocketId) {
+      this.logger.warn(`Target user ${targetUserId} not found for WebRTC offer`);
+      return { success: false, error: 'Target user not connected' };
+    }
+
+    // Forward offer to target user
+    this.server.to(targetSocketId).emit('webrtc-offer', {
+      fromUserId,
+      roomId,
+      sdp,
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logger.log(`[WEBRTC] User ${fromUserId} sent offer to user ${targetUserId} in room ${roomId}`);
+    return { success: true };
+  }
+
+  @SubscribeMessage('webrtc-answer')
+  async handleWebRTCAnswer(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: SignalingMessage,
+  ) {
+    const fromUserId = client.userId;
+    const { roomId, targetUserId, sdp } = data;
+
+    if (!fromUserId || !roomId || !targetUserId || !sdp) {
+      return { success: false, error: 'Invalid answer data' };
+    }
+
+    const targetSocketId = this.userSocketMap.get(targetUserId);
+    if (!targetSocketId) {
+      this.logger.warn(`Target user ${targetUserId} not found for WebRTC answer`);
+      return { success: false, error: 'Target user not connected' };
+    }
+
+    // Forward answer to target user
+    this.server.to(targetSocketId).emit('webrtc-answer', {
+      fromUserId,
+      roomId,
+      sdp,
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logger.log(`[WEBRTC] User ${fromUserId} sent answer to user ${targetUserId} in room ${roomId}`);
+    return { success: true };
+  }
+
+  @SubscribeMessage('webrtc-ice-candidate')
+  async handleWebRTCIceCandidate(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: SignalingMessage,
+  ) {
+    const fromUserId = client.userId;
+    const { roomId, targetUserId, candidate } = data;
+
+    if (!fromUserId || !roomId || !targetUserId || !candidate) {
+      return { success: false, error: 'Invalid ICE candidate data' };
+    }
+
+    const targetSocketId = this.userSocketMap.get(targetUserId);
+    if (!targetSocketId) {
+      return { success: false, error: 'Target user not connected' };
+    }
+
+    // Forward ICE candidate to target user
+    this.server.to(targetSocketId).emit('webrtc-ice-candidate', {
+      fromUserId,
+      roomId,
+      candidate,
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logger.debug(`[WEBRTC] ICE candidate from user ${fromUserId} to user ${targetUserId}`);
     return { success: true };
   }
 

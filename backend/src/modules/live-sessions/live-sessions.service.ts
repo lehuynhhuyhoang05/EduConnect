@@ -17,6 +17,7 @@ import {
 } from './dto';
 import { User, UserRole } from '@modules/users/entities/user.entity';
 import { ClassesService } from '@modules/classes/classes.service';
+import { FileLoggerService } from '@common/logger/file-logger.service';
 
 @Injectable()
 export class LiveSessionsService {
@@ -29,6 +30,7 @@ export class LiveSessionsService {
     private readonly participantRepository: Repository<LiveSessionParticipant>,
     private readonly classesService: ClassesService,
     private readonly dataSource: DataSource,
+    private readonly fileLogger: FileLoggerService,
   ) {}
 
   /**
@@ -41,6 +43,15 @@ export class LiveSessionsService {
   }
 
   // ===================== SESSION CRUD =====================
+
+  /**
+   * Get session by ID (internal use - no user verification)
+   */
+  async findById(sessionId: number): Promise<LiveSession | null> {
+    return this.sessionRepository.findOne({
+      where: { id: sessionId },
+    });
+  }
 
   /**
    * Create a new live session (Teacher only)
@@ -77,6 +88,13 @@ export class LiveSessionsService {
 
     const saved = await this.sessionRepository.save(session);
     this.logger.log(`Live session created: ${saved.title} (${saved.roomId}) by teacher ${teacher.id}`);
+    this.fileLogger.liveSessions('log', 'Session created', {
+      sessionId: saved.id,
+      roomId: saved.roomId,
+      classId,
+      hostId: teacher.id,
+      title: saved.title,
+    });
     return saved;
   }
 
@@ -248,50 +266,63 @@ export class LiveSessionsService {
    * End a live session (Host only)
    */
   async endSession(id: number, teacher: User): Promise<LiveSession> {
-    const session = await this.sessionRepository.findOne({ where: { id } });
+    this.fileLogger.liveSessions('log', 'endSession called', { sessionId: id, teacherId: teacher.id });
 
-    if (!session) {
-      throw new NotFoundException('Phiên học không tồn tại');
-    }
+    try {
+      const session = await this.sessionRepository.findOne({ where: { id } });
 
-    if (session.hostId !== teacher.id) {
-      throw new ForbiddenException('Chỉ host mới có thể kết thúc phiên học');
-    }
-
-    if (session.status !== LiveSessionStatus.LIVE) {
-      throw new BadRequestException('Phiên học chưa bắt đầu hoặc đã kết thúc');
-    }
-
-    // Use transaction to update session and kick all participants
-    return this.dataSource.transaction(async (manager) => {
-      const now = new Date();
-      session.status = LiveSessionStatus.ENDED;
-      session.endedAt = now;
-      
-      // Calculate duration safely
-      if (session.startedAt) {
-        session.durationSeconds = Math.floor(
-          (now.getTime() - session.startedAt.getTime()) / 1000
-        );
-      } else {
-        session.durationSeconds = 0;
+      if (!session) {
+        throw new NotFoundException('Phiên học không tồn tại');
       }
 
-      // Mark all participants as inactive
-      await manager.update(
-        LiveSessionParticipant,
-        { liveSessionId: id, isActive: true },
-        { isActive: false, leftAt: now }
-      );
+      if (session.hostId !== teacher.id) {
+        throw new ForbiddenException('Chỉ host mới có thể kết thúc phiên học');
+      }
 
-      session.currentParticipants = 0;
-      const saved = await manager.save(LiveSession, session);
+      if (session.status !== LiveSessionStatus.LIVE) {
+        throw new BadRequestException('Phiên học chưa bắt đầu hoặc đã kết thúc');
+      }
 
-      this.logger.log(
-        `Live session ended: ${session.title} (${session.roomId}), duration: ${session.durationSeconds}s`
-      );
-      return saved;
-    });
+      // Use transaction to update session and kick all participants
+      return this.dataSource.transaction(async (manager) => {
+        const now = new Date();
+        session.status = LiveSessionStatus.ENDED;
+        session.endedAt = now;
+        
+        // Calculate duration safely
+        if (session.startedAt) {
+          session.durationSeconds = Math.floor(
+            (now.getTime() - session.startedAt.getTime()) / 1000
+          );
+        } else {
+          session.durationSeconds = 0;
+        }
+
+        // Mark all participants as inactive
+        await manager.update(
+          LiveSessionParticipant,
+          { liveSessionId: id, isActive: true },
+          { isActive: false, leftAt: now }
+        );
+
+        session.currentParticipants = 0;
+        const saved = await manager.save(LiveSession, session);
+
+        this.logger.log(
+          `Live session ended: ${session.title} (${session.roomId}), duration: ${session.durationSeconds}s`
+        );
+        this.fileLogger.liveSessions('log', 'Session ended successfully', { sessionId: id, roomId: session.roomId });
+        return saved;
+      });
+    } catch (error) {
+      this.fileLogger.liveSessions('error', 'endSession failed', {
+        sessionId: id,
+        teacherId: teacher.id,
+        error: error.message,
+        stack: error.stack,
+      });
+      throw error;
+    }
   }
 
   /**
