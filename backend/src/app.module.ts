@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ClassesModule } from './modules/classes/classes.module';
 import { FilesModule } from './modules/files/files.module';
+import { AssignmentsModule } from './modules/assignments/assignments.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { FilesModule } from './modules/files/files.module';
     UsersModule,
     ClassesModule,
     FilesModule,
+    AssignmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
