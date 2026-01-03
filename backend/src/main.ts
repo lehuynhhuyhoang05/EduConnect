@@ -4,12 +4,29 @@ import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
+
+  // Security headers with Helmet
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'", 'ws:', 'wss:'],
+        mediaSrc: ["'self'", 'blob:'],
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Allow embedding for video conferencing
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }));
 
   // Serve static files from uploads folder
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
