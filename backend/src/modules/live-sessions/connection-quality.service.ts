@@ -289,14 +289,18 @@ export class ConnectionQualityService {
    */
   getSessionQuality(sessionId: number): {
     participants: ParticipantQuality[];
+    participantCount: number;
     averageScore: number;
     criticalIssues: number;
     warnings: number;
-  } {
+    worstParticipant?: ParticipantQuality;
+  } | null {
     const participants: ParticipantQuality[] = [];
     let totalScore = 0;
     let criticalIssues = 0;
     let warnings = 0;
+    let worstParticipant: ParticipantQuality | undefined;
+    let worstScore = 101;
 
     this.qualityCache.forEach((quality, key) => {
       if (key.startsWith(`${sessionId}-`)) {
@@ -306,21 +310,57 @@ export class ConnectionQualityService {
           if (issue.severity === 'critical') criticalIssues++;
           else warnings++;
         });
+        
+        if (quality.rating.score < worstScore) {
+          worstScore = quality.rating.score;
+          worstParticipant = quality;
+        }
       }
     });
 
+    if (participants.length === 0) {
+      return null;
+    }
+
     return {
       participants,
+      participantCount: participants.length,
       averageScore: participants.length > 0 ? Math.round(totalScore / participants.length) : 0,
       criticalIssues,
       warnings,
+      worstParticipant,
     };
   }
 
   /**
    * Get network recommendations for a participant
    */
-  getRecommendations(sessionId: number, userId: number): {
+  getRecommendations(sessionId: number, userId: number): string[] {
+    const quality = this.getParticipantQuality(sessionId, userId);
+    
+    if (!quality) {
+      return [];
+    }
+
+    const messages: string[] = [];
+
+    if (quality.rating.score < 30) {
+      messages.push('Nên tắt camera để cải thiện chất lượng');
+    } else if (quality.rating.score < 50) {
+      messages.push('Nên giảm chất lượng video');
+    }
+
+    quality.issues.forEach(issue => {
+      messages.push(issue.suggestion);
+    });
+
+    return [...new Set(messages)]; // Remove duplicates
+  }
+
+  /**
+   * Get detailed recommendations for a participant
+   */
+  getDetailedRecommendations(sessionId: number, userId: number): {
     shouldDisableVideo: boolean;
     shouldReduceQuality: boolean;
     suggestedResolution: { width: number; height: number };
@@ -369,6 +409,13 @@ export class ConnectionQualityService {
       suggestedBitrate,
       messages: [...new Set(messages)], // Remove duplicates
     };
+  }
+
+  /**
+   * Clear session stats (alias for cleanupSession for tests)
+   */
+  clearSessionStats(sessionId: number): void {
+    this.cleanupSession(sessionId);
   }
 
   /**

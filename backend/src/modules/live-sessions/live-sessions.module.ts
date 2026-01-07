@@ -12,6 +12,11 @@ import { RecordingService } from './recording.service';
 import { ConnectionQualityService } from './connection-quality.service';
 import { SmartReconnectionService } from './smart-reconnection.service';
 import { AttendanceTrackingService } from './attendance-tracking.service';
+import { HandRaiseService } from './hand-raise.service';
+import { WaitingRoomService } from './waiting-room.service';
+import { QAService } from './qa.service';
+import { VirtualBackgroundService } from './virtual-background.service';
+import { ScreenAnnotationService } from './screen-annotation.service';
 import { LiveSession, LiveSessionParticipant } from './entities';
 import { ClassesModule } from '@modules/classes/classes.module';
 import { User } from '@modules/users/entities/user.entity';
@@ -38,6 +43,11 @@ import { LoggerModule } from '@common/logger/logger.module';
     ConnectionQualityService,
     SmartReconnectionService,
     AttendanceTrackingService,
+    HandRaiseService,
+    WaitingRoomService,
+    QAService,
+    VirtualBackgroundService,
+    ScreenAnnotationService,
   ],
   exports: [
     LiveSessionsService, 
@@ -50,6 +60,11 @@ import { LoggerModule } from '@common/logger/logger.module';
     ConnectionQualityService,
     SmartReconnectionService,
     AttendanceTrackingService,
+    HandRaiseService,
+    WaitingRoomService,
+    QAService,
+    VirtualBackgroundService,
+    ScreenAnnotationService,
   ],
 })
 export class LiveSessionsModule {}

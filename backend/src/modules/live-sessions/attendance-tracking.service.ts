@@ -495,8 +495,8 @@ export class AttendanceTrackingService {
     });
 
     // Build final report
-    const students = Array.from(studentStats.entries()).map(([odifyUserId, stats]) => ({
-      userId: odifyUserId,
+    const students = Array.from(studentStats.entries()).map(([userId, stats]) => ({
+      userId: userId,
       userName: stats.userName,
       presentCount: stats.presentCount,
       lateCount: stats.lateCount,
@@ -525,7 +525,7 @@ export class AttendanceTrackingService {
   exportToCSV(sessionId: number): string {
     const records = this.getSessionAttendance(sessionId);
     
-    const headers = ['User ID', 'Name', 'Status', 'Join Time', 'Leave Time', 'Total Minutes', 'Method', 'Notes'];
+    const headers = ['userId', 'userName', 'status', 'joinTime', 'leaveTime', 'totalMinutes', 'method', 'notes'];
     const rows = records.map(r => [
       r.userId,
       r.userName || '',
@@ -538,5 +538,171 @@ export class AttendanceTrackingService {
     ]);
 
     return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+  }
+
+  /**
+   * Get attendance record for a specific user
+   */
+  getAttendanceRecord(sessionId: number, userId: number): AttendanceRecord | null {
+    const attendanceId = this.sessionAttendance.get(sessionId);
+    if (!attendanceId) return null;
+
+    const session = this.attendanceSessions.get(attendanceId);
+    if (!session) return null;
+
+    return session.records.get(userId) || null;
+  }
+
+  /**
+   * Get attendance session
+   */
+  getAttendanceSession(sessionId: number): AttendanceSession | null {
+    const attendanceId = this.sessionAttendance.get(sessionId);
+    if (!attendanceId) return null;
+    return this.attendanceSessions.get(attendanceId) || null;
+  }
+
+  /**
+   * Get session records
+   */
+  getSessionRecords(sessionId: number): AttendanceRecord[] {
+    return this.getSessionAttendance(sessionId);
+  }
+
+  /**
+   * Get check-in code info
+   */
+  getCheckInCode(sessionId: number): { code: string; expiresAt: Date } | null {
+    return this.getCurrentCode(sessionId);
+  }
+
+  /**
+   * Rotate check-in code
+   */
+  rotateCode(sessionId: number): string | null {
+    const attendanceId = this.sessionAttendance.get(sessionId);
+    if (!attendanceId) return null;
+
+    const session = this.attendanceSessions.get(attendanceId);
+    if (!session || session.settings.method !== 'code') return null;
+
+    session.checkInCode = this.generateCheckInCode();
+    session.codeExpiresAt = new Date(Date.now() + session.settings.codeRotationMinutes * 60 * 1000);
+
+    return session.checkInCode;
+  }
+
+  /**
+   * Get session summary
+   */
+  getSessionSummary(sessionId: number): {
+    totalRecords: number;
+    presentCount: number;
+    lateCount: number;
+    absentCount: number;
+    excusedCount: number;
+    attendanceRate: number;
+  } | null {
+    const summary = this.getAttendanceSummary(sessionId);
+    return {
+      totalRecords: summary.total,
+      presentCount: summary.present,
+      lateCount: summary.late,
+      absentCount: summary.absent,
+      excusedCount: summary.excused,
+      attendanceRate: summary.attendanceRate,
+    };
+  }
+
+  /**
+   * Mark student as absent
+   */
+  markAbsent(sessionId: number, userId: number, userName: string, teacherId: number): AttendanceRecord | null {
+    return this.manualCheckIn(sessionId, teacherId, userId, 'absent');
+  }
+
+  /**
+   * Update attendance status
+   */
+  updateStatus(sessionId: number, userId: number, status: AttendanceRecord['status'], notes?: string): AttendanceRecord | null {
+    const attendanceId = this.sessionAttendance.get(sessionId);
+    if (!attendanceId) return null;
+
+    const session = this.attendanceSessions.get(attendanceId);
+    if (!session) return null;
+
+    const record = session.records.get(userId);
+    if (!record) return null;
+
+    record.status = status;
+    if (notes) record.notes = notes;
+
+    return record;
+  }
+
+  /**
+   * Record late join with specific minutes
+   */
+  recordLateJoin(sessionId: number, userId: number, userName: string, lateByMinutes: number): AttendanceRecord | null {
+    const attendanceId = this.sessionAttendance.get(sessionId);
+    if (!attendanceId) return null;
+
+    const session = this.attendanceSessions.get(attendanceId);
+    if (!session || session.status !== 'open') return null;
+
+    const now = new Date();
+    const record: AttendanceRecord = {
+      id: `rec-${sessionId}-${userId}`,
+      sessionId,
+      classId: session.classId,
+      userId,
+      userName,
+      status: 'late',
+      joinTime: now,
+      totalTimeMinutes: 0,
+      checkInMethod: 'auto',
+      lateByMinutes,
+    };
+
+    session.records.set(userId, record);
+    return record;
+  }
+
+  /**
+   * Get class report
+   */
+  getClassReport(classId: number): ClassAttendanceReport | null {
+    // Find all sessions for this class
+    const sessionIds: number[] = [];
+    this.attendanceSessions.forEach((session) => {
+      if (session.classId === classId) {
+        sessionIds.push(session.sessionId);
+      }
+    });
+
+    if (sessionIds.length === 0) return null;
+
+    return this.generateClassReport(classId, sessionIds);
+  }
+
+  /**
+   * Bulk mark students as absent
+   */
+  bulkMarkAbsent(
+    sessionId: number, 
+    students: { userId: number; userName?: string }[], 
+    teacherId: number
+  ): AttendanceRecord[] {
+    const records: AttendanceRecord[] = [];
+    
+    students.forEach(student => {
+      const record = this.manualCheckIn(sessionId, teacherId, student.userId, 'absent');
+      if (record) {
+        if (student.userName) record.userName = student.userName;
+        records.push(record);
+      }
+    });
+
+    return records;
   }
 }

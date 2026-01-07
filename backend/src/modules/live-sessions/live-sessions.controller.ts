@@ -27,6 +27,11 @@ import { RecordingService } from './recording.service';
 import { ConnectionQualityService } from './connection-quality.service';
 import { SmartReconnectionService } from './smart-reconnection.service';
 import { AttendanceTrackingService } from './attendance-tracking.service';
+import { HandRaiseService } from './hand-raise.service';
+import { WaitingRoomService } from './waiting-room.service';
+import { QAService } from './qa.service';
+import { VirtualBackgroundService } from './virtual-background.service';
+import { ScreenAnnotationService } from './screen-annotation.service';
 import {
   CreateLiveSessionDto,
   UpdateLiveSessionDto,
@@ -54,6 +59,11 @@ export class LiveSessionsController {
     private readonly connectionQualityService: ConnectionQualityService,
     private readonly reconnectionService: SmartReconnectionService,
     private readonly attendanceService: AttendanceTrackingService,
+    private readonly handRaiseService: HandRaiseService,
+    private readonly waitingRoomService: WaitingRoomService,
+    private readonly qaService: QAService,
+    private readonly virtualBackgroundService: VirtualBackgroundService,
+    private readonly screenAnnotationService: ScreenAnnotationService,
   ) {}
 
   // ===================== SESSION CRUD =====================
@@ -770,5 +780,346 @@ export class LiveSessionsController {
       'Content-Disposition': `attachment; filename="attendance-${sessionId}.csv"`,
     });
     res.send(csv);
+  }
+
+  // ===================== HAND RAISE =====================
+
+  @Post('sessions/:id/hand-raise')
+  @ApiOperation({ summary: 'Raise hand in session' })
+  @ApiResponse({ status: 200, description: 'Hand raised' })
+  raiseHand(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.handRaiseService.raiseHand(sessionId, user.id, user.fullName);
+  }
+
+  @Delete('sessions/:id/hand-raise')
+  @ApiOperation({ summary: 'Lower own hand' })
+  @ApiResponse({ status: 200, description: 'Hand lowered' })
+  lowerHand(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+  ) {
+    return { success: this.handRaiseService.lowerHand(sessionId, user.id) };
+  }
+
+  @Post('sessions/:id/hand-raise/:userId/acknowledge')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Acknowledge raised hand (Host only)' })
+  @ApiResponse({ status: 200, description: 'Hand acknowledged' })
+  acknowledgeHand(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @Param('userId', ParseIntPipe) userId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.handRaiseService.acknowledgeHand(sessionId, user.id, userId);
+  }
+
+  @Delete('sessions/:id/hand-raise/all')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Lower all hands (Host only)' })
+  @ApiResponse({ status: 200, description: 'All hands lowered' })
+  lowerAllHands(@Param('id', ParseIntPipe) sessionId: number) {
+    return { count: this.handRaiseService.lowerAllHands(sessionId) };
+  }
+
+  @Get('sessions/:id/hand-raise')
+  @ApiOperation({ summary: 'Get hand raise queue' })
+  @ApiResponse({ status: 200, description: 'Hand raise queue' })
+  getHandRaiseQueue(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.handRaiseService.getQueue(sessionId);
+  }
+
+  // ===================== WAITING ROOM =====================
+
+  @Post('sessions/:id/waiting-room/request')
+  @ApiOperation({ summary: 'Request to join session (goes to waiting room)' })
+  @ApiResponse({ status: 200, description: 'Join request submitted' })
+  requestJoinSession(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.waitingRoomService.requestJoin(sessionId, user.id, user.fullName, { email: user.email });
+  }
+
+  @Post('sessions/:id/waiting-room/:userId/admit')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Admit user from waiting room (Host only)' })
+  @ApiResponse({ status: 200, description: 'User admitted' })
+  admitUser(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @Param('userId', ParseIntPipe) userId: number,
+    @CurrentUser() host: User,
+  ) {
+    return this.waitingRoomService.admitUser(sessionId, userId, host.id);
+  }
+
+  @Post('sessions/:id/waiting-room/admit-all')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Admit all users from waiting room' })
+  @ApiResponse({ status: 200, description: 'All users admitted' })
+  admitAll(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() host: User,
+  ) {
+    return { count: this.waitingRoomService.admitAll(sessionId, host.id) };
+  }
+
+  @Post('sessions/:id/waiting-room/:userId/deny')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Deny user from waiting room' })
+  @ApiResponse({ status: 200, description: 'User denied' })
+  denyUser(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @Param('userId', ParseIntPipe) userId: number,
+    @CurrentUser() host: User,
+    @Body() data?: { reason?: string },
+  ) {
+    return this.waitingRoomService.denyUser(sessionId, userId, host.id, data?.reason);
+  }
+
+  @Get('sessions/:id/waiting-room')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Get waiting room users (Host only)' })
+  @ApiResponse({ status: 200, description: 'Waiting room list' })
+  getWaitingRoom(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.waitingRoomService.getWaitingUsers(sessionId);
+  }
+
+  @Get('sessions/:id/waiting-room/status')
+  @ApiOperation({ summary: 'Get own waiting room status' })
+  @ApiResponse({ status: 200, description: 'User status' })
+  getWaitingStatus(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.waitingRoomService.getUserStatus(sessionId, user.id);
+  }
+
+  // ===================== Q&A =====================
+
+  @Post('sessions/:id/qa/questions')
+  @ApiOperation({ summary: 'Ask a question' })
+  @ApiResponse({ status: 201, description: 'Question submitted' })
+  askQuestion(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+    @Body() data: { text: string; isAnonymous?: boolean },
+  ) {
+    return this.qaService.askQuestion(sessionId, user.id, data.text, { isAnonymous: data.isAnonymous, userName: user.fullName });
+  }
+
+  @Post('sessions/:id/qa/questions/:questionId/upvote')
+  @ApiOperation({ summary: 'Upvote a question' })
+  @ApiResponse({ status: 200, description: 'Upvote recorded' })
+  upvoteQuestion(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @Param('questionId') questionId: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.qaService.upvoteQuestion(sessionId, questionId, user.id);
+  }
+
+  @Post('sessions/:id/qa/questions/:questionId/answer')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Answer a question (Host only)' })
+  @ApiResponse({ status: 200, description: 'Answer recorded' })
+  answerQuestion(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @Param('questionId') questionId: string,
+    @CurrentUser() user: User,
+    @Body() data: { text: string; markAsAnswered?: boolean },
+  ) {
+    return this.qaService.answerQuestion(sessionId, questionId, user.id, data.text, user.fullName);
+  }
+
+  @Post('sessions/:id/qa/questions/:questionId/dismiss')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Dismiss a question (Host only)' })
+  @ApiResponse({ status: 200, description: 'Question dismissed' })
+  dismissQuestion(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @Param('questionId') questionId: string,
+    @CurrentUser() user: User,
+  ) {
+    return { success: this.qaService.dismissQuestion(sessionId, questionId) };
+  }
+
+  @Post('sessions/:id/qa/questions/:questionId/pin')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Toggle pin question (Host only)' })
+  @ApiResponse({ status: 200, description: 'Pin toggled' })
+  togglePinQuestion(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @Param('questionId') questionId: string,
+    @CurrentUser() user: User,
+  ) {
+    return { isPinned: this.qaService.togglePin(sessionId, questionId) };
+  }
+
+  @Get('sessions/:id/qa/questions')
+  @ApiOperation({ summary: 'Get all questions' })
+  @ApiResponse({ status: 200, description: 'Questions list' })
+  getQuestions(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.qaService.getQuestions(sessionId);
+  }
+
+  @Get('sessions/:id/qa/stats')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Get Q&A statistics (Host only)' })
+  @ApiResponse({ status: 200, description: 'Q&A statistics' })
+  getQAStats(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.qaService.getStatistics(sessionId);
+  }
+
+  // ===================== VIRTUAL BACKGROUND =====================
+
+  @Get('backgrounds/predefined')
+  @ApiOperation({ summary: 'Get predefined backgrounds' })
+  @ApiResponse({ status: 200, description: 'Predefined backgrounds list' })
+  getPredefinedBackgrounds() {
+    return this.virtualBackgroundService.getPredefinedBackgrounds();
+  }
+
+  @Get('backgrounds/categories')
+  @ApiOperation({ summary: 'Get background categories' })
+  @ApiResponse({ status: 200, description: 'Categories list' })
+  getBackgroundCategories() {
+    return this.virtualBackgroundService.getCategories();
+  }
+
+  @Get('backgrounds/available')
+  @ApiOperation({ summary: 'Get all available backgrounds for user' })
+  @ApiResponse({ status: 200, description: 'Available backgrounds' })
+  getAvailableBackgrounds(@CurrentUser() user: User) {
+    return this.virtualBackgroundService.getAllAvailableBackgrounds(user.id);
+  }
+
+  @Post('backgrounds/custom')
+  @ApiOperation({ summary: 'Upload custom background' })
+  @ApiResponse({ status: 201, description: 'Background uploaded' })
+  uploadCustomBackground(
+    @CurrentUser() user: User,
+    @Body() data: { name: string; imageUrl: string; thumbnailUrl?: string },
+  ) {
+    return this.virtualBackgroundService.uploadCustomBackground(
+      user.id, data.name, data.imageUrl, data.thumbnailUrl,
+    );
+  }
+
+  @Delete('backgrounds/custom/:backgroundId')
+  @ApiOperation({ summary: 'Delete custom background' })
+  @ApiResponse({ status: 200, description: 'Background deleted' })
+  deleteCustomBackground(
+    @Param('backgroundId') backgroundId: string,
+    @CurrentUser() user: User,
+  ) {
+    return { success: this.virtualBackgroundService.deleteCustomBackground(user.id, backgroundId) };
+  }
+
+  @Put('backgrounds/current')
+  @ApiOperation({ summary: 'Set current background' })
+  @ApiResponse({ status: 200, description: 'Background set' })
+  setCurrentBackground(
+    @CurrentUser() user: User,
+    @Body() data: { backgroundId: string | null },
+  ) {
+    return this.virtualBackgroundService.setUserBackground(user.id, data.backgroundId);
+  }
+
+  @Get('backgrounds/current')
+  @ApiOperation({ summary: 'Get current background' })
+  @ApiResponse({ status: 200, description: 'Current background' })
+  getCurrentBackground(@CurrentUser() user: User) {
+    return this.virtualBackgroundService.getUserCurrentBackground(user.id);
+  }
+
+  // ===================== SCREEN ANNOTATION =====================
+
+  @Post('sessions/:id/annotation/enable')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Enable screen annotation (Host only)' })
+  @ApiResponse({ status: 200, description: 'Annotation enabled' })
+  enableAnnotation(@Param('id', ParseIntPipe) sessionId: number) {
+    this.screenAnnotationService.setEnabled(sessionId, true);
+    return { enabled: true };
+  }
+
+  @Post('sessions/:id/annotation/disable')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Disable screen annotation (Host only)' })
+  @ApiResponse({ status: 200, description: 'Annotation disabled' })
+  disableAnnotation(@Param('id', ParseIntPipe) sessionId: number) {
+    this.screenAnnotationService.setEnabled(sessionId, false);
+    return { enabled: false };
+  }
+
+  @Post('sessions/:id/annotation')
+  @ApiOperation({ summary: 'Add annotation to screen' })
+  @ApiResponse({ status: 201, description: 'Annotation added' })
+  addAnnotation(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+    @Body() data: {
+      type: 'pen' | 'highlighter' | 'arrow' | 'rectangle' | 'ellipse' | 'text' | 'pointer';
+      points?: { x: number; y: number }[];
+      startPoint?: { x: number; y: number };
+      endPoint?: { x: number; y: number };
+      text?: string;
+      color?: string;
+      strokeWidth?: number;
+    },
+  ) {
+    return this.screenAnnotationService.addAnnotation(sessionId, user.id, data, user.fullName);
+  }
+
+  @Delete('sessions/:id/annotation/:annotationId')
+  @ApiOperation({ summary: 'Remove annotation' })
+  @ApiResponse({ status: 200, description: 'Annotation removed' })
+  removeAnnotation(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @Param('annotationId') annotationId: string,
+  ) {
+    return { success: this.screenAnnotationService.removeAnnotation(sessionId, annotationId) };
+  }
+
+  @Delete('sessions/:id/annotation')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Clear all annotations (Host only)' })
+  @ApiResponse({ status: 200, description: 'Annotations cleared' })
+  clearAllAnnotations(@Param('id', ParseIntPipe) sessionId: number) {
+    return { count: this.screenAnnotationService.clearAll(sessionId) };
+  }
+
+  @Post('sessions/:id/annotation/undo')
+  @ApiOperation({ summary: 'Undo last annotation' })
+  @ApiResponse({ status: 200, description: 'Last annotation undone' })
+  undoAnnotation(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.screenAnnotationService.undoLast(sessionId, user.id);
+  }
+
+  @Get('sessions/:id/annotation')
+  @ApiOperation({ summary: 'Get all annotations' })
+  @ApiResponse({ status: 200, description: 'Annotations list' })
+  getAnnotations(@Param('id', ParseIntPipe) sessionId: number) {
+    return this.screenAnnotationService.getAnnotations(sessionId);
+  }
+
+  @Put('sessions/:id/annotation/settings')
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Update annotation settings (Host only)' })
+  @ApiResponse({ status: 200, description: 'Settings updated' })
+  updateAnnotationSettings(
+    @Param('id', ParseIntPipe) sessionId: number,
+    @Body() settings: {
+      allowParticipantAnnotations?: boolean;
+      autoCleanupSeconds?: number;
+    },
+  ) {
+    return this.screenAnnotationService.updateSettings(sessionId, settings);
   }
 }

@@ -11,6 +11,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -19,7 +20,10 @@ import {
   ApiBearerAuth,
   ApiParam,
 } from '@nestjs/swagger';
+import { Response } from 'express';
 import { ClassesService } from './classes.service';
+import { ClassAnnouncementsService } from './class-announcements.service';
+import { GradebookService } from './gradebook.service';
 import { CreateClassDto, UpdateClassDto, JoinClassDto, QueryClassDto } from './dto';
 import { JwtAuthGuard, RolesGuard } from '@modules/auth/guards';
 import { CurrentUser, Roles } from '@modules/auth/decorators';
@@ -30,7 +34,11 @@ import { User, UserRole } from '@modules/users/entities/user.entity';
 @UseGuards(JwtAuthGuard)
 @Controller('classes')
 export class ClassesController {
-  constructor(private readonly classesService: ClassesService) {}
+  constructor(
+    private readonly classesService: ClassesService,
+    private readonly announcementsService: ClassAnnouncementsService,
+    private readonly gradebookService: GradebookService,
+  ) {}
 
   @Post()
   @UseGuards(RolesGuard)
@@ -210,5 +218,245 @@ export class ClassesController {
     @CurrentUser() user: User,
   ) {
     await this.classesService.removeMember(id, studentId, user);
+  }
+
+  // ===================== CLASS ANNOUNCEMENTS =====================
+
+  @Post(':id/announcements')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Tạo thông báo lớp học (Giáo viên)' })
+  @ApiParam({ name: 'id', description: 'ID lớp học' })
+  @ApiResponse({ status: 201, description: 'Thông báo được tạo' })
+  createAnnouncement(
+    @Param('id', ParseIntPipe) classId: number,
+    @CurrentUser() user: User,
+    @Body() data: {
+      title: string;
+      content: string;
+      isPinned?: boolean;
+      scheduledAt?: Date;
+      expiresAt?: Date;
+      priority?: 'normal' | 'important' | 'urgent';
+      allowComments?: boolean;
+    },
+  ) {
+    return this.announcementsService.createAnnouncement(classId, user.id, data, user.fullName);
+  }
+
+  @Get(':id/announcements')
+  @ApiOperation({ summary: 'Lấy danh sách thông báo lớp' })
+  @ApiParam({ name: 'id', description: 'ID lớp học' })
+  @ApiResponse({ status: 200, description: 'Danh sách thông báo' })
+  getAnnouncements(
+    @Param('id', ParseIntPipe) classId: number,
+    @Query('onlyPinned') onlyPinned?: string,
+  ) {
+    return this.announcementsService.getClassAnnouncements(classId, {
+      onlyPinned: onlyPinned === 'true',
+    });
+  }
+
+  @Get(':id/announcements/unread')
+  @ApiOperation({ summary: 'Lấy số thông báo chưa đọc' })
+  @ApiParam({ name: 'id', description: 'ID lớp học' })
+  @ApiResponse({ status: 200, description: 'Số thông báo chưa đọc' })
+  getUnreadCount(
+    @Param('id', ParseIntPipe) classId: number,
+    @CurrentUser() user: User,
+  ) {
+    return { count: this.announcementsService.getUnreadCount(classId, user.id) };
+  }
+
+  @Put(':id/announcements/:announcementId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Cập nhật thông báo (Giáo viên)' })
+  @ApiResponse({ status: 200, description: 'Thông báo được cập nhật' })
+  updateAnnouncement(
+    @Param('announcementId') announcementId: string,
+    @CurrentUser() user: User,
+    @Body() data: {
+      title?: string;
+      content?: string;
+      isPinned?: boolean;
+      priority?: 'normal' | 'important' | 'urgent';
+    },
+  ) {
+    return this.announcementsService.updateAnnouncement(announcementId, user.id, data);
+  }
+
+  @Delete(':id/announcements/:announcementId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Xóa thông báo (Giáo viên)' })
+  @ApiResponse({ status: 204, description: 'Đã xóa thông báo' })
+  deleteAnnouncement(
+    @Param('announcementId') announcementId: string,
+    @CurrentUser() user: User,
+  ) {
+    this.announcementsService.deleteAnnouncement(announcementId, user.id);
+  }
+
+  @Post(':id/announcements/:announcementId/read')
+  @ApiOperation({ summary: 'Đánh dấu đã đọc thông báo' })
+  @ApiResponse({ status: 200, description: 'Đã đánh dấu đọc' })
+  markAsRead(
+    @Param('announcementId') announcementId: string,
+    @CurrentUser() user: User,
+  ) {
+    return { success: this.announcementsService.markAsRead(announcementId, user.id) };
+  }
+
+  @Post(':id/announcements/:announcementId/comments')
+  @ApiOperation({ summary: 'Thêm bình luận vào thông báo' })
+  @ApiResponse({ status: 201, description: 'Bình luận được thêm' })
+  addComment(
+    @Param('announcementId') announcementId: string,
+    @CurrentUser() user: User,
+    @Body() data: { content: string },
+  ) {
+    return this.announcementsService.addComment(announcementId, user.id, data.content, user.fullName);
+  }
+
+  @Post(':id/announcements/:announcementId/pin')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Ghim/bỏ ghim thông báo' })
+  @ApiResponse({ status: 200, description: 'Đã thay đổi trạng thái ghim' })
+  togglePinAnnouncement(
+    @Param('announcementId') announcementId: string,
+    @CurrentUser() user: User,
+  ) {
+    return { isPinned: this.announcementsService.togglePin(announcementId, user.id) };
+  }
+
+  // ===================== GRADEBOOK =====================
+
+  @Get(':id/gradebook')
+  @ApiOperation({ summary: 'Lấy bảng điểm lớp học' })
+  @ApiParam({ name: 'id', description: 'ID lớp học' })
+  @ApiResponse({ status: 200, description: 'Bảng điểm' })
+  getGradebook(@Param('id', ParseIntPipe) classId: number) {
+    return this.gradebookService.getGradebook(classId);
+  }
+
+  @Get(':id/gradebook/students')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Lấy điểm tất cả học sinh (Giáo viên)' })
+  @ApiResponse({ status: 200, description: 'Điểm học sinh' })
+  getAllStudentGrades(@Param('id', ParseIntPipe) classId: number) {
+    return this.gradebookService.getAllStudentGrades(classId);
+  }
+
+  @Get(':id/gradebook/my-grades')
+  @ApiOperation({ summary: 'Lấy điểm của bản thân' })
+  @ApiResponse({ status: 200, description: 'Điểm cá nhân' })
+  getMyGrades(
+    @Param('id', ParseIntPipe) classId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.gradebookService.getStudentGradebook(classId, user.id);
+  }
+
+  @Get(':id/gradebook/statistics')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Thống kê điểm lớp (Giáo viên)' })
+  @ApiResponse({ status: 200, description: 'Thống kê' })
+  getGradebookStatistics(@Param('id', ParseIntPipe) classId: number) {
+    return this.gradebookService.getClassStatistics(classId);
+  }
+
+  @Post(':id/gradebook/assignments')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Thêm bài tập vào bảng điểm' })
+  @ApiResponse({ status: 201, description: 'Bài tập được thêm' })
+  addAssignmentToGradebook(
+    @Param('id', ParseIntPipe) classId: number,
+    @Body() data: {
+      id: number;
+      title: string;
+      category?: string;
+      maxScore: number;
+      weight?: number;
+      dueDate?: Date;
+    },
+  ) {
+    this.gradebookService.addAssignment(classId, data);
+    return { success: true };
+  }
+
+  @Post(':id/gradebook/grades')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Ghi điểm cho học sinh' })
+  @ApiResponse({ status: 200, description: 'Điểm được ghi' })
+  recordGrade(
+    @Param('id', ParseIntPipe) classId: number,
+    @CurrentUser() user: User,
+    @Body() data: {
+      assignmentId: number;
+      userId: number;
+      score: number;
+      submissionId?: number;
+      submittedAt?: Date;
+      isLate?: boolean;
+      comments?: string;
+    },
+  ) {
+    return this.gradebookService.recordGrade(classId, data.assignmentId, data.userId, {
+      score: data.score,
+      submissionId: data.submissionId,
+      submittedAt: data.submittedAt,
+      gradedBy: user.id,
+      isLate: data.isLate,
+      comments: data.comments,
+    });
+  }
+
+  @Post(':id/gradebook/excuse')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Miễn điểm cho học sinh' })
+  @ApiResponse({ status: 200, description: 'Đã miễn điểm' })
+  excuseStudent(
+    @Param('id', ParseIntPipe) classId: number,
+    @Body() data: { assignmentId: number; userId: number },
+  ) {
+    return { success: this.gradebookService.excuseStudent(classId, data.assignmentId, data.userId) };
+  }
+
+  @Put(':id/gradebook/policy')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Cập nhật chính sách điểm' })
+  @ApiResponse({ status: 200, description: 'Chính sách được cập nhật' })
+  updateGradingPolicy(
+    @Param('id', ParseIntPipe) classId: number,
+    @Body() policy: {
+      latePenaltyPerDay?: number;
+      maxLatePenalty?: number;
+      passThreshold?: number;
+    },
+  ) {
+    return this.gradebookService.updatePolicy(classId, policy);
+  }
+
+  @Get(':id/gradebook/export')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({ summary: 'Xuất bảng điểm CSV' })
+  @ApiResponse({ status: 200, description: 'CSV data' })
+  exportGradebook(@Param('id', ParseIntPipe) classId: number, @Res() res: Response) {
+    const csv = this.gradebookService.exportGradebook(classId);
+    res.set({
+      'Content-Type': 'text/csv',
+      'Content-Disposition': `attachment; filename="gradebook-class-${classId}.csv"`,
+    });
+    res.send(csv);
   }
 }

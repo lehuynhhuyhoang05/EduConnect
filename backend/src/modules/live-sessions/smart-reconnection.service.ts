@@ -344,4 +344,17 @@ export class SmartReconnectionService {
       tokensBySession,
     };
   }
+
+  /**
+   * Get count of active tokens for a specific session
+   */
+  getActiveTokenCount(sessionId: number): number {
+    let count = 0;
+    this.userTokens.forEach((_, key) => {
+      if (key.startsWith(`${sessionId}-`)) {
+        count++;
+      }
+    });
+    return count;
+  }
 }
