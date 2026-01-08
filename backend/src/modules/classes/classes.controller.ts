@@ -110,14 +110,14 @@ export class ClassesController {
   @ApiOperation({ summary: 'Tham gia lớp học bằng mã lớp' })
   @ApiResponse({
     status: 201,
-    description: 'Tham gia lớp thành công',
+    description: 'Tham gia lớp thành công, trả về thông tin lớp học',
     schema: {
       example: {
         id: 1,
-        classId: 1,
-        userId: 2,
-        role: 'STUDENT',
-        joinedAt: '2026-01-01T00:00:00.000Z',
+        name: 'Lập trình Web',
+        classCode: 'ABC123',
+        description: 'Học về lập trình web cơ bản',
+        memberCount: 10,
       },
     },
   })

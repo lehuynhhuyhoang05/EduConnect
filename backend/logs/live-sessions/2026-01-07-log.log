@@ -1,0 +1,70 @@
+[2026-01-07T10:35:33.929Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 31,
+    "roomId": "1b805b97-65e4-4196-a535-4d38c0794fc7",
+    "classId": 8,
+    "hostId": 27,
+    "title": "live"
+  }
+[2026-01-07T10:37:26.027Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 31,
+    "teacherId": 27
+  }
+[2026-01-07T10:37:26.076Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 31,
+    "roomId": "1b805b97-65e4-4196-a535-4d38c0794fc7"
+  }
+[2026-01-07T10:38:24.342Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 32,
+    "roomId": "670e9105-7f4a-4e67-90a7-ea5b95edb0e4",
+    "classId": 8,
+    "hostId": 27,
+    "title": "Live2"
+  }
+[2026-01-07T10:40:42.395Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 32,
+    "teacherId": 27
+  }
+[2026-01-07T10:40:42.432Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 32,
+    "roomId": "670e9105-7f4a-4e67-90a7-ea5b95edb0e4"
+  }
+[2026-01-07T10:48:18.090Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 33,
+    "roomId": "b44678c7-3619-4153-8278-2b9cc281ae21",
+    "classId": 8,
+    "hostId": 27,
+    "title": "live3"
+  }
+[2026-01-07T11:04:50.747Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 33,
+    "teacherId": 27
+  }
+[2026-01-07T11:04:50.795Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 33,
+    "roomId": "b44678c7-3619-4153-8278-2b9cc281ae21"
+  }
+[2026-01-07T11:12:05.821Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 34,
+    "roomId": "ca30558c-d9a4-4991-8e00-99dc027a904e",
+    "classId": 8,
+    "hostId": 27,
+    "title": "live5"
+  }
+[2026-01-07T11:58:44.135Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 35,
+    "roomId": "3140e6e3-0e03-4940-b937-a3af9bef2e3e",
+    "classId": 8,
+    "hostId": 27,
+    "title": "live6"
+  }

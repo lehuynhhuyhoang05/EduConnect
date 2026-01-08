@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, In } from 'typeorm';
 import { Assignment, Submission, SubmissionStatus } from './entities';
 import {
   CreateAssignmentDto,
@@ -144,8 +144,27 @@ export class AssignmentsService {
       .orderBy('assignment.deadline', 'ASC')
       .getManyAndCount();
 
+    // Fetch user's submissions for all assignments (for students)
+    const assignmentIds = assignments.map(a => a.id);
+    let userSubmissions: Map<number, any> = new Map();
+    
+    if (assignmentIds.length > 0 && user.role !== 'TEACHER') {
+      const submissions = await this.submissionRepository.find({
+        where: {
+          assignmentId: In(assignmentIds),
+          studentId: user.id,
+        },
+        select: ['id', 'assignmentId', 'status', 'score', 'submittedAt', 'fileUrl'],
+      });
+      submissions.forEach(s => userSubmissions.set(s.assignmentId, s));
+    }
+
     return {
-      data: assignments,
+      data: assignments.map(a => ({
+        ...a,
+        dueDate: a.deadline,
+        mySubmission: userSubmissions.get(a.id) || null,
+      })),
       meta: {
         total,
         page: Number(page),
@@ -185,6 +204,7 @@ export class AssignmentsService {
 
     return {
       ...assignment,
+      dueDate: assignment.deadline, // Map deadline to dueDate for frontend
       creator: this.sanitizeUser(assignment.creator),
       mySubmission,
       isOverdue: new Date() > assignment.deadline,

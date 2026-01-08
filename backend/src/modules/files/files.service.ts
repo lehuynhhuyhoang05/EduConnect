@@ -24,6 +24,9 @@ const FILE_CONFIG = {
     'image/png',
     'image/gif',
     'image/webp',
+    'image/bmp',
+    'image/svg+xml',
+    'image/tiff',
     // Documents
     'application/pdf',
     'application/msword',
@@ -33,15 +36,58 @@ const FILE_CONFIG = {
     'application/vnd.ms-powerpoint',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     'text/plain',
+    'text/csv',
+    'text/html',
+    'text/css',
+    'text/javascript',
+    'application/json',
+    'application/xml',
+    'application/rtf',
     // Video
     'video/mp4',
     'video/webm',
+    'video/avi',
+    'video/quicktime',
+    'video/x-msvideo',
+    'video/x-ms-wmv',
+    'video/x-flv',
+    'video/3gpp',
     // Audio
     'audio/mpeg',
     'audio/wav',
+    'audio/ogg',
+    'audio/webm',
+    'audio/mp4',
+    'audio/aac',
+    'audio/flac',
     // Archives
     'application/zip',
     'application/x-rar-compressed',
+    'application/x-7z-compressed',
+    'application/gzip',
+    'application/x-tar',
+    // Code files
+    'application/javascript',
+    'application/typescript',
+    'application/x-python',
+    'application/java-archive',
+    'text/x-python', // .py files
+    'text/x-java-source', // .java files  
+    'text/x-c', // .c files
+    'text/x-c++src', // .cpp files
+    'text/x-csharp', // .cs files
+    'text/x-go', // .go files
+    'text/x-rust', // .rs files
+    'text/x-php', // .php files
+    'text/x-ruby', // .rb files
+    'text/x-swift', // .swift files
+    'text/x-kotlin', // .kt files
+    'text/x-scala', // .scala files
+    'text/markdown', // .md files
+    'text/x-sql', // .sql files
+    'text/x-yaml', // .yaml files
+    // Other common formats
+    'application/octet-stream', // Generic binary - allow for unknown types
   ],
 };
 

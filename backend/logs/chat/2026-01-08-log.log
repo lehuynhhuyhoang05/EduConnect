@@ -1,0 +1,8 @@
+[2026-01-08T05:44:03.194Z] [LOG] [chat] [ChatModule] Message sent
+  Data: {
+    "messageId": "29",
+    "roomId": "37",
+    "roomType": "live_session",
+    "senderId": 27,
+    "messageType": "text"
+  }

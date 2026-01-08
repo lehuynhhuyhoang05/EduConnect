@@ -230,7 +230,7 @@ export class ClassesService {
   /**
    * Join a class by code - Uses transaction for data consistency
    */
-  async joinClass(joinClassDto: JoinClassDto, user: User): Promise<ClassMember> {
+  async joinClass(joinClassDto: JoinClassDto, user: User): Promise<Class> {
     const classCode = joinClassDto.classCode.toUpperCase();
     const classEntity = await this.findByCode(classCode);
 
@@ -249,20 +249,21 @@ export class ClassesService {
     }
 
     // Use transaction to ensure member creation and count update are atomic
-    return this.dataSource.transaction(async (manager) => {
+    await this.dataSource.transaction(async (manager) => {
       const member = manager.create(ClassMember, {
         classId: classEntity.id,
         userId: user.id,
         role: ClassRole.STUDENT,
       });
 
-      const savedMember = await manager.save(ClassMember, member);
+      await manager.save(ClassMember, member);
 
       // Update member count
       await manager.increment(Class, { id: classEntity.id }, 'memberCount', 1);
-
-      return savedMember;
     });
+
+    // Return the class with updated member count
+    return this.findOne(classEntity.id, user);
   }
 
   /**

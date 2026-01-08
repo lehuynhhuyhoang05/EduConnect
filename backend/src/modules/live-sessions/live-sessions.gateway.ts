@@ -71,6 +71,8 @@ export class LiveSessionsGateway
   private userSocketMap = new Map<number, string>();
   // Map socketId -> userId for reverse lookup
   private socketUserMap = new Map<string, number>();
+  // Map userId -> display name (for UI)
+  private userDisplayNameMap = new Map<number, string>();
   // Map roomId -> Set of userIds
   private roomParticipants = new Map<string, Set<number>>();
   // Map roomId -> waiting room users
@@ -129,6 +131,7 @@ export class LiveSessionsGateway
     if (userId) {
       this.userSocketMap.delete(userId);
       this.socketUserMap.delete(client.id);
+      this.userDisplayNameMap.delete(userId);
 
       // Remove from waiting room if present
       if (client.roomId) {
@@ -236,25 +239,34 @@ export class LiveSessionsGateway
       await client.join(roomId);
       client.roomId = roomId;
 
+      // Resolve and store display name for this user (avoid relying on Socket instance lookups)
+      const displayName =
+        userName?.trim() ||
+        (this.userDisplayNameMap.get(userId) ?? '') ||
+        `User ${userId}`;
+      this.userDisplayNameMap.set(userId, displayName);
+
       // Track room participants
       if (!this.roomParticipants.has(roomId)) {
         this.roomParticipants.set(roomId, new Set());
       }
       this.roomParticipants.get(roomId).add(userId);
 
-      // Get existing participants in room
+      // Get existing participants in room with their user info
       const existingParticipants = Array.from(this.roomParticipants.get(roomId))
         .filter(id => id !== userId)
         .map(id => ({
           userId: id,
           socketId: this.userSocketMap.get(id),
+          userName: this.userDisplayNameMap.get(id) || `User ${id}`,
         }));
 
-      // Notify others in room about new participant
+      // Notify others in room about new participant with name
       client.to(roomId).emit('user-joined', {
         userId,
         socketId: client.id,
         roomId,
+        userName: displayName,
         timestamp: new Date().toISOString(),
       });
 
