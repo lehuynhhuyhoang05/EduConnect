@@ -104,14 +104,16 @@ export const useClassesStore = defineStore('classes', {
       }
     },
 
-    async joinClass(data: JoinClassRequest) {
+    async joinClass(classCode: string) {
       const api = useApi()
-      const membership = await api.post<ClassMember>('/classes/join', data)
+      await api.post<ClassMember>('/classes/join', { classCode })
       
-      // Refresh classes list
+      // Refresh classes list to get the new class
       await this.fetchClasses()
       
-      return membership
+      // Find and return the joined class
+      const joinedClass = this.classes.find(c => c.classCode === classCode || c.code === classCode)
+      return joinedClass || this.classes[0]
     },
 
     async leaveClass(id: number) {

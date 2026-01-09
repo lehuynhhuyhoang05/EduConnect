@@ -55,8 +55,8 @@ const handleJoinClass = async () => {
   }
   isJoining.value = true
   try {
-    const joinedClass = await classesStore.joinClass(joinClassCode.value.trim())
-    toast.success(`Đã tham gia lớp ${joinedClass.name}`)
+    const joinedClass = await classesStore.joinClass(joinClassCode.value.trim().toUpperCase())
+    toast.success(`Đã tham gia lớp ${joinedClass?.name || ''}`)
     showJoinDialog.value = false
     joinClassCode.value = ''
   } catch (error: any) {

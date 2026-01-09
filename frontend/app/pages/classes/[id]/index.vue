@@ -7,6 +7,7 @@ const authStore = useAuthStore()
 const classesStore = useClassesStore()
 const assignmentsStore = useAssignmentsStore()
 const liveSessionsStore = useLiveSessionsStore()
+const announcementsStore = useAnnouncementsStore()
 const { toast } = useToast()
 
 const classId = computed(() => Number(route.params.id))
@@ -15,27 +16,11 @@ const activeTab = ref('stream')
 
 const currentClass = computed(() => classesStore.currentClass)
 const isTeacher = computed(() => currentClass.value?.teacherId === authStore.user?.id)
+const announcements = computed(() => announcementsStore.announcements)
 
 // New post state
 const newPost = ref('')
 const isPostingAnnouncement = ref(false)
-const announcements = ref<Array<{
-  id: number
-  content: string
-  author: { fullName: string; avatarUrl?: string }
-  createdAt: Date
-  comments: Array<{ id: number; content: string; author: { fullName: string }; createdAt: Date }>
-}>>([
-  {
-    id: 1,
-    content: 'Chào mừng các bạn đến với lớp học! Hãy giới thiệu bản thân ở phần bình luận nhé.',
-    author: { fullName: 'Giáo viên Demo' },
-    createdAt: new Date(Date.now() - 86400000),
-    comments: [
-      { id: 1, content: 'Xin chào mọi người!', author: { fullName: 'Nguyễn Văn A' }, createdAt: new Date() }
-    ]
-  }
-])
 
 const tabs = computed(() => {
   const baseTabs = [
@@ -63,6 +48,17 @@ const classColors = [
 const classColor = computed(() => classColors[(classId.value || 0) % classColors.length])
 
 const showCodeDialog = ref(false)
+const showDeleteDialog = ref(false)
+const showEditDialog = ref(false)
+const isDeleting = ref(false)
+const isSaving = ref(false)
+
+const editForm = reactive({
+  name: '',
+  description: '',
+  subject: '',
+})
+
 const classCode = computed(() => currentClass.value?.classCode || currentClass.value?.code || '')
 const qrCodeUrl = computed(() => {
   if (!classCode.value) return ''
@@ -76,21 +72,61 @@ const copyCode = async () => {
   }
 }
 
+const openEditDialog = () => {
+  if (currentClass.value) {
+    editForm.name = currentClass.value.name
+    editForm.description = currentClass.value.description || ''
+    editForm.subject = currentClass.value.subject || ''
+    showEditDialog.value = true
+  }
+}
+
+const saveClassChanges = async () => {
+  if (!editForm.name.trim()) {
+    toast.error('Vui lòng nhập tên lớp')
+    return
+  }
+  
+  isSaving.value = true
+  try {
+    await classesStore.updateClass(classId.value, editForm)
+    toast.success('Đã cập nhật lớp học')
+    showEditDialog.value = false
+  } catch (error: any) {
+    toast.error('Không thể cập nhật lớp học', error.message)
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const deleteClass = async () => {
+  isDeleting.value = true
+  try {
+    await classesStore.deleteClass(classId.value)
+    toast.success('Đã xóa lớp học')
+    router.push('/classes')
+  } catch (error: any) {
+    toast.error('Không thể xóa lớp học', error.message)
+    showDeleteDialog.value = false
+  } finally {
+    isDeleting.value = false
+  }
+}
+
 const postAnnouncement = async () => {
   if (!newPost.value.trim()) return
   
   isPostingAnnouncement.value = true
   try {
-    await new Promise(resolve => setTimeout(resolve, 500))
-    announcements.value.unshift({
-      id: Date.now(),
+    await announcementsStore.createAnnouncement(classId.value, {
+      title: 'Thông báo',
       content: newPost.value,
-      author: { fullName: authStore.user?.fullName || 'Bạn' },
-      createdAt: new Date(),
-      comments: []
+      allowComments: true,
     })
     newPost.value = ''
     toast.success('Đã đăng thông báo')
+  } catch (error: any) {
+    toast.error('Không thể đăng thông báo', error.message)
   } finally {
     isPostingAnnouncement.value = false
   }
@@ -127,6 +163,7 @@ onMounted(async () => {
     await Promise.all([
       assignmentsStore.fetchAssignments({ classId: classId.value }),
       liveSessionsStore.fetchSessions({ classId: classId.value }),
+      announcementsStore.fetchAnnouncements(classId.value),
     ])
   } catch (error: any) {
     console.error('Failed to fetch class:', error)
@@ -380,35 +417,58 @@ onMounted(async () => {
             v-for="announcement in announcements"
             :key="announcement.id"
             class="bg-white rounded-2xl shadow-sm overflow-hidden"
+            :class="announcement.isPinned ? 'border-2 border-primary' : ''"
           >
             <div class="p-5">
-              <div class="flex items-start gap-4">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-medium flex-shrink-0">
-                  {{ announcement.author.fullName.charAt(0) }}
-                </div>
-                <div class="flex-1">
-                  <div class="flex items-center gap-2">
-                    <span class="font-semibold text-gray-900">{{ announcement.author.fullName }}</span>
-                    <span class="text-gray-400 text-sm">{{ formatRelativeTime(announcement.createdAt) }}</span>
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex items-start gap-4 flex-1">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-medium flex-shrink-0">
+                    {{ announcement.author?.fullName?.charAt(0) || 'T' }}
                   </div>
-                  <p class="text-gray-700 mt-2 whitespace-pre-wrap">{{ announcement.content }}</p>
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-semibold text-gray-900">{{ announcement.author?.fullName || 'Giáo viên' }}</span>
+                      <span class="text-gray-400 text-sm">{{ formatRelativeTime(announcement.createdAt) }}</span>
+                      <span v-if="announcement.isPinned" class="px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary flex items-center gap-1">
+                        <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M12 17v5m-3-2 3-3 3 3m-3-13V2m-3 2 3 3 3-3"/>
+                        </svg>
+                        Đã ghim
+                      </span>
+                      <span v-if="announcement.priority === 'important'" class="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-600">
+                        Quan trọng
+                      </span>
+                      <span v-else-if="announcement.priority === 'urgent'" class="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-600">
+                        Khẩn cấp
+                      </span>
+                    </div>
+                    <h3 v-if="announcement.title" class="font-semibold text-lg text-gray-900 mt-2">{{ announcement.title }}</h3>
+                    <p class="text-gray-700 mt-2 whitespace-pre-wrap">{{ announcement.content }}</p>
+                  </div>
                 </div>
+                <button v-if="isTeacher" class="p-2 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors">
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"/>
+                    <circle cx="12" cy="5" r="1"/>
+                    <circle cx="12" cy="19" r="1"/>
+                  </svg>
+                </button>
               </div>
             </div>
 
             <!-- Comments section -->
-            <div v-if="announcement.comments.length > 0" class="border-t border-gray-100 bg-gray-50 px-5 py-4">
+            <div v-if="announcement.comments && announcement.comments.length > 0" class="border-t border-gray-100 bg-gray-50 px-5 py-4 space-y-3">
               <div
                 v-for="comment in announcement.comments"
                 :key="comment.id"
                 class="flex items-start gap-3"
               >
                 <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white text-sm font-medium">
-                  {{ comment.author.fullName.charAt(0) }}
+                  {{ comment.userName?.charAt(0) || 'U' }}
                 </div>
                 <div class="flex-1 bg-white rounded-xl p-3">
                   <div class="flex items-center gap-2">
-                    <span class="font-medium text-sm text-gray-900">{{ comment.author.fullName }}</span>
+                    <span class="font-medium text-sm text-gray-900">{{ comment.userName }}</span>
                     <span class="text-gray-400 text-xs">{{ formatRelativeTime(comment.createdAt) }}</span>
                   </div>
                   <p class="text-gray-700 text-sm mt-1">{{ comment.content }}</p>
@@ -583,29 +643,32 @@ onMounted(async () => {
       <!-- Settings Tab - Enhanced -->
       <div v-else-if="activeTab === 'settings' && isTeacher" class="space-y-6">
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div class="px-6 py-4 border-b">
-            <h2 class="text-lg font-bold text-gray-900">Cài đặt lớp học</h2>
-          </div>
-          <div class="p-6 space-y-5">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Tên lớp</label>
-              <input
-                :value="currentClass.name"
-                type="text"
-                class="w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
-              <textarea
-                :value="currentClass.description"
-                rows="3"
-                class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
-              />
-            </div>
-            <button class="px-6 py-3 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-colors">
-              Lưu thay đổi
+          <div class="px-6 py-4 border-b flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-900">Thông tin lớp học</h2>
+            <button
+              @click="openEditDialog"
+              class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
+            >
+              Chỉnh sửa
             </button>
+          </div>
+          <div class="p-6 space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-500 mb-1">Tên lớp</label>
+              <p class="text-gray-900 font-medium">{{ currentClass.name }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-500 mb-1">Mô tả</label>
+              <p class="text-gray-900">{{ currentClass.description || 'Chưa có mô tả' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-500 mb-1">Môn học</label>
+              <p class="text-gray-900">{{ currentClass.subject || 'Chưa xác định' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-500 mb-1">Mã lớp</label>
+              <p class="font-mono text-lg font-bold text-primary">{{ classCode }}</p>
+            </div>
           </div>
         </div>
 
@@ -617,7 +680,10 @@ onMounted(async () => {
             <p class="text-sm text-gray-600 mb-4">
               Xóa lớp học sẽ xóa tất cả dữ liệu liên quan bao gồm bài tập, tài liệu và thông báo. Hành động này không thể hoàn tác.
             </p>
-            <button class="px-6 py-3 rounded-xl border-2 border-red-500 text-red-600 font-medium hover:bg-red-500 hover:text-white transition-colors">
+            <button
+              @click="showDeleteDialog = true"
+              class="px-6 py-3 rounded-xl border-2 border-red-500 text-red-600 font-medium hover:bg-red-500 hover:text-white transition-colors"
+            >
               Xóa lớp học
             </button>
           </div>
@@ -692,6 +758,149 @@ onMounted(async () => {
           </Transition>
         </div>
       </Transition>
+    </Teleport>
+
+    <!-- Edit Class Dialog -->
+    <Teleport to="body">
+      <div
+        v-if="showEditDialog"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+        @click.self="showEditDialog = false"
+      >
+        <div class="relative bg-card border border-border rounded-2xl shadow-2xl max-w-lg w-full p-6 animate-in fade-in-0 zoom-in-95">
+          <button
+            @click="showEditDialog = false"
+            class="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+
+          <div class="mb-6">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="p-2 bg-primary/10 rounded-xl">
+                <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold">Chỉnh sửa lớp học</h2>
+            </div>
+          </div>
+
+          <form @submit.prevent="saveClassChanges" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium mb-2">Tên lớp học</label>
+              <input
+                v-model="editForm.name"
+                type="text"
+                required
+                class="w-full px-4 py-3 rounded-xl border border-input bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                placeholder="VD: Lập trình Web - K20"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-2">Môn học</label>
+              <input
+                v-model="editForm.subject"
+                type="text"
+                class="w-full px-4 py-3 rounded-xl border border-input bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                placeholder="VD: Lập trình"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-2">Mô tả</label>
+              <textarea
+                v-model="editForm.description"
+                rows="3"
+                class="w-full px-4 py-3 rounded-xl border border-input bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                placeholder="Mô tả về lớp học..."
+              />
+            </div>
+
+            <div class="flex gap-3 pt-2">
+              <button
+                type="button"
+                @click="showEditDialog = false"
+                class="flex-1 px-4 py-3 rounded-xl border border-input hover:bg-muted/50 font-medium transition-all"
+                :disabled="isSaving"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                class="flex-1 px-4 py-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                :disabled="isSaving"
+              >
+                <svg v-if="isSaving" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ isSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Delete Confirmation Dialog -->
+    <Teleport to="body">
+      <div
+        v-if="showDeleteDialog"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+        @click.self="showDeleteDialog = false"
+      >
+        <div class="relative bg-card border-2 border-red-200 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in-0 zoom-in-95">
+          <div class="flex justify-center mb-4">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+              <svg class="w-8 h-8 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                <line x1="10" y1="11" x2="10" y2="17"/>
+                <line x1="14" y1="11" x2="14" y2="17"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-red-600 mb-2">Xác nhận xóa lớp học</h2>
+            <p class="text-muted-foreground">
+              Bạn có chắc chắn muốn xóa lớp <strong class="text-foreground">{{ currentClass?.name }}</strong>?
+            </p>
+            <p class="text-sm text-red-600 mt-3 font-medium">
+              ⚠️ Hành động này không thể hoàn tác!
+            </p>
+            <p class="text-xs text-muted-foreground mt-2">
+              Tất cả bài tập, tài liệu và thông báo sẽ bị xóa vĩnh viễn.
+            </p>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              @click="showDeleteDialog = false"
+              class="flex-1 px-4 py-3 rounded-xl border border-input hover:bg-muted/50 font-medium transition-all"
+              :disabled="isDeleting"
+            >
+              Hủy
+            </button>
+            <button
+              @click="deleteClass"
+              class="flex-1 px-4 py-3 rounded-xl bg-red-600 text-white hover:bg-red-700 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              :disabled="isDeleting"
+            >
+              <svg v-if="isDeleting" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isDeleting ? 'Đang xóa...' : 'Xóa lớp học' }}
+            </button>
+          </div>
+        </div>
+      </div>
     </Teleport>
   </div>
 </template>
