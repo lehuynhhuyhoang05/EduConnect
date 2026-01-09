@@ -185,6 +185,7 @@ export interface CreateSessionRequest {
   description?: string
   scheduledAt?: string
   maxParticipants?: number
+  waitingRoomEnabled?: boolean
 }
 
 // Chat types
