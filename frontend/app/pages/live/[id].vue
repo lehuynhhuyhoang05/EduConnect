@@ -22,6 +22,7 @@ const session = ref<LiveSession | null>(null)
 const isLoading = ref(true)
 const isJoining = ref(false)
 const hasJoined = ref(false)
+const isWaitingForAdmission = ref(false) // Waiting room state
 
 // Room ID for socket
 const roomId = computed(() => `session-${sessionId.value}`)
@@ -30,6 +31,31 @@ const roomId = computed(() => `session-${sessionId.value}`)
 const isChatOpen = ref(true)
 const isParticipantsOpen = ref(false)
 const isWhiteboardOpen = ref(false)
+const isAttendanceOpen = ref(false)
+const isRecordingOpen = ref(false)
+const isWaitingRoomOpen = ref(false)
+
+// Feature panel state - tracks active right panel
+const activePanel = ref<'chat' | 'participants' | 'attendance' | 'recording' | 'waitingRoom' | null>('chat')
+
+// Toggle panel helper
+const togglePanel = (panel: typeof activePanel.value) => {
+  if (activePanel.value === panel) {
+    activePanel.value = null
+    isChatOpen.value = false
+    isParticipantsOpen.value = false
+    isAttendanceOpen.value = false
+    isRecordingOpen.value = false
+    isWaitingRoomOpen.value = false
+  } else {
+    activePanel.value = panel
+    isChatOpen.value = panel === 'chat'
+    isParticipantsOpen.value = panel === 'participants'
+    isAttendanceOpen.value = panel === 'attendance'
+    isRecordingOpen.value = panel === 'recording'
+    isWaitingRoomOpen.value = panel === 'waitingRoom'
+  }
+}
 
 // Pre-join media state
 const preJoinAudioEnabled = ref(true)
@@ -334,6 +360,77 @@ const setupSocketHandlers = () => {
   }
 }
 
+// Setup handler for when student gets admitted from waiting room
+const setupAdmissionHandler = () => {
+  // Listen for admission granted
+  liveSocket.onAdmissionGranted.value = async (data) => {
+    console.log('Admission granted in [id].vue:', data)
+    if (data.userId === authStore.user?.id) {
+      isWaitingForAdmission.value = false
+      hasJoined.value = true
+      toast.success('Đã được chấp nhận tham gia!')
+      // room-joined event will follow with participants list
+    }
+  }
+  
+  // Listen for room-joined event (sent by backend after admission)
+  liveSocket.onRoomJoined.value = async (data) => {
+    console.log('Room joined event received:', data)
+    // Setup WebRTC with existing participants
+    await setupWebRTCWithParticipants(data.participants || [])
+  }
+  
+  // Listen for admission denied
+  liveSocket.onAdmissionDenied.value = (data) => {
+    console.log('Admission denied in [id].vue:', data)
+    if (data.userId === authStore.user?.id) {
+      isWaitingForAdmission.value = false
+      toast.error(data.reason || 'Yêu cầu tham gia bị từ chối')
+      navigateTo(`/classes/${session.value?.classId || ''}`)
+    }
+  }
+}
+
+// Setup WebRTC connections with participants list
+const setupWebRTCWithParticipants = async (participantsList: Array<{ userId: number; socketId?: string; userName?: string }>) => {
+  const localUserId = authStore.user?.id || 0
+  console.log('Setting up WebRTC with participants:', participantsList)
+  
+  for (const p of participantsList) {
+    // Add to participants list
+    participants.value.set(p.userId, {
+      id: p.userId,
+      fullName: p.userName || `User ${p.userId}`,
+      role: 'participant',
+      isMuted: true,
+      isCameraOn: false,
+    })
+    
+    // Only send offer if our userId is higher (we are the initiator)
+    if (localUserId > p.userId) {
+      console.log('I have higher userId, sending offer to:', p.userId)
+      const offer = await webRTC.createOffer(
+        p.userId,
+        (candidate) => liveSocket.sendIceCandidate(p.userId, candidate)
+      )
+      if (offer) {
+        liveSocket.sendOffer(p.userId, offer)
+      }
+    } else {
+      console.log('I have lower userId, waiting for offer from:', p.userId)
+      // The host/other peer should send us an offer
+    }
+  }
+  participants.value = new Map(participants.value)
+  
+  // Broadcast our media state
+  liveSocket.updateMediaState(
+    roomId.value,
+    webRTC.isAudioEnabled.value,
+    webRTC.isVideoEnabled.value
+  )
+}
+
 // Join the session
 const joinSession = async () => {
   if (hasJoined.value || isJoining.value) return
@@ -374,7 +471,10 @@ const joinSession = async () => {
     
     if (!result.success) {
       if (result.waiting) {
+        isWaitingForAdmission.value = true
         toast.info('Đang chờ host chấp nhận...')
+        // Setup handler for when we get admitted
+        setupAdmissionHandler()
         return
       }
       throw new Error(result.error || 'Không thể tham gia phòng')
@@ -803,7 +903,7 @@ onBeforeRouteLeave((_to, _from, next) => {
     </div>
     
     <!-- Pre-join Screen -->
-    <div v-else-if="!hasJoined" class="flex-1 flex items-center justify-center p-4">
+    <div v-else-if="!hasJoined && !isWaitingForAdmission" class="flex-1 flex items-center justify-center p-4">
       <div class="max-w-lg w-full bg-gray-800 rounded-2xl p-8">
         <h1 class="text-2xl font-bold text-white mb-2">{{ session?.title }}</h1>
         <p class="text-gray-400 mb-6">{{ session?.class?.name }}</p>
@@ -881,6 +981,40 @@ onBeforeRouteLeave((_to, _from, next) => {
           @click="router.push('/dashboard')"
         >
           Quay lại
+        </button>
+      </div>
+    </div>
+    
+    <!-- Waiting for Admission Screen -->
+    <div v-else-if="isWaitingForAdmission" class="flex-1 flex items-center justify-center p-4">
+      <div class="max-w-lg w-full bg-gray-800 rounded-2xl p-8 text-center">
+        <div class="w-20 h-20 rounded-full bg-orange-500/20 flex items-center justify-center mx-auto mb-6">
+          <svg class="w-10 h-10 text-orange-400 animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        
+        <h1 class="text-2xl font-bold text-white mb-2">Đang chờ chấp nhận</h1>
+        <p class="text-gray-400 mb-6">
+          Yêu cầu tham gia của bạn đã được gửi đến giảng viên.<br>
+          Vui lòng đợi trong giây lát...
+        </p>
+        
+        <div class="flex justify-center gap-2 mb-6">
+          <span class="w-2 h-2 rounded-full bg-orange-400 animate-bounce" style="animation-delay: 0ms"></span>
+          <span class="w-2 h-2 rounded-full bg-orange-400 animate-bounce" style="animation-delay: 150ms"></span>
+          <span class="w-2 h-2 rounded-full bg-orange-400 animate-bounce" style="animation-delay: 300ms"></span>
+        </div>
+        
+        <p class="text-sm text-gray-500">{{ session?.title }}</p>
+        <p class="text-xs text-gray-600">{{ session?.class?.name }}</p>
+        
+        <button
+          class="w-full mt-8 py-3 rounded-xl bg-gray-700 hover:bg-gray-600 text-white font-medium transition-colors"
+          @click="router.push('/dashboard')"
+        >
+          Hủy và quay lại
         </button>
       </div>
     </div>
@@ -1235,12 +1369,54 @@ onBeforeRouteLeave((_to, _from, next) => {
               </svg>
             </button>
 
+            <!-- Attendance - Điểm danh (cả teacher và student) -->
+            <button
+              class="w-12 h-12 rounded-full flex items-center justify-center transition-all"
+              :class="activePanel === 'attendance' ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
+              title="Điểm danh"
+              @click="togglePanel('attendance')"
+            >
+              <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+              </svg>
+            </button>
+
+            <!-- Recording (Host only) -->
+            <button
+              v-if="authStore.isTeacher"
+              class="w-12 h-12 rounded-full flex items-center justify-center transition-all relative"
+              :class="activePanel === 'recording' ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
+              title="Ghi hình"
+              @click="togglePanel('recording')"
+            >
+              <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+
+            <!-- Waiting Room (Host only) -->
+            <button
+              v-if="authStore.isTeacher"
+              class="w-12 h-12 rounded-full flex items-center justify-center transition-all relative"
+              :class="activePanel === 'waitingRoom' ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
+              title="Phòng chờ"
+              @click="togglePanel('waitingRoom')"
+            >
+              <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </button>
+
             <!-- Participants -->
             <button
               class="w-12 h-12 rounded-full flex items-center justify-center transition-all relative"
-              :class="isParticipantsOpen ? 'bg-primary hover:bg-primary/90 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
+              :class="activePanel === 'participants' ? 'bg-primary hover:bg-primary/90 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
               title="Người tham gia"
-              @click="isParticipantsOpen = !isParticipantsOpen; isChatOpen = false"
+              @click="togglePanel('participants')"
             >
               <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -1256,9 +1432,9 @@ onBeforeRouteLeave((_to, _from, next) => {
             <!-- Chat -->
             <button
               class="w-12 h-12 rounded-full flex items-center justify-center transition-all relative"
-              :class="isChatOpen ? 'bg-primary hover:bg-primary/90 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
+              :class="activePanel === 'chat' ? 'bg-primary hover:bg-primary/90 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
               title="Chat"
-              @click="isChatOpen = !isChatOpen; isParticipantsOpen = false"
+              @click="togglePanel('chat')"
             >
               <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -1277,7 +1453,7 @@ onBeforeRouteLeave((_to, _from, next) => {
           </div>
         </div>
 
-        <!-- Side Panel (Chat / Participants) -->
+        <!-- Side Panel (Chat / Participants / Attendance / Recording / Waiting Room) -->
         <Transition
           enter-active-class="transition-all duration-300"
           enter-from-class="translate-x-full opacity-0"
@@ -1287,17 +1463,23 @@ onBeforeRouteLeave((_to, _from, next) => {
           leave-to-class="translate-x-full opacity-0"
         >
           <div
-            v-if="isChatOpen || isParticipantsOpen"
+            v-if="activePanel"
             class="w-80 bg-gray-800 border-l border-gray-700 flex flex-col"
           >
             <!-- Panel Header -->
             <div class="h-14 px-4 border-b border-gray-700 flex items-center justify-between">
               <h3 class="text-white font-medium">
-                {{ isChatOpen ? 'Trò chuyện' : 'Người tham gia' }}
+                {{ 
+                  activePanel === 'chat' ? 'Trò chuyện' : 
+                  activePanel === 'participants' ? 'Người tham gia' :
+                  activePanel === 'attendance' ? 'Điểm danh' :
+                  activePanel === 'recording' ? 'Ghi hình' :
+                  activePanel === 'waitingRoom' ? 'Phòng chờ' : ''
+                }}
               </h3>
               <button
                 class="w-8 h-8 rounded-lg hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
-                @click="isChatOpen = false; isParticipantsOpen = false"
+                @click="togglePanel(null)"
               >
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="18" y1="6" x2="6" y2="18"/>
@@ -1307,7 +1489,7 @@ onBeforeRouteLeave((_to, _from, next) => {
             </div>
 
             <!-- Chat Content -->
-            <div v-if="isChatOpen" class="flex-1 flex flex-col">
+            <div v-if="activePanel === 'chat'" class="flex-1 flex flex-col">
               <div class="flex-1 overflow-y-auto p-4 space-y-4">
                 <div v-if="messages.length === 0" class="text-center text-gray-500 py-8">
                   Chưa có tin nhắn nào
@@ -1353,7 +1535,7 @@ onBeforeRouteLeave((_to, _from, next) => {
             </div>
 
             <!-- Participants Content -->
-            <div v-if="isParticipantsOpen" class="flex-1 overflow-y-auto p-4 space-y-2">
+            <div v-if="activePanel === 'participants'" class="flex-1 overflow-y-auto p-4 space-y-2">
               <div
                 v-for="p in allParticipants"
                 :key="p.id"
@@ -1402,6 +1584,32 @@ onBeforeRouteLeave((_to, _from, next) => {
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Attendance Panel -->
+            <div v-if="activePanel === 'attendance'" class="flex-1 overflow-y-auto p-4">
+              <LiveAttendancePanel
+                :session-id="sessionId"
+                :is-host="authStore.isTeacher"
+                :participants="allParticipants.map(p => ({ userId: p.id, userName: p.fullName }))"
+              />
+            </div>
+
+            <!-- Recording Panel -->
+            <div v-if="activePanel === 'recording'" class="flex-1 overflow-y-auto p-4">
+              <LiveRecordingControls
+                :session-id="sessionId"
+                :is-host="authStore.isTeacher"
+              />
+            </div>
+
+            <!-- Waiting Room Panel -->
+            <div v-if="activePanel === 'waitingRoom'" class="flex-1 overflow-y-auto p-4">
+              <LiveWaitingRoom
+                :session-id="sessionId"
+                :is-host="authStore.isTeacher"
+                :user-id="authStore.user?.id || 0"
+              />
             </div>
           </div>
         </Transition>
