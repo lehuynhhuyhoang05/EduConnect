@@ -883,11 +883,20 @@ export class LiveSessionsGateway
     // Notify the denied user
     if (deniedUser.socketId) {
       this.server.to(deniedUser.socketId).emit('admission-denied', {
+        userId: targetUserId,
         byHostId: hostId,
         reason: reason || 'Host đã từ chối yêu cầu tham gia',
         timestamp: new Date().toISOString(),
       });
     }
+    
+    // Also notify the host/room that user was denied
+    this.server.to(roomId).emit('user-denied', {
+      userId: targetUserId,
+      userName: deniedUser.userName,
+      byHostId: hostId,
+      timestamp: new Date().toISOString(),
+    });
 
     this.logger.log(`Host ${hostId} denied user ${targetUserId} from room ${roomId}`);
 
@@ -895,13 +904,17 @@ export class LiveSessionsGateway
   }
 
   private async admitUserFromWaitingRoom(roomId: string, userId: number, hostId: number) {
+    this.logger.log(`Admitting user ${userId} to room ${roomId} by host ${hostId}`);
+    
     const waitingUsers = this.waitingRoom.get(roomId);
     if (!waitingUsers) {
+      this.logger.error(`No waiting room found for ${roomId}`);
       return { success: false, error: 'No waiting room found' };
     }
 
     const userIndex = waitingUsers.findIndex(u => u.userId === userId);
     if (userIndex === -1) {
+      this.logger.error(`User ${userId} not in waiting room for ${roomId}`);
       return { success: false, error: 'User not in waiting room' };
     }
 
@@ -909,7 +922,10 @@ export class LiveSessionsGateway
     waitingUsers.splice(userIndex, 1);
 
     // Get the user's socket and admit them to the room
-    const userSocket = this.server.sockets.sockets.get(admittedUser.socketId) as AuthenticatedSocket;
+    const sockets = await this.server.in(admittedUser.socketId).fetchSockets();
+    const userSocket = sockets[0] as any as AuthenticatedSocket;
+    this.logger.log(`User socket found: ${!!userSocket}, socketId: ${admittedUser.socketId}`);
+    
     if (userSocket) {
       await userSocket.join(roomId);
       userSocket.roomId = roomId;
@@ -922,18 +938,27 @@ export class LiveSessionsGateway
 
       // Notify the admitted user
       userSocket.emit('admission-granted', {
+        userId,
         byHostId: hostId,
         roomId,
         timestamp: new Date().toISOString(),
       });
 
-      // Get existing participants
-      const existingParticipants = Array.from(this.roomParticipants.get(roomId))
-        .filter(id => id !== userId)
-        .map(id => ({
-          userId: id,
-          socketId: this.userSocketMap.get(id),
-        }));
+      // Get existing participants with userNames
+      const existingUserIds = Array.from(this.roomParticipants.get(roomId))
+        .filter(id => id !== userId);
+      
+      // Fetch user details for all existing participants
+      const existingParticipants = await Promise.all(
+        existingUserIds.map(async (id) => {
+          const participantUser = await this.userRepository.findOne({ where: { id } });
+          return {
+            userId: id,
+            userName: participantUser?.fullName || `User ${id}`,
+            socketId: this.userSocketMap.get(id),
+          };
+        })
+      );
 
       // Send participants list to admitted user
       userSocket.emit('room-joined', {
@@ -952,6 +977,8 @@ export class LiveSessionsGateway
       });
 
       this.logger.log(`Host ${hostId} admitted user ${userId} to room ${roomId}`);
+    } else {
+      this.logger.error(`User socket not found for userId: ${userId}, socketId: ${admittedUser.socketId}`);
     }
 
     return { success: true };
@@ -1099,6 +1126,179 @@ export class LiveSessionsGateway
   }
 
   // ===================== UTILITY METHODS =====================
+
+  // ===================== ATTENDANCE =====================
+
+  // Map roomId -> attendance session data
+  private attendanceSessions = new Map<string, {
+    isOpen: boolean;
+    code: string;
+    startedAt: Date;
+    method: 'code' | 'manual' | 'auto';
+    records: Map<number, { status: string; checkInTime: Date }>;
+  }>();
+
+  @SubscribeMessage('start-attendance')
+  async handleStartAttendance(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string; method?: string },
+  ) {
+    const hostId = client.userId;
+    const { roomId, method = 'code' } = data;
+
+    // Generate random 6-digit code
+    const code = Math.random().toString().substring(2, 8);
+
+    this.attendanceSessions.set(roomId, {
+      isOpen: true,
+      code,
+      startedAt: new Date(),
+      method: method as any,
+      records: new Map(),
+    });
+
+    // Broadcast to all in room
+    this.server.to(roomId).emit('attendance-started', {
+      isOpen: true,
+      code: method === 'code' ? code : undefined,
+      method,
+      startedBy: hostId,
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logger.log(`Host ${hostId} started attendance in room ${roomId} with method ${method}`);
+
+    return { success: true, code };
+  }
+
+  @SubscribeMessage('close-attendance')
+  async handleCloseAttendance(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string },
+  ) {
+    const hostId = client.userId;
+    const { roomId } = data;
+
+    const session = this.attendanceSessions.get(roomId);
+    if (session) {
+      session.isOpen = false;
+    }
+
+    // Broadcast to all in room
+    this.server.to(roomId).emit('attendance-closed', {
+      isOpen: false,
+      closedBy: hostId,
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logger.log(`Host ${hostId} closed attendance in room ${roomId}`);
+
+    return { success: true };
+  }
+
+  @SubscribeMessage('check-in-attendance')
+  async handleCheckInAttendance(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string; code: string },
+  ) {
+    const userId = client.userId;
+    const { roomId, code } = data;
+
+    const session = this.attendanceSessions.get(roomId);
+    if (!session || !session.isOpen) {
+      return { success: false, error: 'Điểm danh chưa mở' };
+    }
+
+    if (session.method === 'code' && session.code !== code) {
+      return { success: false, error: 'Mã điểm danh không đúng' };
+    }
+
+    // Get user info
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    // Record check-in
+    session.records.set(userId, {
+      status: 'present',
+      checkInTime: new Date(),
+    });
+
+    // Notify room about check-in
+    this.server.to(roomId).emit('attendance-checked-in', {
+      userId,
+      userName: user?.fullName || `User ${userId}`,
+      status: 'present',
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logger.log(`User ${userId} checked in to attendance in room ${roomId}`);
+
+    return { success: true };
+  }
+
+  @SubscribeMessage('manual-attendance')
+  async handleManualAttendance(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string; targetUserId: number; status: string; userName?: string },
+  ) {
+    const hostId = client.userId;
+    const { roomId, targetUserId, status, userName } = data;
+
+    const session = this.attendanceSessions.get(roomId);
+    if (!session) {
+      // Create session if not exists
+      this.attendanceSessions.set(roomId, {
+        isOpen: true,
+        code: '',
+        startedAt: new Date(),
+        method: 'manual',
+        records: new Map(),
+      });
+    }
+
+    const currentSession = this.attendanceSessions.get(roomId)!;
+    currentSession.records.set(targetUserId, {
+      status,
+      checkInTime: new Date(),
+    });
+
+    // Notify room about manual check-in
+    this.server.to(roomId).emit('attendance-checked-in', {
+      userId: targetUserId,
+      userName: userName || `User ${targetUserId}`,
+      status,
+      byHost: hostId,
+      timestamp: new Date().toISOString(),
+    });
+
+    this.logger.log(`Host ${hostId} marked user ${targetUserId} as ${status} in room ${roomId}`);
+
+    return { success: true };
+  }
+
+  @SubscribeMessage('get-attendance-status')
+  async handleGetAttendanceStatus(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { roomId: string },
+  ) {
+    const { roomId } = data;
+    const session = this.attendanceSessions.get(roomId);
+
+    if (!session) {
+      return { success: true, isOpen: false };
+    }
+
+    return {
+      success: true,
+      isOpen: session.isOpen,
+      code: session.method === 'code' ? session.code : undefined,
+      method: session.method,
+      records: Array.from(session.records.entries()).map(([userId, record]) => ({
+        userId,
+        status: record.status,
+        checkInTime: record.checkInTime.toISOString(),
+      })),
+    };
+  }
 
   /**
    * Get participants in a room
