@@ -1,1 +1,0 @@
-export { JoinClassModal } from './JoinClassModal';

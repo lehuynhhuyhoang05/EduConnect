@@ -11,7 +11,6 @@ import {
   UploadedFiles,
   Res,
   ParseIntPipe,
-  Req,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
@@ -22,19 +21,12 @@ import {
   ApiConsumes,
   ApiBody,
 } from '@nestjs/swagger';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { FilesService } from './files.service';
 import { QueryFileDto } from './dto';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
 import { User } from '@modules/users/entities/user.entity';
-import { File } from './entities';
-
-// Helper to add URL to file response
-const fileWithUrl = (file: File, req: Request) => ({
-  ...file,
-  url: `${req.protocol}://${req.get('host')}${file.path}`,
-});
 
 @ApiTags('Files')
 @Controller('files')
@@ -63,10 +55,8 @@ export class FilesController {
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: User,
-    @Req() req: Request,
   ) {
-    const uploaded = await this.filesService.upload(file, user);
-    return fileWithUrl(uploaded, req);
+    return this.filesService.upload(file, user);
   }
 
   @Post('upload-multiple')
@@ -91,10 +81,8 @@ export class FilesController {
   async uploadMultipleFiles(
     @UploadedFiles() files: Express.Multer.File[],
     @CurrentUser() user: User,
-    @Req() req: Request,
   ) {
-    const uploaded = await this.filesService.uploadMultiple(files, user);
-    return uploaded.map(f => fileWithUrl(f, req));
+    return this.filesService.uploadMultiple(files, user);
   }
 
   @Get()

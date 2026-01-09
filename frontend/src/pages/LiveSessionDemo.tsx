@@ -529,7 +529,7 @@ export default function LiveSessionDemo() {
           </div>
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20 space-y-5">
             <div>
-              <label className="text-slate-300 text-sm font-medium mb-2 flex items-center gap-2">
+              <label className="text-slate-300 text-sm font-medium mb-2 block flex items-center gap-2">
                 <span>🏠</span> Room ID
               </label>
               <input 
@@ -541,7 +541,7 @@ export default function LiveSessionDemo() {
               <p className="text-slate-500 text-xs mt-1">Nhập cùng Room ID để vào chung phòng</p>
             </div>
             <div>
-              <label className="text-slate-300 text-sm font-medium mb-2 flex items-center gap-2">
+              <label className="text-slate-300 text-sm font-medium mb-2 block flex items-center gap-2">
                 <span>🔢</span> Session ID
               </label>
               <input 
