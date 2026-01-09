@@ -1,13 +1,13 @@
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware(async (to, from) => {
   const authStore = useAuthStore()
   
-  // Initialize auth if not done yet
-  if (import.meta.client) {
-    authStore.initAuth()
+  // Initialize auth if not done yet (must await!)
+  if (import.meta.client && !authStore.isAuthenticated) {
+    await authStore.initAuth()
   }
   
   // Check if the route requires authentication
-  const publicRoutes = ['/auth/login', '/auth/register', '/auth/forgot-password']
+  const publicRoutes = ['/auth/login', '/auth/register', '/auth/forgot-password', '/']
   
   if (!authStore.isAuthenticated && !publicRoutes.includes(to.path)) {
     return navigateTo('/auth/login')

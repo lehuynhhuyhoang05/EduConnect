@@ -184,15 +184,16 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="isLoading" class="max-w-5xl mx-auto space-y-6 py-6">
-    <div class="h-52 rounded-2xl bg-gray-200 animate-pulse" />
-    <div class="flex gap-4">
-      <div v-for="i in 4" :key="i" class="h-10 w-24 rounded-lg bg-gray-200 animate-pulse" />
+  <div>
+    <div v-if="isLoading" class="max-w-5xl mx-auto space-y-6 py-6">
+      <div class="h-52 rounded-2xl bg-gray-200 animate-pulse" />
+      <div class="flex gap-4">
+        <div v-for="i in 4" :key="i" class="h-10 w-24 rounded-lg bg-gray-200 animate-pulse" />
+      </div>
+      <div class="h-64 rounded-2xl bg-gray-200 animate-pulse" />
     </div>
-    <div class="h-64 rounded-2xl bg-gray-200 animate-pulse" />
-  </div>
 
-  <div v-else-if="currentClass" class="max-w-5xl mx-auto py-6 space-y-6">
+    <div v-else-if="currentClass" class="max-w-5xl mx-auto py-6 space-y-6">
     <!-- Header Banner - Enhanced -->
     <div class="relative overflow-hidden rounded-2xl shadow-xl">
       <!-- Cover Image/Gradient -->
@@ -902,5 +903,6 @@ onMounted(async () => {
         </div>
       </div>
     </Teleport>
+    </div>
   </div>
 </template>

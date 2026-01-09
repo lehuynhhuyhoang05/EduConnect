@@ -204,7 +204,7 @@ export class AuthService {
     // Generate access token (short-lived)
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_SECRET'),
-      expiresIn: this.configService.get('JWT_EXPIRES_IN') || '15m',
+      expiresIn: this.configService.get('JWT_EXPIRATION') || '7d',
     });
 
     // Generate refresh token (cryptographically secure random string)

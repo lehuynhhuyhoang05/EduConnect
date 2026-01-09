@@ -35,3 +35,9 @@
     "email": "huyhoang24@gmail.com",
     "ipAddress": "::1"
   }
+[2026-01-09T08:06:07.805Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }

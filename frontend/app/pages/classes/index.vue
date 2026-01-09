@@ -78,7 +78,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="space-y-8">
+  <div>
+    <div class="space-y-8">
     <!-- Header -->
     <div class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
       <div>
@@ -410,7 +411,7 @@ onMounted(async () => {
         </div>
       </NuxtLink>
     </div>
-  </div>
+    </div>
 
   <!-- Join Class Dialog -->
   <Teleport to="body">
@@ -490,4 +491,5 @@ onMounted(async () => {
       </div>
     </div>
   </Teleport>
+  </div>
 </template>

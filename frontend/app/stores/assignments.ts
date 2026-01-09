@@ -166,5 +166,30 @@ export const useAssignmentsStore = defineStore('assignments', {
       
       return returned
     },
+
+    // Assignment Statistics
+    async fetchAssignmentStats(assignmentId: number) {
+      const api = useApi()
+      return await api.get<{
+        total: number
+        submitted: number
+        graded: number
+        pending: number
+        late: number
+        averageScore: number
+      }>(`/assignments/${assignmentId}/stats`)
+    },
+
+    // Export grades as CSV
+    async exportGrades(assignmentId: number) {
+      const api = useApi()
+      return await api.get<string>(`/assignments/${assignmentId}/export-grades`)
+    },
+
+    // Bulk grade submissions
+    async bulkGrade(assignmentId: number, grades: Array<{ submissionId: number; score: number; feedback?: string }>) {
+      const api = useApi()
+      return await api.post<{ success: number; failed: number }>(`/assignments/${assignmentId}/bulk-grade`, { grades })
+    },
   },
 })

@@ -135,10 +135,11 @@ export const useAuthStore = defineStore('auth', {
       this.token = response.tokens.accessToken
       this.refreshTokenValue = response.tokens.refreshToken
       
-      // Persist to localStorage
+      // Persist to localStorage with expiry check
       if (import.meta.client) {
         localStorage.setItem('accessToken', response.tokens.accessToken)
         localStorage.setItem('refreshToken', response.tokens.refreshToken)
+        localStorage.setItem('tokenExpiry', String(Date.now() + 7 * 24 * 60 * 60 * 1000)) // 7 days
       }
     },
 
@@ -151,6 +152,7 @@ export const useAuthStore = defineStore('auth', {
       if (import.meta.client) {
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
+        localStorage.removeItem('tokenExpiry')
       }
     },
 
@@ -160,13 +162,28 @@ export const useAuthStore = defineStore('auth', {
       
       const accessToken = localStorage.getItem('accessToken')
       const refreshToken = localStorage.getItem('refreshToken')
+      const tokenExpiry = localStorage.getItem('tokenExpiry')
+      
+      // Check if token expired
+      if (tokenExpiry && Date.now() > Number(tokenExpiry)) {
+        this.clearAuthData()
+        return
+      }
       
       if (accessToken && refreshToken) {
         this.token = accessToken
         this.refreshTokenValue = refreshToken
         
         // Fetch current user
-        await this.fetchCurrentUser()
+        const user = await this.fetchCurrentUser()
+        
+        // If user fetch failed, try to refresh token
+        if (!user && refreshToken) {
+          const success = await this.refreshToken()
+          if (success) {
+            await this.fetchCurrentUser()
+          }
+        }
       }
     },
   },
