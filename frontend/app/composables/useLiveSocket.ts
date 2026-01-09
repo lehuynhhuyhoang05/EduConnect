@@ -42,26 +42,85 @@ interface HandRaiseEvent {
   timestamp: string
 }
 
+// Attendance events
+interface AttendanceStartedEvent {
+  isOpen: boolean
+  code?: string
+  method: string
+  startedBy: number
+  timestamp: string
+}
+
+interface AttendanceCheckedInEvent {
+  userId: number
+  userName: string
+  status: string
+  byHost?: number
+  timestamp: string
+}
+
+// Waiting Room events
+interface WaitingRoomStatusEvent {
+  enabled: boolean
+  byHostId: number
+  timestamp: string
+  users?: Array<{
+    userId: number
+    userName: string
+    socketId: string
+    requestedAt: string
+  }>
+}
+
+interface UserWaitingEvent {
+  userId: number
+  userName: string
+  socketId: string
+  roomId: string
+  timestamp: string
+}
+
+interface AdmissionEvent {
+  userId?: number
+  byHostId?: number
+  roomId?: string
+  reason?: string
+  timestamp: string
+}
+
+// Singleton state - shared across all components
+const socket = ref<Socket | null>(null)
+const isConnected = ref(false)
+const connectionError = ref<string | null>(null)
+
+// Event callbacks - shared
+const onSignal = ref<((data: SignalData) => void) | null>(null)
+const onUserJoined = ref<((data: UserJoined) => void) | null>(null)
+const onUserLeft = ref<((data: UserLeft) => void) | null>(null)
+const onMediaState = ref<((data: MediaState) => void) | null>(null)
+const onChatMessage = ref<((data: ChatMessage) => void) | null>(null)
+const onHandRaised = ref<((data: HandRaiseEvent) => void) | null>(null)
+const onHandLowered = ref<((data: HandRaiseEvent) => void) | null>(null)
+const onSessionEnded = ref<(() => void) | null>(null)
+
+// Attendance event callbacks
+const onAttendanceStarted = ref<((data: AttendanceStartedEvent) => void) | null>(null)
+const onAttendanceClosed = ref<((data: { isOpen: boolean; closedBy: number; timestamp: string }) => void) | null>(null)
+const onAttendanceCheckedIn = ref<((data: AttendanceCheckedInEvent) => void) | null>(null)
+
+// Waiting room event callbacks  
+const onWaitingRoomStatus = ref<((data: WaitingRoomStatusEvent) => void) | null>(null)
+const onUserWaiting = ref<((data: UserWaitingEvent) => void) | null>(null)
+const onAdmissionGranted = ref<((data: AdmissionEvent) => void) | null>(null)
+const onAdmissionDenied = ref<((data: AdmissionEvent) => void) | null>(null)
+const onRoomJoined = ref<((data: { roomId: string; participants: Array<{ userId: number; socketId?: string }> }) => void) | null>(null)
+
 export function useLiveSocket() {
   const config = useRuntimeConfig()
   const authStore = useAuthStore()
   
-  const socket = ref<Socket | null>(null)
-  const isConnected = ref(false)
-  const connectionError = ref<string | null>(null)
-  
-  // Event callbacks
-  const onSignal = ref<((data: SignalData) => void) | null>(null)
-  const onUserJoined = ref<((data: UserJoined) => void) | null>(null)
-  const onUserLeft = ref<((data: UserLeft) => void) | null>(null)
-  const onMediaState = ref<((data: MediaState) => void) | null>(null)
-  const onChatMessage = ref<((data: ChatMessage) => void) | null>(null)
-  const onHandRaised = ref<((data: HandRaiseEvent) => void) | null>(null)
-  const onHandLowered = ref<((data: HandRaiseEvent) => void) | null>(null)
-  const onSessionEnded = ref<(() => void) | null>(null)
-  
   const connect = () => {
-    if (socket.value?.connected) {
+    if (isConnected.value && socket.value) {
       return
     }
     
@@ -148,6 +207,49 @@ export function useLiveSocket() {
       console.log('Session ended by host')
       onSessionEnded.value?.()
     })
+    
+    // ========== ATTENDANCE EVENTS ==========
+    socket.value.on('attendance-started', (data: AttendanceStartedEvent) => {
+      console.log('Attendance started:', data)
+      onAttendanceStarted.value?.(data)
+    })
+    
+    socket.value.on('attendance-closed', (data: any) => {
+      console.log('Attendance closed:', data)
+      onAttendanceClosed.value?.(data)
+    })
+    
+    socket.value.on('attendance-checked-in', (data: AttendanceCheckedInEvent) => {
+      console.log('Attendance checked in:', data)
+      onAttendanceCheckedIn.value?.(data)
+    })
+    
+    // ========== WAITING ROOM EVENTS ==========
+    socket.value.on('waiting-room-status', (data: WaitingRoomStatusEvent) => {
+      console.log('Waiting room status:', data)
+      onWaitingRoomStatus.value?.(data)
+    })
+    
+    socket.value.on('user-waiting', (data: UserWaitingEvent) => {
+      console.log('User waiting:', data)
+      onUserWaiting.value?.(data)
+    })
+    
+    socket.value.on('admission-granted', (data: AdmissionEvent) => {
+      console.log('Admission granted:', data)
+      onAdmissionGranted.value?.(data)
+    })
+    
+    socket.value.on('admission-denied', (data: AdmissionEvent) => {
+      console.log('Admission denied:', data)
+      onAdmissionDenied.value?.(data)
+    })
+    
+    // Room joined event (sent after admission from waiting room)
+    socket.value.on('room-joined', (data: { roomId: string; participants: Array<{ userId: number; socketId?: string }> }) => {
+      console.log('Room joined:', data)
+      onRoomJoined.value?.(data)
+    })
   }
   
   const disconnect = () => {
@@ -165,7 +267,7 @@ export function useLiveSocket() {
     error?: string
   }> => {
     return new Promise((resolve) => {
-      if (!socket.value?.connected) {
+      if (!isConnected.value || !socket.value) {
         resolve({ success: false, error: 'Socket not connected' })
         return
       }
@@ -183,7 +285,7 @@ export function useLiveSocket() {
   
   const leaveRoom = async (roomId: string): Promise<{ success: boolean }> => {
     return new Promise((resolve) => {
-      if (!socket.value?.connected) {
+      if (!isConnected.value || !socket.value) {
         resolve({ success: false })
         return
       }
@@ -226,10 +328,135 @@ export function useLiveSocket() {
     socket.value?.emit('lower-hand', { roomId })
   }
   
+  // ========== ATTENDANCE SOCKET METHODS ==========
+  const startAttendance = (roomId: string, method: string = 'code'): Promise<{ success: boolean; code?: string }> => {
+    return new Promise((resolve) => {
+      if (!isConnected.value || !socket.value) {
+        resolve({ success: false })
+        return
+      }
+      socket.value.emit('start-attendance', { roomId, method }, (response: any) => {
+        resolve(response)
+      })
+    })
+  }
+  
+  const closeAttendance = (roomId: string): Promise<{ success: boolean }> => {
+    return new Promise((resolve) => {
+      if (!isConnected.value || !socket.value) {
+        resolve({ success: false })
+        return
+      }
+      socket.value.emit('close-attendance', { roomId }, (response: any) => {
+        resolve(response)
+      })
+    })
+  }
+  
+  const checkInAttendance = (roomId: string, code: string): Promise<{ success: boolean; error?: string }> => {
+    return new Promise((resolve) => {
+      if (!isConnected.value || !socket.value) {
+        resolve({ success: false, error: 'Not connected' })
+        return
+      }
+      socket.value.emit('check-in-attendance', { roomId, code }, (response: any) => {
+        resolve(response)
+      })
+    })
+  }
+  
+  const manualAttendance = (roomId: string, targetUserId: number, status: string, userName?: string): Promise<{ success: boolean }> => {
+    return new Promise((resolve) => {
+      if (!isConnected.value || !socket.value) {
+        resolve({ success: false })
+        return
+      }
+      socket.value.emit('manual-attendance', { roomId, targetUserId, status, userName }, (response: any) => {
+        resolve(response)
+      })
+    })
+  }
+  
+  const getAttendanceStatus = (roomId: string): Promise<{ success: boolean; isOpen?: boolean; code?: string; method?: string; records?: any[] }> => {
+    return new Promise((resolve) => {
+      if (!isConnected.value || !socket.value) {
+        resolve({ success: false })
+        return
+      }
+      socket.value.emit('get-attendance-status', { roomId }, (response: any) => {
+        resolve(response)
+      })
+    })
+  }
+  
+  // ========== WAITING ROOM SOCKET METHODS ==========
+  const enableWaitingRoom = (roomId: string, enabled: boolean): Promise<{ success: boolean }> => {
+    return new Promise((resolve) => {
+      if (!isConnected.value || !socket.value) {
+        resolve({ success: false })
+        return
+      }
+      socket.value.emit('enable-waiting-room', { roomId, enabled }, (response: any) => {
+        resolve(response)
+      })
+    })
+  }
+  
+  const getWaitingUsers = (roomId: string): Promise<{ success: boolean; users?: any[] }> => {
+    return new Promise((resolve) => {
+      if (!isConnected.value || !socket.value) {
+        resolve({ success: false })
+        return
+      }
+      socket.value.emit('get-waiting-users', { roomId }, (response: any) => {
+        resolve(response)
+      })
+    })
+  }
+  
+  const admitUser = (roomId: string, targetUserId: number): Promise<{ success: boolean }> => {
+    return new Promise((resolve) => {
+      console.log('admitUser called:', { roomId, targetUserId, isConnected: isConnected.value })
+      if (!isConnected.value || !socket.value) {
+        console.log('admitUser: socket not connected')
+        resolve({ success: false })
+        return
+      }
+      socket.value.emit('admit-user', { roomId, targetUserId }, (response: any) => {
+        console.log('admitUser response:', response)
+        resolve(response)
+      })
+    })
+  }
+  
+  const admitAllUsers = (roomId: string): Promise<{ success: boolean; admittedCount?: number }> => {
+    return new Promise((resolve) => {
+      if (!isConnected.value || !socket.value) {
+        resolve({ success: false })
+        return
+      }
+      socket.value.emit('admit-all-users', { roomId }, (response: any) => {
+        resolve(response)
+      })
+    })
+  }
+  
+  const denyUser = (roomId: string, targetUserId: number, reason?: string): Promise<{ success: boolean }> => {
+    return new Promise((resolve) => {
+      if (!isConnected.value || !socket.value) {
+        resolve({ success: false })
+        return
+      }
+      socket.value.emit('deny-user', { roomId, targetUserId, reason }, (response: any) => {
+        resolve(response)
+      })
+    })
+  }
+  
   return {
-    socket: readonly(socket),
-    isConnected: readonly(isConnected),
-    connectionError: readonly(connectionError),
+    socket,
+    isConnected,
+    connectionError,
     connect,
     disconnect,
     joinRoom,
@@ -241,6 +468,18 @@ export function useLiveSocket() {
     sendChatMessage,
     raiseHand,
     lowerHand,
+    // Attendance methods
+    startAttendance,
+    closeAttendance,
+    checkInAttendance,
+    manualAttendance,
+    getAttendanceStatus,
+    // Waiting room methods
+    enableWaitingRoom,
+    getWaitingUsers,
+    admitUser,
+    admitAllUsers,
+    denyUser,
     // Event callbacks
     onSignal,
     onUserJoined,
@@ -250,5 +489,15 @@ export function useLiveSocket() {
     onHandRaised,
     onHandLowered,
     onSessionEnded,
+    // Attendance events
+    onAttendanceStarted,
+    onAttendanceClosed,
+    onAttendanceCheckedIn,
+    // Waiting room events
+    onWaitingRoomStatus,
+    onUserWaiting,
+    onAdmissionGranted,
+    onAdmissionDenied,
+    onRoomJoined,
   }
 }
