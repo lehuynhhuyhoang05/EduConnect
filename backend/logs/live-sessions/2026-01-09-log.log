@@ -6,3 +6,389 @@
     "hostId": 27,
     "title": "Buổi học - 9/1/2026"
   }
+[2026-01-09T09:26:33.060Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 39,
+    "roomId": "25a6c753-bcb9-4989-ac0c-a3e263a1723f",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T09:26:46.000Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 40,
+    "roomId": "0fb10619-61fc-4c85-8008-28ffe36e7353",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T09:31:23.461Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 41,
+    "roomId": "2606bbf8-6887-473c-b8f5-b6f3a99f0395",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T09:36:24.282Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 42,
+    "roomId": "a82d099b-7f16-4055-b0b2-fb8ac1f836c9",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T09:55:01.183Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 43,
+    "roomId": "4c9df71d-a3a7-46ff-b98b-08756fa020c1",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T09:55:06.465Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 44,
+    "roomId": "ce9ce292-9a6b-403e-9000-161a33e2b74e",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T09:55:19.565Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 45,
+    "roomId": "f3590ff3-bc9d-40bc-ab04-2d6fecbd658f",
+    "classId": 9,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T09:55:26.939Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 46,
+    "roomId": "580431af-38a9-4080-a930-ab5ff56a2909",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T09:58:38.691Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 47,
+    "roomId": "5ca9a3b3-ec7e-4e7f-869d-05a58ff9f94c",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T09:59:37.091Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 48,
+    "roomId": "86df4747-2575-43f0-a068-904be470c48f",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T10:03:15.940Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 49,
+    "roomId": "3fc9130e-da03-4ac7-8d1f-0cd03875fa58",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T10:03:29.352Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 50,
+    "roomId": "010dad24-492c-4e09-ad7a-50191e7bbebf",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T10:04:10.775Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 51,
+    "roomId": "3cf1cea2-a242-4175-827b-e9066b405551",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T10:09:00.904Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 52,
+    "roomId": "10b4644e-92f9-43e7-8092-ffbc4d1088c9",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T10:14:50.659Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 53,
+    "roomId": "050e5cfe-eace-443b-94d4-f5dca7127b83",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T10:33:35.144Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 54,
+    "roomId": "04e406c0-3213-49b0-83c6-9a0fff685199",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T10:45:59.703Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 55,
+    "roomId": "b79aa7aa-72b4-447c-812d-48045d118e97",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T10:46:10.663Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 56,
+    "roomId": "94168e78-ef6b-4607-9293-8103041ab22e",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T10:46:31.370Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 57,
+    "roomId": "9092b337-0849-46e2-9245-e5f30fdb01c2",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T10:49:05.030Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 58,
+    "roomId": "4e702b03-2c3e-4a4c-9fc9-6cb62f4ddd8e",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T11:05:05.669Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 53,
+    "teacherId": 27
+  }
+[2026-01-09T11:05:05.795Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 53,
+    "roomId": "050e5cfe-eace-443b-94d4-f5dca7127b83"
+  }
+[2026-01-09T11:05:12.676Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 59,
+    "roomId": "84d177c0-a3c0-427b-ac7a-ecd77787aa0c",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T11:10:16.325Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 59,
+    "teacherId": 27
+  }
+[2026-01-09T11:10:16.353Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 59,
+    "roomId": "84d177c0-a3c0-427b-ac7a-ecd77787aa0c"
+  }
+[2026-01-09T11:16:15.076Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 48,
+    "teacherId": 27
+  }
+[2026-01-09T11:16:15.111Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 48,
+    "roomId": "86df4747-2575-43f0-a068-904be470c48f"
+  }
+[2026-01-09T11:16:32.984Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 60,
+    "roomId": "9d6b5407-f09b-4159-8e3c-63e4e78f25ad",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T11:24:18.797Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 37,
+    "teacherId": 27
+  }
+[2026-01-09T11:24:18.852Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 37,
+    "roomId": "d37cbded-d0a7-4f03-b6f2-805c3eafe1ad"
+  }
+[2026-01-09T11:24:20.859Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 60,
+    "teacherId": 27
+  }
+[2026-01-09T11:24:20.892Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 60,
+    "roomId": "9d6b5407-f09b-4159-8e3c-63e4e78f25ad"
+  }
+[2026-01-09T12:13:43.525Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 61,
+    "roomId": "0afd0814-87a4-449e-a1ba-a950ca37c87d",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T12:21:32.780Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 61,
+    "teacherId": 27
+  }
+[2026-01-09T12:21:32.813Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 61,
+    "roomId": "0afd0814-87a4-449e-a1ba-a950ca37c87d"
+  }
+[2026-01-09T12:21:37.055Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 62,
+    "roomId": "c46f648c-e3ba-49d8-9a51-d7e2f3451008",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T12:31:15.953Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 62,
+    "teacherId": 27
+  }
+[2026-01-09T12:31:16.002Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 62,
+    "roomId": "c46f648c-e3ba-49d8-9a51-d7e2f3451008"
+  }
+[2026-01-09T12:31:17.191Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 63,
+    "roomId": "25b9b757-fb52-4ee5-aeef-fbfe419fe178",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T12:31:32.054Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 64,
+    "roomId": "97e7d211-4978-4cd4-ab80-a53cb40a4371",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T12:31:39.119Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 63,
+    "teacherId": 27
+  }
+[2026-01-09T12:31:39.149Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 63,
+    "roomId": "25b9b757-fb52-4ee5-aeef-fbfe419fe178"
+  }
+[2026-01-09T12:57:46.572Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 65,
+    "roomId": "45d21d30-b365-4142-a150-f1612de6a666",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T13:40:12.223Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 65,
+    "teacherId": 27
+  }
+[2026-01-09T13:40:12.315Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 65,
+    "roomId": "45d21d30-b365-4142-a150-f1612de6a666"
+  }
+[2026-01-09T13:45:41.303Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 66,
+    "roomId": "551618d8-268d-4a8c-ab01-2df34df22519",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T14:11:25.998Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 66,
+    "teacherId": 27
+  }
+[2026-01-09T14:11:26.069Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 66,
+    "roomId": "551618d8-268d-4a8c-ab01-2df34df22519"
+  }
+[2026-01-09T14:11:31.018Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 67,
+    "roomId": "2bf54e86-30f8-4b64-86c3-ab59f39f2f35",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T14:11:58.609Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 67,
+    "teacherId": 27
+  }
+[2026-01-09T14:11:58.642Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 67,
+    "roomId": "2bf54e86-30f8-4b64-86c3-ab59f39f2f35"
+  }
+[2026-01-09T14:12:03.721Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 68,
+    "roomId": "855f699d-4c70-4946-9430-a978ec418bb0",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T14:19:58.361Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 68,
+    "teacherId": 27
+  }
+[2026-01-09T14:19:58.431Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 68,
+    "roomId": "855f699d-4c70-4946-9430-a978ec418bb0"
+  }
+[2026-01-09T14:20:03.803Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 69,
+    "roomId": "670cb2a8-ea27-41f2-ac25-bbab8d1c105a",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }
+[2026-01-09T14:41:31.319Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 69,
+    "teacherId": 27
+  }
+[2026-01-09T14:41:31.385Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 69,
+    "roomId": "670cb2a8-ea27-41f2-ac25-bbab8d1c105a"
+  }
+[2026-01-09T14:41:46.811Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 70,
+    "roomId": "f388af10-a750-440a-97c5-24cee9deda57",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }

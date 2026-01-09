@@ -41,3 +41,75 @@
     "email": "hoanglhh0026@ut.edu.vn",
     "ipAddress": "::1"
   }
+[2026-01-09T08:13:28.192Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-09T08:14:19.663Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 28,
+    "email": "huyhoang24@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T08:31:24.692Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 28,
+    "email": "huyhoang24@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T08:39:30.632Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 28,
+    "email": "huyhoang24@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T08:39:51.828Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-09T08:40:59.754Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 28,
+    "email": "huyhoang24@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T08:43:05.461Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T08:46:08.797Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T08:50:59.820Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T08:55:23.991Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T09:00:35.879Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T09:35:56.993Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
