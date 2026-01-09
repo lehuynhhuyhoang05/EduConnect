@@ -41,6 +41,7 @@ const tabs = computed(() => {
     { id: 'live', label: 'Phiên live', icon: 'video', count: classLiveSessions.value.length },
     { id: 'materials', label: 'Tài liệu', icon: 'folder', count: 0 },
     { id: 'members', label: 'Thành viên', icon: 'users', count: currentClass.value?.memberCount || 0 },
+    { id: 'attendance', label: 'Điểm danh', icon: 'attendance', count: 0 },
   ]
 
   if (isTeacher.value) {
@@ -64,9 +65,16 @@ const showCodeDialog = ref(false)
 const showDeleteDialog = ref(false)
 const showEditDialog = ref(false)
 const showLiveShareDialog = ref(false)
+const showCreateSessionDialog = ref(false)
 const createdLiveSession = ref<{ id: number; title: string } | null>(null)
 const isDeleting = ref(false)
 const isSaving = ref(false)
+const isCreatingSession = ref(false)
+
+// Create session form
+const createSessionForm = reactive({
+  title: '',
+})
 
 const editForm = reactive({
   name: '',
@@ -168,11 +176,19 @@ const goToLiveSession = () => {
   }
 }
 
+// Open create session dialog
+const openCreateSessionDialog = () => {
+  createSessionForm.title = `Buổi học - ${new Date().toLocaleDateString('vi-VN')}`
+  showCreateSessionDialog.value = true
+}
+
+// Create and start live session
 const startLiveSession = async () => {
+  isCreatingSession.value = true
   try {
     // Create the session
     const session = await liveSessionsStore.createSession(classId.value, {
-      title: `Buổi học - ${new Date().toLocaleDateString('vi-VN')}`,
+      title: createSessionForm.title || `Buổi học - ${new Date().toLocaleDateString('vi-VN')}`,
     })
     
     // Start the session immediately to set status to 'live'
@@ -181,11 +197,14 @@ const startLiveSession = async () => {
     // Refresh sessions to update the list
     await liveSessionsStore.fetchSessions({ classId: classId.value })
     
-    // Show share modal with link and QR code
+    // Close create dialog and show share modal
+    showCreateSessionDialog.value = false
     createdLiveSession.value = { id: session.id, title: session.title }
     showLiveShareDialog.value = true
   } catch (error: any) {
     toast.error('Không thể bắt đầu buổi học', error.message)
+  } finally {
+    isCreatingSession.value = false
   }
 }
 
@@ -428,6 +447,10 @@ onMounted(async () => {
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
+          <!-- Attendance icon -->
+          <svg v-else-if="tab.icon === 'attendance'" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
           <!-- Settings icon -->
           <svg v-else-if="tab.icon === 'settings'" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"/>
@@ -663,7 +686,7 @@ onMounted(async () => {
           <h3 class="text-lg font-bold text-gray-900">Phiên live</h3>
           <button 
             v-if="isTeacher"
-            @click="startLiveSession"
+            @click="openCreateSessionDialog"
             class="px-4 py-2 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-colors flex items-center gap-2"
           >
             <span class="relative flex h-3 w-3">
@@ -858,6 +881,11 @@ onMounted(async () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Attendance Tab - Giống Moodle -->
+      <div v-else-if="activeTab === 'attendance' && isTeacher" class="space-y-6">
+        <ClassAttendanceManager :class-id="classId" :members="members" />
       </div>
 
       <!-- Settings Tab - Enhanced -->
@@ -1123,6 +1151,90 @@ onMounted(async () => {
       </div>
     </Teleport>
 
+    <!-- Create Live Session Dialog -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-all duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-all duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showCreateSessionDialog" class="fixed inset-0 z-50 flex items-center justify-center">
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showCreateSessionDialog = false" />
+          <div class="relative bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
+            <div class="text-center mb-6">
+              <div class="w-16 h-16 bg-red-100 dark:bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="relative flex h-6 w-6">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span class="relative inline-flex h-6 w-6 rounded-full bg-red-500"></span>
+                </span>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white">Bắt đầu phiên live</h3>
+              <p class="text-gray-500 dark:text-gray-400 mt-1">Cấu hình phiên live trước khi bắt đầu</p>
+            </div>
+
+            <!-- Session Title -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tiêu đề phiên live</label>
+              <input
+                v-model="createSessionForm.title"
+                type="text"
+                placeholder="Nhập tiêu đề..."
+                class="w-full h-11 px-4 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              />
+            </div>
+
+            <!-- Info box -->
+            <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl">
+              <div class="flex gap-2 items-start">
+                <svg class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 16v-4"/>
+                  <path d="M12 8h.01"/>
+                </svg>
+                <div class="text-sm text-blue-700 dark:text-blue-300">
+                  <p class="font-medium">Các tính năng trong phiên live:</p>
+                  <ul class="mt-1 text-xs space-y-0.5 text-blue-600 dark:text-blue-400">
+                    <li>• <strong>Điểm danh</strong>: Mở panel điểm danh để bắt đầu</li>
+                    <li>• <strong>Phòng chờ</strong>: Mở panel phòng chờ và bật để kiểm duyệt</li>
+                    <li>• <strong>Ghi hình</strong>: Sử dụng panel ghi hình (demo only)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-3">
+              <button
+                class="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition-colors"
+                @click="showCreateSessionDialog = false"
+                :disabled="isCreatingSession"
+              >
+                Hủy
+              </button>
+              <button
+                class="flex-1 px-4 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                @click="startLiveSession"
+                :disabled="isCreatingSession"
+              >
+                <svg v-if="isCreatingSession" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="relative flex h-2 w-2" v-if="!isCreatingSession">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span class="relative inline-flex h-2 w-2 rounded-full bg-white"></span>
+                </span>
+                {{ isCreatingSession ? 'Đang tạo...' : 'Bắt đầu' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
     <!-- Live Session Share Modal -->
     <Teleport to="body">
       <Transition
@@ -1174,7 +1286,7 @@ onMounted(async () => {
             </div>
 
             <!-- QR Code -->
-            <div class="text-center mb-6">
+            <div class="text-center mb-4">
               <div class="inline-flex bg-white p-3 rounded-xl border border-gray-200">
                 <img 
                   v-if="liveShareLink"
@@ -1184,6 +1296,25 @@ onMounted(async () => {
                 />
               </div>
               <p class="text-gray-400 text-xs mt-2">Quét mã QR để tham gia</p>
+            </div>
+
+            <!-- Info box -->
+            <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl">
+              <div class="flex gap-2 items-start">
+                <svg class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 16v-4"/>
+                  <path d="M12 8h.01"/>
+                </svg>
+                <div class="text-sm text-blue-700 dark:text-blue-300">
+                  <p class="font-medium">Các tính năng:</p>
+                  <ul class="mt-1 text-xs space-y-0.5 text-blue-600 dark:text-blue-400">
+                    <li>• <strong>Điểm danh</strong>: Bấm icon điểm danh → Chọn mã code/QR hoặc thủ công</li>
+                    <li>• <strong>Phòng chờ</strong>: Bấm icon phòng chờ → Toggle "Bật phòng chờ"</li>
+                    <li>• <strong>Ghi hình</strong>: Bấm icon ghi hình (demo only)</li>
+                  </ul>
+                </div>
+              </div>
             </div>
 
             <!-- Actions -->
