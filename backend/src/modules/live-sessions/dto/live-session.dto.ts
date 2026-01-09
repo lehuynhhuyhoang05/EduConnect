@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsNumber,
   IsDateString,
+  IsBoolean,
   MaxLength,
   Min,
   Max,
@@ -33,6 +34,11 @@ export class CreateLiveSessionDto {
   @Min(2)
   @Max(100)
   maxParticipants?: number;
+
+  @ApiProperty({ example: false, required: false, default: false })
+  @IsOptional()
+  @IsBoolean()
+  waitingRoomEnabled?: boolean;
 }
 
 export class UpdateLiveSessionDto {
