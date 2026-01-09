@@ -14,6 +14,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { LiveSessionsService } from './live-sessions.service';
+import { BreakoutRoomsService } from './breakout-rooms.service';
 import { ConnectionQuality } from './entities';
 import { User } from '@modules/users/entities/user.entity';
 import { FileLoggerService } from '@common/logger/file-logger.service';
@@ -79,10 +80,17 @@ export class LiveSessionsGateway
   private waitingRoomEnabled = new Map<string, boolean>();
   // Map roomId -> users with raised hands
   private raisedHands = new Map<string, HandRaiseInfo[]>();
+  // Map sessionId -> breakout room status
+  private activeBreakoutSessions = new Map<number, boolean>();
+  // Map userId -> current breakout roomId (null = main room)
+  private userBreakoutRoom = new Map<number, string | null>();
+  // Map breakout roomId -> Set of userIds
+  private breakoutRoomParticipants = new Map<string, Set<number>>();
 
   constructor(
     private readonly jwtService: JwtService,
     private readonly liveSessionsService: LiveSessionsService,
+    private readonly breakoutRoomsService: BreakoutRoomsService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly fileLogger: FileLoggerService,
@@ -153,6 +161,21 @@ export class LiveSessionsGateway
             });
           }
         }
+      }
+
+      // Cleanup breakout room tracking
+      const breakoutRoom = this.userBreakoutRoom.get(userId);
+      if (breakoutRoom) {
+        const participants = this.breakoutRoomParticipants.get(breakoutRoom);
+        if (participants) {
+          participants.delete(userId);
+          // Notify breakout room
+          this.server.to(breakoutRoom).emit('user-left-breakout', {
+            userId,
+            roomId: breakoutRoom,
+          });
+        }
+        this.userBreakoutRoom.delete(userId);
       }
 
       // Leave all rooms and notify participants
@@ -327,6 +350,22 @@ export class LiveSessionsGateway
       return { success: false, error: 'Not authenticated' };
     }
 
+    // Check if both users are in the same room (main or breakout)
+    const fromBreakoutRoom = this.userBreakoutRoom.get(fromUserId);
+    const targetBreakoutRoom = this.userBreakoutRoom.get(targetUserId);
+
+    // Only allow signaling if both are in same context
+    // (both in main room OR both in same breakout room)
+    if (fromBreakoutRoom !== targetBreakoutRoom) {
+      this.logger.warn(
+        `Signal blocked: users in different rooms (${fromBreakoutRoom} vs ${targetBreakoutRoom})`,
+      );
+      return { 
+        success: false, 
+        error: 'Cannot signal to user in different room' 
+      };
+    }
+
     const targetSocketId = this.userSocketMap.get(targetUserId);
     
     if (!targetSocketId) {
@@ -342,7 +381,9 @@ export class LiveSessionsGateway
       timestamp: new Date().toISOString(),
     });
 
-    this.logger.debug(`Signal ${type} from ${fromUserId} to ${targetUserId}`);
+    this.logger.debug(
+      `Signal ${type} from ${fromUserId} to ${targetUserId} in ${fromBreakoutRoom || 'main'}`,
+    );
 
     return { success: true };
   }
@@ -1331,5 +1372,477 @@ export class LiveSessionsGateway
     if (socketId) {
       this.server.to(socketId).emit(event, data);
     }
+  }
+
+  // ===================== BREAKOUT ROOMS =====================
+
+  /**
+   * Create and configure breakout rooms
+   */
+  @SubscribeMessage('create-breakout-rooms')
+  async handleCreateBreakoutRooms(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: {
+      sessionId: number;
+      rooms: { name: string; participantIds?: number[] }[];
+      allowParticipantsToChoose?: boolean;
+      allowReturnToMain?: boolean;
+      autoCloseAfterMinutes?: number;
+    },
+  ) {
+    const userId = client.userId;
+    if (!userId) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    try {
+      const result = this.breakoutRoomsService.createBreakoutRooms(
+        data.sessionId,
+        userId,
+        {
+          rooms: data.rooms,
+          allowParticipantsToChoose: data.allowParticipantsToChoose ?? false,
+          allowReturnToMain: data.allowReturnToMain ?? true,
+          autoCloseAfterMinutes: data.autoCloseAfterMinutes,
+        },
+      );
+
+      // Broadcast to all participants in main room
+      const mainRoomId = `session-${data.sessionId}`;
+      this.server.to(mainRoomId).emit('breakout-rooms-created', {
+        sessionId: data.sessionId,
+        rooms: result.rooms.map(r => ({
+          id: r.id,
+          name: r.name,
+          maxParticipants: r.maxParticipants,
+        })),
+        config: {
+          allowParticipantsToChoose: data.allowParticipantsToChoose,
+          allowReturnToMain: data.allowReturnToMain,
+          autoCloseAfterMinutes: data.autoCloseAfterMinutes,
+        },
+      });
+
+      this.fileLogger.log(
+        'live-sessions',
+        'info',
+        `Breakout rooms created for session ${data.sessionId} by user ${userId}`,
+      );
+
+      return { success: true, rooms: result.rooms };
+    } catch (error) {
+      this.fileLogger.log(
+        'live-sessions',
+        'error',
+        `Failed to create breakout rooms: ${error.message}`,
+      );
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Start breakout rooms (allow participants to join)
+   */
+  @SubscribeMessage('start-breakout-rooms')
+  async handleStartBreakoutRooms(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { sessionId: number },
+  ) {
+    const userId = client.userId;
+    if (!userId) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    try {
+      const result = this.breakoutRoomsService.startBreakoutRooms(
+        data.sessionId,
+        userId,
+      );
+
+      this.activeBreakoutSessions.set(data.sessionId, true);
+
+      // Broadcast to main room that breakout rooms are now open
+      const mainRoomId = `session-${data.sessionId}`;
+      this.server.to(mainRoomId).emit('breakout-rooms-started', {
+        sessionId: data.sessionId,
+        rooms: result.rooms,
+      });
+
+      this.fileLogger.log(
+        'live-sessions',
+        'info',
+        `Breakout rooms started for session ${data.sessionId}`,
+      );
+
+      return { success: true, rooms: result.rooms };
+    } catch (error) {
+      this.fileLogger.log(
+        'live-sessions',
+        'error',
+        `Failed to start breakout rooms: ${error.message}`,
+      );
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Join a breakout room
+   */
+  @SubscribeMessage('join-breakout-room')
+  async handleJoinBreakoutRoom(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { sessionId: number; roomId: string },
+  ) {
+    const userId = client.userId;
+    if (!userId) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    try {
+      // Get user info
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      if (!user) {
+        return { success: false, error: 'User not found' };
+      }
+
+      // Join breakout room via service
+      const room = this.breakoutRoomsService.joinBreakoutRoom(
+        data.sessionId,
+        data.roomId,
+        userId,
+        user.fullName,
+      );
+
+      // Update socket room membership
+      const mainRoomId = `session-${data.sessionId}`;
+      client.leave(mainRoomId); // Leave main room
+      client.join(data.roomId); // Join breakout room
+
+      // Track user's breakout room
+      this.userBreakoutRoom.set(userId, data.roomId);
+
+      // Track participants in breakout room
+      if (!this.breakoutRoomParticipants.has(data.roomId)) {
+        this.breakoutRoomParticipants.set(data.roomId, new Set());
+      }
+      this.breakoutRoomParticipants.get(data.roomId)!.add(userId);
+
+      // Notify others in breakout room
+      this.server.to(data.roomId).emit('user-joined-breakout', {
+        userId,
+        userName: user.fullName,
+        roomId: data.roomId,
+      });
+
+      // Notify main room
+      this.server.to(mainRoomId).emit('user-moved-to-breakout', {
+        userId,
+        roomId: data.roomId,
+      });
+
+      // Get all participants in the breakout room for WebRTC setup
+      const participants = Array.from(
+        this.breakoutRoomParticipants.get(data.roomId) || [],
+      ).filter(id => id !== userId);
+
+      // Get participant info
+      const participantInfo = await Promise.all(
+        participants.map(async (id) => {
+          const socketId = this.userSocketMap.get(id);
+          const pUser = await this.userRepository.findOne({ where: { id } });
+          return {
+            userId: id,
+            socketId,
+            userName: pUser?.fullName || 'Unknown',
+          };
+        }),
+      );
+
+      this.fileLogger.log(
+        'live-sessions',
+        'info',
+        `User ${userId} joined breakout room ${data.roomId}`,
+      );
+
+      return {
+        success: true,
+        room,
+        participants: participantInfo,
+      };
+    } catch (error) {
+      this.fileLogger.log(
+        'live-sessions',
+        'error',
+        `Failed to join breakout room: ${error.message}`,
+      );
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Leave breakout room and return to main
+   */
+  @SubscribeMessage('leave-breakout-room')
+  async handleLeaveBreakoutRoom(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { sessionId: number },
+  ) {
+    const userId = client.userId;
+    if (!userId) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    try {
+      const currentBreakoutRoom = this.userBreakoutRoom.get(userId);
+      
+      if (!currentBreakoutRoom) {
+        return { success: false, error: 'Not in a breakout room' };
+      }
+
+      // Leave via service
+      const result = this.breakoutRoomsService.leaveBreakoutRoom(
+        data.sessionId,
+        userId,
+      );
+
+      // Update socket room membership
+      client.leave(currentBreakoutRoom);
+      const mainRoomId = `session-${data.sessionId}`;
+      client.join(mainRoomId);
+
+      // Update tracking
+      this.userBreakoutRoom.delete(userId);
+      const roomParticipants = this.breakoutRoomParticipants.get(currentBreakoutRoom);
+      if (roomParticipants) {
+        roomParticipants.delete(userId);
+      }
+
+      // Notify breakout room
+      this.server.to(currentBreakoutRoom).emit('user-left-breakout', {
+        userId,
+        roomId: currentBreakoutRoom,
+      });
+
+      // Notify main room
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      this.server.to(mainRoomId).emit('user-returned-to-main', {
+        userId,
+        userName: user?.fullName || 'Unknown',
+      });
+
+      // Get main room participants for WebRTC reconnection
+      const mainParticipants = Array.from(
+        this.roomParticipants.get(mainRoomId) || [],
+      ).filter(id => id !== userId && !this.userBreakoutRoom.has(id));
+
+      const participantInfo = await Promise.all(
+        mainParticipants.map(async (id) => {
+          const socketId = this.userSocketMap.get(id);
+          const pUser = await this.userRepository.findOne({ where: { id } });
+          return {
+            userId: id,
+            socketId,
+            userName: pUser?.fullName || 'Unknown',
+          };
+        }),
+      );
+
+      this.fileLogger.log(
+        'live-sessions',
+        'info',
+        `User ${userId} left breakout room ${currentBreakoutRoom}`,
+      );
+
+      return {
+        success: true,
+        leftRoom: result.leftRoom,
+        mainRoomParticipants: participantInfo,
+      };
+    } catch (error) {
+      this.fileLogger.log(
+        'live-sessions',
+        'error',
+        `Failed to leave breakout room: ${error.message}`,
+      );
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Host broadcasts message to all breakout rooms
+   */
+  @SubscribeMessage('broadcast-to-breakouts')
+  async handleBroadcastToBreakouts(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { sessionId: number; message: string },
+  ) {
+    const userId = client.userId;
+    if (!userId) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    try {
+      const result = this.breakoutRoomsService.broadcastToAllRooms(
+        data.sessionId,
+        userId,
+        data.message,
+      );
+
+      // Get all breakout rooms for this session
+      const status = this.breakoutRoomsService.getBreakoutStatus(data.sessionId);
+      if (status) {
+        status.rooms.forEach((room) => {
+          this.server.to(room.id).emit('host-broadcast', {
+            message: data.message,
+            timestamp: new Date().toISOString(),
+          });
+        });
+      }
+
+      this.fileLogger.log(
+        'live-sessions',
+        'info',
+        `Broadcast sent to ${result.recipients} participants in ${result.rooms.length} rooms`,
+      );
+
+      return { success: true, ...result };
+    } catch (error) {
+      this.fileLogger.log(
+        'live-sessions',
+        'error',
+        `Failed to broadcast to breakouts: ${error.message}`,
+      );
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Close all breakout rooms
+   */
+  @SubscribeMessage('close-all-breakouts')
+  async handleCloseAllBreakouts(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { sessionId: number },
+  ) {
+    const userId = client.userId;
+    if (!userId) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    try {
+      // Get current status before closing
+      const status = this.breakoutRoomsService.getBreakoutStatus(data.sessionId);
+      
+      if (!status) {
+        return { success: false, error: 'No active breakout session' };
+      }
+
+      // Notify all breakout rooms that they're closing
+      status.rooms.forEach((room) => {
+        this.server.to(room.id).emit('breakout-closing', {
+          message: 'Host is closing all breakout rooms. Returning to main room...',
+          countdownSeconds: 10,
+        });
+      });
+
+      // Wait 10 seconds before actually closing
+      setTimeout(async () => {
+        const result = this.breakoutRoomsService.closeBreakoutRooms(
+          data.sessionId,
+          userId,
+        );
+
+        const mainRoomId = `session-${data.sessionId}`;
+
+        // Move all users back to main room
+        status.rooms.forEach((room) => {
+          const participants = this.breakoutRoomParticipants.get(room.id);
+          if (participants) {
+            participants.forEach((participantId) => {
+              const socketId = this.userSocketMap.get(participantId);
+              if (socketId) {
+                const sockets = this.server.sockets.sockets;
+                const socket = sockets.get(socketId);
+                if (socket) {
+                  socket.leave(room.id);
+                  socket.join(mainRoomId);
+                }
+              }
+              this.userBreakoutRoom.delete(participantId);
+            });
+          }
+          this.breakoutRoomParticipants.delete(room.id);
+        });
+
+        this.activeBreakoutSessions.delete(data.sessionId);
+
+        // Notify everyone
+        this.server.to(mainRoomId).emit('breakout-rooms-closed', {
+          sessionId: data.sessionId,
+          totalParticipants: result.totalParticipants,
+        });
+
+        this.fileLogger.log(
+          'live-sessions',
+          'info',
+          `All breakout rooms closed for session ${data.sessionId}`,
+        );
+      }, 10000);
+
+      return { success: true, message: 'Closing in 10 seconds' };
+    } catch (error) {
+      this.fileLogger.log(
+        'live-sessions',
+        'error',
+        `Failed to close breakout rooms: ${error.message}`,
+      );
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Get breakout room status
+   */
+  @SubscribeMessage('get-breakout-status')
+  async handleGetBreakoutStatus(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { sessionId: number },
+  ) {
+    const status = this.breakoutRoomsService.getBreakoutStatus(data.sessionId);
+    
+    if (!status) {
+      return { success: true, hasBreakoutRooms: false };
+    }
+
+    return {
+      success: true,
+      hasBreakoutRooms: true,
+      ...status,
+    };
+  }
+
+  /**
+   * Get user's current breakout room
+   */
+  @SubscribeMessage('get-my-breakout-room')
+  async handleGetMyBreakoutRoom(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { sessionId: number },
+  ) {
+    const userId = client.userId;
+    if (!userId) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    const currentRoom = this.userBreakoutRoom.get(userId);
+    const room = currentRoom
+      ? this.breakoutRoomsService.getUserCurrentRoom(data.sessionId, userId)
+      : null;
+
+    return {
+      success: true,
+      inBreakoutRoom: !!currentRoom,
+      room,
+    };
   }
 }
