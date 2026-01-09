@@ -63,6 +63,11 @@ const classColors = [
 const classColor = computed(() => classColors[(classId.value || 0) % classColors.length])
 
 const showCodeDialog = ref(false)
+const qrCodeUrl = computed(() => {
+  if (!currentClass.value?.code) return ''
+  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentClass.value.code)}`
+})
+
 const copyCode = async () => {
   if (currentClass.value?.code) {
     await navigator.clipboard.writeText(currentClass.value.code)
@@ -92,8 +97,7 @@ const postAnnouncement = async () => {
 
 const startLiveSession = async () => {
   try {
-    const session = await liveSessionsStore.createSession({
-      classId: classId.value,
+    const session = await liveSessionsStore.createSession(classId.value, {
       title: `Buổi học - ${new Date().toLocaleDateString('vi-VN')}`,
     })
     router.push(`/live/${session.id}`)
@@ -654,6 +658,14 @@ onMounted(async () => {
                   <span class="font-mono text-4xl font-bold tracking-[0.3em] text-primary">
                     {{ currentClass.code }}
                   </span>
+                </div>
+
+                <!-- QR Code -->
+                <div v-if="qrCodeUrl" class="mt-6 flex justify-center">
+                  <div class="p-4 bg-white rounded-xl border-2 border-gray-100">
+                    <img :src="qrCodeUrl" alt="QR Code" class="w-40 h-40" />
+                    <p class="text-xs text-gray-500 text-center mt-2">Quét QR để tham gia</p>
+                  </div>
                 </div>
 
                 <div class="flex gap-3 mt-6">
