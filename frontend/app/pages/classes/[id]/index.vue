@@ -63,14 +63,15 @@ const classColors = [
 const classColor = computed(() => classColors[(classId.value || 0) % classColors.length])
 
 const showCodeDialog = ref(false)
+const classCode = computed(() => currentClass.value?.classCode || currentClass.value?.code || '')
 const qrCodeUrl = computed(() => {
-  if (!currentClass.value?.code) return ''
-  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentClass.value.code)}`
+  if (!classCode.value) return ''
+  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(classCode.value)}`
 })
 
 const copyCode = async () => {
-  if (currentClass.value?.code) {
-    await navigator.clipboard.writeText(currentClass.value.code)
+  if (classCode.value) {
+    await navigator.clipboard.writeText(classCode.value)
     toast.success('Đã sao chép mã lớp!')
   }
 }
@@ -656,7 +657,7 @@ onMounted(async () => {
                 
                 <div class="mt-6 p-6 bg-gradient-to-br from-primary/10 to-purple-500/10 rounded-2xl text-center">
                   <span class="font-mono text-4xl font-bold tracking-[0.3em] text-primary">
-                    {{ currentClass.code }}
+                    {{ classCode }}
                   </span>
                 </div>
 

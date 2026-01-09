@@ -1,0 +1,8 @@
+[2026-01-09T07:56:26.956Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 38,
+    "roomId": "64e16e53-a242-49b8-bf3f-a4daac754a9d",
+    "classId": 16,
+    "hostId": 27,
+    "title": "Buổi học - 9/1/2026"
+  }

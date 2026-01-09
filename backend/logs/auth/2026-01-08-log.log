@@ -1,0 +1,12 @@
+[2026-01-08T07:50:02.675Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-08T08:08:01.588Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }

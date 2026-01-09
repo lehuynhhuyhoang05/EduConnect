@@ -7,6 +7,9 @@ const isLoading = ref(true)
 const searchQuery = ref('')
 const filterRole = ref<'all' | 'teaching' | 'enrolled'>('all')
 const viewMode = ref<'grid' | 'list'>('grid')
+const showJoinDialog = ref(false)
+const joinClassCode = ref('')
+const isJoining = ref(false)
 
 const filteredClasses = computed(() => {
   let classes = classesStore.classes
@@ -45,6 +48,24 @@ const getGradient = (id: number) => {
   return gradients[id % gradients.length]
 }
 
+const handleJoinClass = async () => {
+  if (!joinClassCode.value.trim()) {
+    toast.error('Vui lòng nhập mã lớp')
+    return
+  }
+  isJoining.value = true
+  try {
+    const joinedClass = await classesStore.joinClass(joinClassCode.value.trim())
+    toast.success(`Đã tham gia lớp ${joinedClass.name}`)
+    showJoinDialog.value = false
+    joinClassCode.value = ''
+  } catch (error: any) {
+    toast.error(error.message || 'Mã lớp không hợp lệ')
+  } finally {
+    isJoining.value = false
+  }
+}
+
 onMounted(async () => {
   try {
     await classesStore.fetchClasses()
@@ -78,22 +99,21 @@ onMounted(async () => {
             Tạo lớp mới
           </button>
         </NuxtLink>
-        <NuxtLink to="/classes/join">
-          <button 
-            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all"
-            :class="authStore.isTeacher 
-              ? 'border border-input bg-background hover:bg-muted/50' 
-              : 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25'"
-          >
-            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <line x1="19" x2="19" y1="8" y2="14"/>
-              <line x1="22" x2="16" y1="11" y2="11"/>
-            </svg>
-            Tham gia lớp
-          </button>
-        </NuxtLink>
+        <button 
+          @click="showJoinDialog = true"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all"
+          :class="authStore.isTeacher 
+            ? 'border border-input bg-background hover:bg-muted/50' 
+            : 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25'"
+        >
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="19" x2="19" y1="8" y2="14"/>
+            <line x1="22" x2="16" y1="11" y2="11"/>
+          </svg>
+          Tham gia lớp
+        </button>
       </div>
     </div>
 
@@ -231,11 +251,12 @@ onMounted(async () => {
             Tạo lớp học
           </button>
         </NuxtLink>
-        <NuxtLink to="/classes/join">
-          <button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-input bg-background font-medium hover:bg-muted/50 transition-all">
-            Tham gia lớp
-          </button>
-        </NuxtLink>
+        <button 
+          @click="showJoinDialog = true"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-input bg-background font-medium hover:bg-muted/50 transition-all"
+        >
+          Tham gia lớp
+        </button>
       </div>
     </div>
 
@@ -390,4 +411,83 @@ onMounted(async () => {
       </NuxtLink>
     </div>
   </div>
+
+  <!-- Join Class Dialog -->
+  <Teleport to="body">
+    <div
+      v-if="showJoinDialog"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      @click.self="showJoinDialog = false"
+    >
+      <div class="relative bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in-0 zoom-in-95">
+        <!-- Close Button -->
+        <button
+          @click="showJoinDialog = false"
+          class="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+
+        <!-- Header -->
+        <div class="mb-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="p-2 bg-primary/10 rounded-xl">
+              <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <line x1="19" x2="19" y1="8" y2="14"/>
+                <line x1="22" x2="16" y1="11" y2="11"/>
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold">Tham gia lớp học</h2>
+          </div>
+          <p class="text-sm text-muted-foreground">
+            Nhập mã lớp học để tham gia vào lớp của giáo viên
+          </p>
+        </div>
+
+        <!-- Form -->
+        <form @submit.prevent="handleJoinClass" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">Mã lớp</label>
+            <input
+              v-model="joinClassCode"
+              type="text"
+              placeholder="Nhập mã lớp (VD: ABC123)"
+              class="w-full px-4 py-3 rounded-xl border border-input bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-mono uppercase"
+              :disabled="isJoining"
+              required
+            />
+            <p class="text-xs text-muted-foreground mt-2">
+              Mã lớp được cung cấp bởi giáo viên của bạn
+            </p>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              type="button"
+              @click="showJoinDialog = false"
+              class="flex-1 px-4 py-3 rounded-xl border border-input hover:bg-muted/50 font-medium transition-all"
+              :disabled="isJoining"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              class="flex-1 px-4 py-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              :disabled="isJoining"
+            >
+              <svg v-if="isJoining" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isJoining ? 'Đang tham gia...' : 'Tham gia' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </Teleport>
 </template>

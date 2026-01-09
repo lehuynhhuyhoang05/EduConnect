@@ -1,0 +1,5 @@
+[2026-01-09T07:35:33.385Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }

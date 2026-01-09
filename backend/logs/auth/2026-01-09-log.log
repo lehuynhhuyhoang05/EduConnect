@@ -1,0 +1,37 @@
+[2026-01-09T07:25:43.479Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 28,
+    "email": "huyhoang24@gmai.com",
+    "role": "STUDENT",
+    "ipAddress": "::1"
+  }
+[2026-01-09T07:33:52.989Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 28,
+    "email": "huyhoang24@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T07:35:46.733Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 28,
+    "email": "huyhoang24@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-09T07:36:38.752Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-09T07:49:28.372Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-09T07:53:23.606Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 28,
+    "email": "huyhoang24@gmail.com",
+    "ipAddress": "::1"
+  }

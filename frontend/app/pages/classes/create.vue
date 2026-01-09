@@ -51,6 +51,9 @@ const validateForm = () => {
   return isValid
 }
 
+const createdClass = ref<any>(null)
+const showSuccessDialog = ref(false)
+
 const handleSubmit = async () => {
   if (!validateForm()) return
 
@@ -63,13 +66,31 @@ const handleSubmit = async () => {
       subject: form.subject,
     })
 
-    toast.success('Tạo lớp học thành công!', `Mã lớp: ${newClass.code}`)
-    router.push(`/classes/${newClass.id}`)
+    createdClass.value = newClass
+    showSuccessDialog.value = true
   } catch (error: any) {
     toast.error('Không thể tạo lớp học', error.message || 'Vui lòng thử lại')
   } finally {
     isLoading.value = false
   }
+}
+
+const copyClassCode = async () => {
+  if (createdClass.value?.classCode || createdClass.value?.code) {
+    const code = createdClass.value.classCode || createdClass.value.code
+    await navigator.clipboard.writeText(code)
+    toast.success('Đã sao chép mã lớp!')
+  }
+}
+
+const qrCodeUrl = computed(() => {
+  const code = createdClass.value?.classCode || createdClass.value?.code
+  if (!code) return ''
+  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(code)}`
+})
+
+const goToClass = () => {
+  router.push(`/classes/${createdClass.value.id}`)
 }
 
 const selectSubject = (subject: string) => {
@@ -217,4 +238,77 @@ const selectSubject = (subject: string) => {
       </div>
     </div>
   </div>
+
+  <!-- Success Dialog -->
+  <Teleport to="body">
+    <div
+      v-if="showSuccessDialog"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      @click.self="showSuccessDialog = false"
+    >
+      <div class="relative bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in-0 zoom-in-95">
+        <!-- Success Icon -->
+        <div class="flex justify-center mb-4">
+          <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center">
+            <svg class="w-8 h-8 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Header -->
+        <div class="text-center mb-6">
+          <h2 class="text-2xl font-bold mb-2">Tạo lớp học thành công! 🎉</h2>
+          <p class="text-sm text-muted-foreground">
+            Lớp <strong>{{ createdClass?.name }}</strong> đã được tạo
+          </p>
+        </div>
+
+        <!-- Class Code -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium mb-2 text-center">Mã lớp học</label>
+          <div class="p-6 bg-gradient-to-br from-primary/10 to-purple-500/10 rounded-2xl text-center">
+            <span class="font-mono text-4xl font-bold tracking-[0.3em] text-primary">
+              {{ createdClass?.classCode || createdClass?.code }}
+            </span>
+          </div>
+          <p class="text-xs text-muted-foreground text-center mt-2">
+            Chia sẻ mã này để học sinh tham gia lớp
+          </p>
+        </div>
+
+        <!-- QR Code -->
+        <div v-if="qrCodeUrl" class="mb-6 flex justify-center">
+          <div class="p-4 bg-white rounded-xl border-2 border-gray-100">
+            <img :src="qrCodeUrl" alt="QR Code" class="w-40 h-40" />
+            <p class="text-xs text-gray-500 text-center mt-2">Quét QR để tham gia</p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3">
+          <button
+            @click="copyClassCode"
+            class="flex-1 px-4 py-3 rounded-xl border border-input hover:bg-muted/50 font-medium transition-all flex items-center justify-center gap-2"
+          >
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+            Sao chép mã
+          </button>
+          <button
+            @click="goToClass"
+            class="flex-1 px-4 py-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-medium transition-all flex items-center justify-center gap-2"
+          >
+            Vào lớp học
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14m-7-7 7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
