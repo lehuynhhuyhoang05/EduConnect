@@ -31,6 +31,9 @@ export class Submission {
   @Column({ name: 'file_url', type: 'varchar', length: 500, nullable: true })
   fileUrl: string;
 
+  @Column({ name: 'original_file_name', type: 'varchar', length: 255, nullable: true })
+  originalFileName: string;
+
   @Column({ type: 'text', nullable: true })
   content: string;
 

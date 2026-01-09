@@ -242,17 +242,27 @@ export class LiveSessionsGateway
       }
       this.roomParticipants.get(roomId).add(userId);
 
-      // Get existing participants in room
-      const existingParticipants = Array.from(this.roomParticipants.get(roomId))
-        .filter(id => id !== userId)
-        .map(id => ({
-          userId: id,
-          socketId: this.userSocketMap.get(id),
-        }));
+      // Get existing participants in room with their full names
+      const existingUserIds = Array.from(this.roomParticipants.get(roomId))
+        .filter(id => id !== userId);
+      
+      // Fetch user details for all existing participants
+      const existingParticipants = await Promise.all(
+        existingUserIds.map(async (id) => {
+          const participantUser = await this.userRepository.findOne({ where: { id } });
+          return {
+            userId: id,
+            userName: participantUser?.fullName || `User ${id}`,
+            socketId: this.userSocketMap.get(id),
+          };
+        })
+      );
 
-      // Notify others in room about new participant
+      // Notify others in room about new participant - include userName
+      const user = await this.userRepository.findOne({ where: { id: userId } });
       client.to(roomId).emit('user-joined', {
         userId,
+        userName: user?.fullName || userName || `User ${userId}`,
         socketId: client.id,
         roomId,
         timestamp: new Date().toISOString(),
@@ -578,9 +588,13 @@ export class LiveSessionsGateway
         raisedAt: new Date(),
       });
 
-      // Broadcast to room
+      // Get user info for userName
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+
+      // Broadcast to room with userName
       this.server.to(roomId).emit('hand-raised', {
         userId,
+        userName: user?.fullName || `User ${userId}`,
         timestamp: new Date().toISOString(),
         order: hands.length, // Position in queue
       });
@@ -610,9 +624,13 @@ export class LiveSessionsGateway
       if (index > -1) {
         hands.splice(index, 1);
 
-        // Broadcast to room
+        // Get user info for userName
+        const user = await this.userRepository.findOne({ where: { id: targetId } });
+
+        // Broadcast to room with userName
         this.server.to(roomId).emit('hand-lowered', {
           userId: targetId,
+          userName: user?.fullName || `User ${targetId}`,
           byUserId: userId,
           timestamp: new Date().toISOString(),
         });
@@ -974,9 +992,13 @@ export class LiveSessionsGateway
   ) {
     const userId = client.userId;
 
-    // Broadcast to room
+    // Get user info for userName
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    // Broadcast to room with userName
     this.server.to(data.roomId).emit('chat-message', {
       userId,
+      userName: user?.fullName || `User ${userId}`,
       message: data.message,
       type: data.type || 'text',
       timestamp: new Date().toISOString(),

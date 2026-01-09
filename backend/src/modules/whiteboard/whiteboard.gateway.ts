@@ -251,9 +251,17 @@ export class WhiteboardGateway implements OnGatewayConnection, OnGatewayDisconne
         const roomKey = `wb:${data.roomType}:${data.roomId}`;
 
         // Confirm stroke completion to everyone (including sender for persistence confirmation)
+        // Include full stroke data so clients can redraw properly
         this.server.to(roomKey).emit('wb:stroke-completed', {
           strokeId: data.strokeId,
           id: result.id,
+          userId: userData.user.id,
+          userName: userData.user.fullName,
+          tool: result.tool,
+          color: result.color,
+          strokeWidth: result.strokeWidth,
+          opacity: result.opacity,
+          path: result.path,
         });
       }
     } catch (error) {

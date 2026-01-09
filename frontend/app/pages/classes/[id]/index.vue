@@ -17,6 +17,18 @@ const activeTab = ref('stream')
 const currentClass = computed(() => classesStore.currentClass)
 const isTeacher = computed(() => currentClass.value?.teacherId === authStore.user?.id)
 const announcements = computed(() => announcementsStore.announcements)
+const members = computed(() => classesStore.members || [])
+
+// Active live session for this class
+const activeLiveSession = computed(() => {
+  const sessions = liveSessionsStore.liveSessions || []
+  return sessions.find((s: LiveSession) => s.classId === classId.value)
+})
+
+// All sessions for this class
+const classLiveSessions = computed(() => {
+  return liveSessionsStore.sessions?.filter((s: LiveSession) => s.classId === classId.value) || []
+})
 
 // New post state
 const newPost = ref('')
@@ -26,6 +38,7 @@ const tabs = computed(() => {
   const baseTabs = [
     { id: 'stream', label: 'Bảng tin', icon: 'stream', count: announcements.value.length },
     { id: 'assignments', label: 'Bài tập', icon: 'assignment', count: assignmentsStore.assignments?.length || 0 },
+    { id: 'live', label: 'Phiên live', icon: 'video', count: classLiveSessions.value.length },
     { id: 'materials', label: 'Tài liệu', icon: 'folder', count: 0 },
     { id: 'members', label: 'Thành viên', icon: 'users', count: currentClass.value?.memberCount || 0 },
   ]
@@ -50,6 +63,8 @@ const classColor = computed(() => classColors[(classId.value || 0) % classColors
 const showCodeDialog = ref(false)
 const showDeleteDialog = ref(false)
 const showEditDialog = ref(false)
+const showLiveShareDialog = ref(false)
+const createdLiveSession = ref<{ id: number; title: string } | null>(null)
 const isDeleting = ref(false)
 const isSaving = ref(false)
 
@@ -132,14 +147,78 @@ const postAnnouncement = async () => {
   }
 }
 
+const liveShareLink = computed(() => {
+  if (!createdLiveSession.value) return ''
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}/live/${createdLiveSession.value.id}`
+  }
+  return ''
+})
+
+const copyLiveLink = async () => {
+  if (liveShareLink.value) {
+    await navigator.clipboard.writeText(liveShareLink.value)
+    toast.success('Đã sao chép link phiên live!')
+  }
+}
+
+const goToLiveSession = () => {
+  if (createdLiveSession.value) {
+    router.push(`/live/${createdLiveSession.value.id}`)
+  }
+}
+
 const startLiveSession = async () => {
   try {
+    // Create the session
     const session = await liveSessionsStore.createSession(classId.value, {
       title: `Buổi học - ${new Date().toLocaleDateString('vi-VN')}`,
     })
-    router.push(`/live/${session.id}`)
+    
+    // Start the session immediately to set status to 'live'
+    await liveSessionsStore.startSession(session.id)
+    
+    // Refresh sessions to update the list
+    await liveSessionsStore.fetchSessions({ classId: classId.value })
+    
+    // Show share modal with link and QR code
+    createdLiveSession.value = { id: session.id, title: session.title }
+    showLiveShareDialog.value = true
   } catch (error: any) {
     toast.error('Không thể bắt đầu buổi học', error.message)
+  }
+}
+
+const startExistingSession = async (sessionId: number) => {
+  try {
+    await liveSessionsStore.startSession(sessionId)
+    await liveSessionsStore.fetchSessions({ classId: classId.value })
+    toast.success('Đã bắt đầu phiên live')
+    router.push(`/live/${sessionId}`)
+  } catch (error: any) {
+    toast.error('Không thể bắt đầu phiên live', error.message)
+  }
+}
+
+const endLiveSession = async (sessionId: number) => {
+  if (!confirm('Bạn có chắc muốn kết thúc phiên live này?')) return
+  try {
+    await liveSessionsStore.endSession(sessionId)
+    await liveSessionsStore.fetchSessions({ classId: classId.value })
+    toast.success('Đã kết thúc phiên live')
+  } catch (error: any) {
+    toast.error('Không thể kết thúc phiên live', error.message)
+  }
+}
+
+const deleteLiveSession = async (sessionId: number) => {
+  if (!confirm('Bạn có chắc muốn xóa phiên live này? Hành động này không thể hoàn tác.')) return
+  try {
+    await liveSessionsStore.deleteSession(sessionId)
+    await liveSessionsStore.fetchSessions({ classId: classId.value })
+    toast.success('Đã xóa phiên live')
+  } catch (error: any) {
+    toast.error('Không thể xóa phiên live', error.message)
   }
 }
 
@@ -164,6 +243,7 @@ onMounted(async () => {
       assignmentsStore.fetchAssignments({ classId: classId.value }),
       liveSessionsStore.fetchSessions({ classId: classId.value }),
       announcementsStore.fetchAnnouncements(classId.value),
+      classesStore.fetchMembers(classId.value),
     ])
   } catch (error: any) {
     console.error('Failed to fetch class:', error)
@@ -284,10 +364,10 @@ onMounted(async () => {
       enter-to-class="opacity-100 translate-y-0"
     >
       <div
-        v-if="liveSessionsStore.liveSessions?.some((s: LiveSession) => s.classId === classId)"
+        v-if="activeLiveSession"
         class="rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 p-5 shadow-lg shadow-green-500/25"
       >
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between flex-wrap gap-4">
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
               <span class="relative flex h-4 w-4">
@@ -296,14 +376,15 @@ onMounted(async () => {
               </span>
             </div>
             <div>
-              <p class="font-bold text-white text-lg">Buổi học đang diễn ra</p>
-              <p class="text-white/80">
-                {{ liveSessionsStore.liveSessions?.find((s: LiveSession) => s.classId === classId)?.title }}
-              </p>
+              <p class="font-bold text-white text-lg">🔴 Buổi học đang diễn ra</p>
+              <p class="text-white/80">{{ activeLiveSession.title }}</p>
             </div>
           </div>
-          <NuxtLink :to="`/live/${liveSessionsStore.liveSessions?.find((s: LiveSession) => s.classId === classId)?.id}`">
-            <button class="px-6 py-3 rounded-xl bg-white text-green-600 font-bold hover:bg-green-50 transition-colors shadow-lg">
+          <NuxtLink :to="`/live/${activeLiveSession.id}`">
+            <button class="px-6 py-3 rounded-xl bg-white text-green-600 font-bold hover:bg-green-50 transition-colors shadow-lg flex items-center gap-2">
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
               Tham gia ngay
             </button>
           </NuxtLink>
@@ -330,6 +411,11 @@ onMounted(async () => {
           <!-- Assignment icon -->
           <svg v-else-if="tab.icon === 'assignment'" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          <!-- Video/Live icon -->
+          <svg v-else-if="tab.icon === 'video'" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="23 7 16 12 23 17 23 7"/>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
           </svg>
           <!-- Folder icon -->
           <svg v-else-if="tab.icon === 'folder'" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -571,6 +657,129 @@ onMounted(async () => {
         </NuxtLink>
       </div>
 
+      <!-- Live Sessions Tab -->
+      <div v-else-if="activeTab === 'live'" class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-gray-900">Phiên live</h3>
+          <button 
+            v-if="isTeacher"
+            @click="startLiveSession"
+            class="px-4 py-2 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-colors flex items-center gap-2"
+          >
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+              <span class="relative inline-flex h-3 w-3 rounded-full bg-white"></span>
+            </span>
+            Bắt đầu phiên live
+          </button>
+        </div>
+        
+        <!-- Live Sessions List -->
+        <div class="space-y-3">
+          <div v-if="!classLiveSessions.length" class="bg-white rounded-2xl shadow-sm p-12 text-center">
+            <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto">
+              <svg class="w-8 h-8 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="23 7 16 12 23 17 23 7"/>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              </svg>
+            </div>
+            <p class="text-gray-500 mt-4">Chưa có phiên live nào</p>
+          </div>
+          
+          <div 
+            v-for="session in classLiveSessions" 
+            :key="session.id"
+            class="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all"
+          >
+            <div class="p-5">
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-semibold text-gray-900">{{ session.title }}</h4>
+                    <span 
+                      v-if="session.status === 'live'"
+                      class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-500 text-white text-xs font-bold"
+                    >
+                      <span class="relative flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-white"></span>
+                      </span>
+                      LIVE
+                    </span>
+                    <span 
+                      v-else-if="session.status === 'scheduled'"
+                      class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium"
+                    >
+                      Đã lên lịch
+                    </span>
+                    <span 
+                      v-else
+                      class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs font-medium"
+                    >
+                      Đã kết thúc
+                    </span>
+                  </div>
+                  <div class="mt-2 flex items-center gap-4 text-sm text-gray-500">
+                    <span class="flex items-center gap-1">
+                      <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      {{ session.startedAt ? new Date(session.startedAt).toLocaleString('vi-VN') : session.scheduledAt ? new Date(session.scheduledAt).toLocaleString('vi-VN') : 'Chưa xác định' }}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                      </svg>
+                      {{ session.currentParticipants || 0 }} / {{ session.maxParticipants || 20 }}
+                    </span>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <!-- Join button -->
+                  <NuxtLink 
+                    v-if="session.status === 'live'"
+                    :to="`/live/${session.id}`"
+                    class="px-4 py-2 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600 transition-colors"
+                  >
+                    Tham gia
+                  </NuxtLink>
+                  
+                  <!-- Teacher actions -->
+                  <template v-if="isTeacher">
+                    <button
+                      v-if="session.status === 'scheduled'"
+                      @click="startExistingSession(session.id)"
+                      class="px-4 py-2 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600 transition-colors"
+                    >
+                      Bắt đầu
+                    </button>
+                    <button
+                      v-if="session.status === 'live'"
+                      @click="endLiveSession(session.id)"
+                      class="px-4 py-2 rounded-lg bg-orange-500 text-white font-medium hover:bg-orange-600 transition-colors"
+                    >
+                      Kết thúc
+                    </button>
+                    <button
+                      @click="deleteLiveSession(session.id)"
+                      class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Xóa phiên"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Materials Tab - Enhanced -->
       <div v-else-if="activeTab === 'materials'" class="bg-white rounded-2xl shadow-sm p-12 text-center">
         <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto">
@@ -616,26 +825,36 @@ onMounted(async () => {
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div class="px-5 py-3 bg-gray-50 border-b flex items-center justify-between">
             <span class="text-sm font-medium text-gray-700">
-              Học sinh ({{ (currentClass.memberCount || 1) - 1 }})
+              Học sinh ({{ members.filter((m: any) => m.role === 'STUDENT').length }})
             </span>
             <button v-if="isTeacher" class="text-sm text-primary font-medium hover:underline">
               Mời học sinh
             </button>
           </div>
           <div class="divide-y">
-            <div v-if="(currentClass.memberCount || 1) <= 1" class="p-8 text-center text-gray-500">
+            <div v-if="members.filter((m: any) => m.role === 'STUDENT').length === 0" class="p-8 text-center text-gray-500">
               <p>Chưa có học sinh nào</p>
               <p class="text-sm text-gray-400 mt-1">Chia sẻ mã lớp để mời học sinh tham gia</p>
             </div>
-            <!-- Sample students - would be fetched from API -->
-            <div v-else v-for="i in 3" :key="i" class="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
-              <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium">
-                S{{ i }}
+            <!-- Real students from API -->
+            <div v-else v-for="member in members.filter((m: any) => m.role === 'STUDENT')" :key="member.id" class="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium">
+                {{ (member.user?.fullName || member.fullName || 'S').charAt(0).toUpperCase() }}
               </div>
               <div class="flex-1">
-                <p class="font-medium text-gray-900">Học sinh {{ i }}</p>
-                <p class="text-sm text-gray-500">student{{ i }}@example.com</p>
+                <p class="font-medium text-gray-900">{{ member.user?.fullName || member.fullName || 'Học sinh' }}</p>
+                <p class="text-sm text-gray-500">{{ member.user?.email || member.email || '' }}</p>
               </div>
+              <button 
+                v-if="isTeacher"
+                class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                @click="classesStore.removeMember(classId, member.userId || member.id)"
+                title="Xóa học sinh"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -902,6 +1121,93 @@ onMounted(async () => {
           </div>
         </div>
       </div>
+    </Teleport>
+
+    <!-- Live Session Share Modal -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-all duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-all duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showLiveShareDialog" class="fixed inset-0 z-50 flex items-center justify-center">
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="goToLiveSession" />
+          <div class="relative bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
+            <div class="text-center mb-4">
+              <div class="w-16 h-16 bg-green-100 dark:bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="relative flex h-6 w-6">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span class="relative inline-flex h-6 w-6 rounded-full bg-green-500"></span>
+                </span>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white">Phiên live đã được tạo!</h3>
+              <p class="text-gray-500 dark:text-gray-400 mt-1">{{ createdLiveSession?.title }}</p>
+            </div>
+
+            <p class="text-sm text-gray-600 dark:text-gray-300 text-center mb-4">
+              Chia sẻ link hoặc QR code cho sinh viên để tham gia
+            </p>
+
+            <!-- Link Input -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Link tham gia</label>
+              <div class="flex gap-2">
+                <input
+                  :value="liveShareLink"
+                  readonly
+                  class="flex-1 h-10 px-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-sm text-gray-900 dark:text-white"
+                />
+                <button
+                  class="px-4 h-10 rounded-lg bg-primary hover:bg-primary/90 text-white font-medium transition-colors flex items-center gap-2"
+                  @click="copyLiveLink"
+                >
+                  <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                  Sao chép
+                </button>
+              </div>
+            </div>
+
+            <!-- QR Code -->
+            <div class="text-center mb-6">
+              <div class="inline-flex bg-white p-3 rounded-xl border border-gray-200">
+                <img 
+                  v-if="liveShareLink"
+                  :src="`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(liveShareLink)}`"
+                  alt="QR Code"
+                  class="w-36 h-36"
+                />
+              </div>
+              <p class="text-gray-400 text-xs mt-2">Quét mã QR để tham gia</p>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-3">
+              <button
+                class="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition-colors"
+                @click="showLiveShareDialog = false"
+              >
+                Đóng
+              </button>
+              <button
+                class="flex-1 px-4 py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-medium transition-colors flex items-center justify-center gap-2"
+                @click="goToLiveSession"
+              >
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span class="relative inline-flex h-2 w-2 rounded-full bg-white"></span>
+                </span>
+                Vào phiên live
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
     </Teleport>
     </div>
   </div>

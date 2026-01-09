@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, In } from 'typeorm';
 import { Assignment, Submission, SubmissionStatus } from './entities';
 import {
   CreateAssignmentDto,
@@ -143,6 +143,23 @@ export class AssignmentsService {
       .take(limit)
       .orderBy('assignment.deadline', 'ASC')
       .getManyAndCount();
+
+    // For students, include their submissions
+    if (user.role === UserRole.STUDENT) {
+      const assignmentIds = assignments.map(a => a.id);
+      const submissions = await this.submissionRepository.find({
+        where: { 
+          assignmentId: In(assignmentIds),
+          studentId: user.id 
+        },
+      });
+
+      // Map submissions to assignments
+      const submissionMap = new Map(submissions.map(s => [s.assignmentId, s]));
+      assignments.forEach(assignment => {
+        (assignment as any).submission = submissionMap.get(assignment.id) || null;
+      });
+    }
 
     return {
       data: assignments,
@@ -303,6 +320,7 @@ export class AssignmentsService {
       if (existingSubmission) {
         // Update existing submission
         existingSubmission.fileUrl = submitDto.fileUrl ?? existingSubmission.fileUrl;
+        existingSubmission.originalFileName = submitDto.originalFileName ?? existingSubmission.originalFileName;
         existingSubmission.content = submitDto.content ?? existingSubmission.content;
         existingSubmission.status = SubmissionStatus.SUBMITTED;
         existingSubmission.submittedAt = new Date();
@@ -319,6 +337,7 @@ export class AssignmentsService {
           assignmentId,
           studentId: student.id,
           fileUrl: submitDto.fileUrl,
+          originalFileName: submitDto.originalFileName,
           content: submitDto.content,
           status: SubmissionStatus.SUBMITTED,
           isLate,

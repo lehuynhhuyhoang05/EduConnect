@@ -18,9 +18,9 @@ const statusCounts = computed(() => {
   const assignments = assignmentsStore.assignments ?? []
   return {
     all: assignments.length,
-    pending: assignments.filter((a: Assignment) => !a.submission).length,
-    submitted: assignments.filter((a: Assignment) => a.submission && !a.submission.grade).length,
-    graded: assignments.filter((a: Assignment) => a.submission?.grade !== undefined).length,
+    pending: assignments.filter((a: Assignment) => !a.submission || a.submission.status === 'returned').length,
+    submitted: assignments.filter((a: Assignment) => a.submission && a.submission.status === 'submitted').length,
+    graded: assignments.filter((a: Assignment) => a.submission && a.submission.status === 'graded').length,
   }
 })
 
@@ -29,11 +29,11 @@ const filteredAssignments = computed(() => {
 
   // Filter by status
   if (filterStatus.value === 'pending') {
-    assignments = assignments.filter((a: Assignment) => !a.submission)
+    assignments = assignments.filter((a: Assignment) => !a.submission || a.submission.status === 'returned')
   } else if (filterStatus.value === 'submitted') {
-    assignments = assignments.filter((a: Assignment) => a.submission && !a.submission.grade)
+    assignments = assignments.filter((a: Assignment) => a.submission && a.submission.status === 'submitted')
   } else if (filterStatus.value === 'graded') {
-    assignments = assignments.filter((a: Assignment) => a.submission?.grade !== undefined)
+    assignments = assignments.filter((a: Assignment) => a.submission && a.submission.status === 'graded')
   }
 
   // Filter by search
@@ -49,7 +49,7 @@ const filteredAssignments = computed(() => {
 })
 
 const getStatusInfo = (assignment: Assignment) => {
-  if (assignment.submission?.grade !== undefined) {
+  if (assignment.submission?.status === 'graded' && assignment.submission?.score !== null && assignment.submission?.score !== undefined) {
     return { 
       label: 'Đã chấm', 
       bgColor: 'bg-green-100',
@@ -57,12 +57,20 @@ const getStatusInfo = (assignment: Assignment) => {
       iconBg: 'bg-green-500',
     }
   }
-  if (assignment.submission) {
+  if (assignment.submission && assignment.submission.status === 'submitted') {
     return { 
       label: 'Đã nộp', 
       bgColor: 'bg-blue-100',
       textColor: 'text-blue-700',
       iconBg: 'bg-blue-500',
+    }
+  }
+  if (assignment.submission && assignment.submission.status === 'returned') {
+    return { 
+      label: 'Đã trả lại', 
+      bgColor: 'bg-yellow-100',
+      textColor: 'text-yellow-700',
+      iconBg: 'bg-yellow-500',
     }
   }
   if (assignment.deadline && new Date(assignment.deadline) < new Date()) {

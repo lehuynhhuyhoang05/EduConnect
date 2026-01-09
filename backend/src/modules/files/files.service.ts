@@ -21,9 +21,11 @@ const FILE_CONFIG = {
   allowedMimeTypes: [
     // Images
     'image/jpeg',
+    'image/jpg',
     'image/png',
     'image/gif',
     'image/webp',
+    'image/svg+xml',
     // Documents
     'application/pdf',
     'application/msword',
@@ -33,15 +35,34 @@ const FILE_CONFIG = {
     'application/vnd.ms-powerpoint',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     'text/plain',
+    'text/csv',
+    'text/html',
+    'text/css',
+    'text/javascript',
+    'application/json',
+    'application/xml',
+    // Code files
+    'text/x-python',
+    'text/x-java',
+    'text/x-c',
+    'text/x-c++',
+    'application/x-python-code',
+    'application/x-ipynb+json',
     // Video
     'video/mp4',
     'video/webm',
+    'video/mpeg',
     // Audio
     'audio/mpeg',
     'audio/wav',
+    'audio/ogg',
     // Archives
     'application/zip',
+    'application/x-zip-compressed',
     'application/x-rar-compressed',
+    'application/x-7z-compressed',
+    // Other
+    'application/octet-stream',
   ],
 };
 
@@ -99,17 +120,25 @@ export class FilesService {
   ): Promise<File> {
     // Validate file
     if (!fileData) {
+      this.logger.error('No file data received in upload request');
       throw new BadRequestException('Không có file được upload');
     }
 
+    this.logger.log(`Upload attempt - File: ${fileData.originalname}, Size: ${fileData.size}, Type: ${fileData.mimetype}`);
+
     if (fileData.size > FILE_CONFIG.maxSize) {
+      this.logger.warn(`File too large: ${fileData.size} bytes (max: ${FILE_CONFIG.maxSize})`);
       throw new BadRequestException(
         `File quá lớn. Kích thước tối đa là ${FILE_CONFIG.maxSize / 1024 / 1024}MB`,
       );
     }
 
     if (!FILE_CONFIG.allowedMimeTypes.includes(fileData.mimetype)) {
-      throw new BadRequestException('Loại file không được hỗ trợ');
+      this.logger.warn(`Unsupported mime type: ${fileData.mimetype}`);
+      throw new BadRequestException(
+        `Loại file không được hỗ trợ: ${fileData.mimetype}. ` +
+        `Các loại file được phép: PDF, Word, Excel, PowerPoint, hình ảnh, video, audio, ZIP, text files`
+      );
     }
 
     const storedName = this.generateStoredName(fileData.originalname);

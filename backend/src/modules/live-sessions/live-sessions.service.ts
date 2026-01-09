@@ -137,6 +137,7 @@ export class LiveSessionsService {
     const [sessions, total] = await queryBuilder
       .select([
         'session.id',
+        'session.classId',
         'session.roomId',
         'session.title',
         'session.description',

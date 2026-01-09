@@ -98,6 +98,7 @@ export interface Submission {
   studentId: number
   student?: User
   fileUrl?: string
+  originalFileName?: string
   content?: string
   score?: number
   feedback?: string

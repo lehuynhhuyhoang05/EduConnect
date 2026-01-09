@@ -5,123 +5,38 @@ definePageMeta({
 })
 
 const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore()
-const assignmentId = computed(() => route.params.id as string)
+const assignmentsStore = useAssignmentsStore()
+const { toast } = useToast()
+
+const assignmentId = computed(() => Number(route.params.id))
 
 const isTeacher = computed(() => authStore.isTeacher)
 const isLoading = ref(true)
 const isSubmitting = ref(false)
+const isDownloading = ref(false)
 const showSubmitModal = ref(false)
 const showGradeModal = ref(false)
+const showDeleteGradeConfirm = ref(false)
 const selectedSubmission = ref<any>(null)
+const gradeMode = ref<'create' | 'edit'>('create')
 
-// Assignment data
-const assignment = ref({
-  id: 1,
-  title: 'Bài tập lập trình Python cơ bản',
-  description: `
-    <h3>Yêu cầu</h3>
-    <p>Viết một chương trình Python thực hiện các công việc sau:</p>
-    <ol>
-      <li>Nhập vào một danh sách các số nguyên từ người dùng</li>
-      <li>Tìm số lớn nhất, nhỏ nhất và tính trung bình cộng</li>
-      <li>Sắp xếp danh sách theo thứ tự tăng dần</li>
-      <li>In kết quả ra màn hình với định dạng đẹp</li>
-    </ol>
-    <h3>Hướng dẫn</h3>
-    <p>Sử dụng các hàm built-in của Python như <code>max()</code>, <code>min()</code>, <code>sum()</code>, <code>sorted()</code></p>
-    <h3>Tiêu chí chấm điểm</h3>
-    <ul>
-      <li>Chương trình chạy đúng: 6 điểm</li>
-      <li>Code sạch, dễ đọc: 2 điểm</li>
-      <li>Xử lý ngoại lệ: 2 điểm</li>
-    </ul>
-  `,
-  class: {
-    id: 1,
-    name: 'Lập trình Python',
-    code: 'CS101'
-  },
-  dueDate: '2024-12-25T23:59:59',
-  createdAt: '2024-12-01T10:00:00',
-  maxScore: 10,
-  status: 'open',
-  attachments: [
-    { id: 1, name: 'huong_dan.pdf', size: '245 KB', url: '#' },
-    { id: 2, name: 'mau_bai_tap.py', size: '1.2 KB', url: '#' }
-  ],
-  submissions: {
-    total: 28,
-    submitted: 18,
-    graded: 12
-  }
+// Assignment data from API
+const assignment = computed(() => assignmentsStore.currentAssignment)
+const submissions = computed(() => assignmentsStore.submissions)
+const mySubmission = computed(() => assignmentsStore.mySubmission)
+
+// Computed counts for teacher progress
+const gradedCount = computed(() => {
+  if (!submissions.value) return 0
+  return submissions.value.filter((s: any) => s.status === 'graded').length
 })
 
-// Student submission
-const submission = ref<{
-  id: number | null
-  status: string
-  submittedAt: string | null
-  score: number | null
-  feedback: string | null
-  files: Array<{ id: number; name: string; size: string }>
-}>({
-  id: null,
-  status: 'not_submitted',
-  submittedAt: null,
-  score: null,
-  feedback: null,
-  files: []
+const pendingCount = computed(() => {
+  if (!submissions.value) return 0
+  return submissions.value.filter((s: any) => s.status === 'submitted').length
 })
-
-// Teacher view - all submissions
-const allSubmissions = ref([
-  { 
-    id: 1, 
-    student: { id: 1, name: 'Nguyễn Văn A', avatar: null },
-    submittedAt: '2024-12-20T14:30:00',
-    status: 'graded',
-    score: 9,
-    feedback: 'Bài làm tốt, code sạch, xử lý ngoại lệ đầy đủ.',
-    files: [{ id: 1, name: 'baitap.py', size: '2.4 KB' }]
-  },
-  { 
-    id: 2, 
-    student: { id: 2, name: 'Trần Thị B', avatar: null },
-    submittedAt: '2024-12-21T09:15:00',
-    status: 'submitted',
-    score: null,
-    feedback: null,
-    files: [{ id: 2, name: 'solution.py', size: '1.8 KB' }]
-  },
-  { 
-    id: 3, 
-    student: { id: 3, name: 'Lê Văn C', avatar: null },
-    submittedAt: '2024-12-21T22:45:00',
-    status: 'late',
-    score: 7,
-    feedback: 'Nộp muộn, trừ 1 điểm. Code cần cải thiện phần xử lý lỗi.',
-    files: [{ id: 3, name: 'assignment.py', size: '3.1 KB' }]
-  },
-  { 
-    id: 4, 
-    student: { id: 4, name: 'Phạm Thị D', avatar: null },
-    submittedAt: null,
-    status: 'not_submitted',
-    score: null,
-    feedback: null,
-    files: []
-  },
-  { 
-    id: 5, 
-    student: { id: 5, name: 'Hoàng Văn E', avatar: null },
-    submittedAt: '2024-12-19T16:20:00',
-    status: 'graded',
-    score: 10,
-    feedback: 'Xuất sắc! Code rất sạch và có nhiều xử lý nâng cao.',
-    files: [{ id: 5, name: 'main.py', size: '4.2 KB' }]
-  },
-])
 
 // Submit form
 const submitForm = ref({
@@ -139,12 +54,15 @@ const gradeForm = ref({
 const submissionFilter = ref('all')
 
 const filteredSubmissions = computed(() => {
-  if (submissionFilter.value === 'all') return allSubmissions.value
-  return allSubmissions.value.filter(s => s.status === submissionFilter.value)
+  if (!submissions.value) return []
+  if (submissionFilter.value === 'all') return submissions.value
+  return submissions.value.filter((s: any) => s.status === submissionFilter.value)
 })
 
 const getDaysRemaining = () => {
-  const due = new Date(assignment.value.dueDate)
+  if (!assignment.value?.deadline) return { text: 'Không có hạn', class: 'text-gray-500' }
+  
+  const due = new Date(assignment.value.deadline)
   const now = new Date()
   const diff = due.getTime() - now.getTime()
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
@@ -156,7 +74,8 @@ const getDaysRemaining = () => {
   return { text: `${days} ngày`, class: 'text-green-600' }
 }
 
-const formatDate = (date: string) => {
+const formatDate = (date: string | Date | undefined) => {
+  if (!date) return 'Không xác định'
   return new Date(date).toLocaleDateString('vi-VN', {
     weekday: 'long',
     year: 'numeric',
@@ -167,7 +86,7 @@ const formatDate = (date: string) => {
   })
 }
 
-const formatDateShort = (date: string | null) => {
+const formatDateShort = (date: string | Date | null | undefined) => {
   if (!date) return '—'
   return new Date(date).toLocaleDateString('vi-VN', {
     day: '2-digit',
@@ -177,14 +96,15 @@ const formatDateShort = (date: string | null) => {
   })
 }
 
-const getStatusBadge = (status: string) => {
+const getStatusBadge = (status: string): { text: string; class: string } => {
   const badges: Record<string, { text: string; class: string }> = {
     'graded': { text: 'Đã chấm', class: 'bg-green-100 text-green-700' },
     'submitted': { text: 'Đã nộp', class: 'bg-blue-100 text-blue-700' },
+    'returned': { text: 'Đã trả', class: 'bg-purple-100 text-purple-700' },
     'late': { text: 'Nộp muộn', class: 'bg-orange-100 text-orange-700' },
     'not_submitted': { text: 'Chưa nộp', class: 'bg-gray-100 text-gray-600' }
   }
-  return badges[status] || badges['not_submitted']
+  return badges[status] ?? { text: 'Đã nộp', class: 'bg-blue-100 text-blue-700' }
 }
 
 const handleFileChange = (event: Event) => {
@@ -198,51 +118,209 @@ const removeFile = (index: number) => {
   submitForm.value.files.splice(index, 1)
 }
 
-const handleSubmit = async () => {
-  isSubmitting.value = true
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1500))
-  
-  submission.value = {
-    id: 1,
-    status: 'submitted',
-    submittedAt: new Date().toISOString(),
-    score: null,
-    feedback: null,
-    files: submitForm.value.files.map((f, i) => ({ id: i + 1, name: f.name, size: `${(f.size / 1024).toFixed(1)} KB` }))
-  }
-  
-  showSubmitModal.value = false
-  isSubmitting.value = false
+// Helper to get full file URL
+const getFileUrl = (path: string | undefined) => {
+  if (!path) return ''
+  if (path.startsWith('http')) return path
+  const config = useRuntimeConfig()
+  return `${config.public.apiUrl}${path}`
 }
 
-const openGradeModal = (sub: any) => {
+const handleSubmit = async () => {
+  // Validate that user has either content or file
+  if (!submitForm.value.content?.trim() && submitForm.value.files.length === 0) {
+    toast.error('Vui lòng nhập nội dung hoặc đính kèm tệp')
+    return
+  }
+  
+  isSubmitting.value = true
+  try {
+    const submissionData: any = {}
+    
+    // Upload file first if exists
+    if (submitForm.value.files.length > 0 && submitForm.value.files[0]) {
+      const formData = new FormData()
+      const file = submitForm.value.files[0]
+      
+      // Debug logging
+      console.log('Uploading file:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        isFile: file instanceof File,
+        isBlob: file instanceof Blob
+      })
+      
+      // Ensure it's a valid File/Blob object
+      if (file instanceof File || file instanceof Blob) {
+        formData.append('file', file, file.name || 'upload')
+        
+        const api = useApi()
+        const uploadResult = await api.upload<{ path: string }>('/files/upload', formData)
+        submissionData.fileUrl = uploadResult.path
+        submissionData.originalFileName = file.name // Save original filename
+      } else {
+        toast.error('File không hợp lệ')
+        isSubmitting.value = false
+        return
+      }
+    }
+    
+    if (submitForm.value.content?.trim()) {
+      submissionData.content = submitForm.value.content
+    }
+    
+    // Ensure at least one field is present
+    if (!submissionData.content && !submissionData.fileUrl) {
+      submissionData.content = 'Đã nộp bài'
+    }
+    
+    await assignmentsStore.submitAssignment(assignmentId.value, submissionData)
+    toast.success('Đã nộp bài thành công!')
+    showSubmitModal.value = false
+    submitForm.value = { content: '', files: [] }
+    
+    // Reload submission data and assignment to update counts
+    await Promise.all([
+      assignmentsStore.fetchMySubmission(assignmentId.value),
+      assignmentsStore.fetchAssignment(assignmentId.value),
+      assignmentsStore.fetchAssignments() // Reload list for sidebar/other views
+    ])
+  } catch (error: any) {
+    toast.error(`Không thể nộp bài: ${error.message}`)
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+const openGradeModal = (sub: any, mode: 'create' | 'edit' = 'create') => {
   selectedSubmission.value = sub
-  gradeForm.value.score = sub.score || 0
+  gradeForm.value.score = sub.score ?? 0
   gradeForm.value.feedback = sub.feedback || ''
+  gradeMode.value = mode
   showGradeModal.value = true
 }
 
 const handleGrade = async () => {
-  isSubmitting.value = true
-  await new Promise(resolve => setTimeout(resolve, 1000))
+  if (!selectedSubmission.value) return
   
-  // Update submission
-  const index = allSubmissions.value.findIndex(s => s.id === selectedSubmission.value.id)
-  if (index !== -1) {
-    allSubmissions.value[index].score = gradeForm.value.score
-    allSubmissions.value[index].feedback = gradeForm.value.feedback
-    allSubmissions.value[index].status = 'graded'
+  // Validate score
+  const maxScore = assignment.value?.maxScore || 10
+  if (gradeForm.value.score < 0 || gradeForm.value.score > maxScore) {
+    toast.error(`Điểm phải từ 0 đến ${maxScore}`)
+    return
   }
   
-  showGradeModal.value = false
-  isSubmitting.value = false
+  isSubmitting.value = true
+  try {
+    await assignmentsStore.gradeSubmission(selectedSubmission.value.id, {
+      score: gradeForm.value.score,
+      feedback: gradeForm.value.feedback
+    })
+    toast.success(gradeMode.value === 'edit' ? 'Đã cập nhật điểm!' : 'Đã chấm điểm thành công!')
+    showGradeModal.value = false
+    // Refresh all related data
+    await Promise.all([
+      assignmentsStore.fetchSubmissions(assignmentId.value),
+      assignmentsStore.fetchAssignment(assignmentId.value),
+      assignmentsStore.fetchAssignments() // Reload list
+    ])
+  } catch (error: any) {
+    toast.error(`Không thể chấm điểm: ${error.message}`)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
-onMounted(() => {
-  setTimeout(() => {
+const handleDeleteGrade = async () => {
+  if (!selectedSubmission.value) return
+  
+  isSubmitting.value = true
+  try {
+    // Set score to null/0 and return submission
+    await assignmentsStore.returnSubmission(selectedSubmission.value.id, 'Điểm đã bị xóa, vui lòng nộp lại')
+    toast.success('Đã xóa điểm và trả bài!')
+    showDeleteGradeConfirm.value = false
+    showGradeModal.value = false
+    // Refresh all related data
+    await Promise.all([
+      assignmentsStore.fetchSubmissions(assignmentId.value),
+      assignmentsStore.fetchAssignment(assignmentId.value),
+      assignmentsStore.fetchAssignments()
+    ])
+  } catch (error: any) {
+    toast.error(`Không thể xóa điểm: ${error.message}`)
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// Download single submission
+const downloadSubmission = async (sub: any) => {
+  if (!sub.fileUrl) {
+    toast.error('Bài nộp này không có tệp đính kèm')
+    return
+  }
+  
+  try {
+    const fileUrl = getFileUrl(sub.fileUrl)
+    const fileName = sub.originalFileName || sub.fileUrl.split('/').pop()
+    const studentName = sub.student?.fullName?.replace(/\s+/g, '_') || 'student'
+    const downloadName = `${studentName}_${fileName}`
+    
+    const link = document.createElement('a')
+    link.href = fileUrl
+    link.download = downloadName
+    link.target = '_blank'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch {
+    toast.error('Không thể tải xuống tệp')
+  }
+}
+
+// Download all submissions as zip (or export grades as CSV)
+const downloadAllSubmissions = async () => {
+  isDownloading.value = true
+  try {
+    // Export grades as CSV for now
+    const csvData = await assignmentsStore.exportGrades(assignmentId.value)
+    
+    // Create and download CSV file
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `grades_${assignment.value?.title || 'assignment'}_${assignmentId.value}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(link.href)
+    
+    toast.success('Đã tải xuống danh sách điểm!')
+  } catch (error: any) {
+    toast.error(`Không thể tải xuống: ${error.message}`)
+  } finally {
+    isDownloading.value = false
+  }
+}
+
+onMounted(async () => {
+  try {
+    await assignmentsStore.fetchAssignment(assignmentId.value)
+    
+    if (isTeacher.value) {
+      await assignmentsStore.fetchSubmissions(assignmentId.value)
+    } else {
+      await assignmentsStore.fetchMySubmission(assignmentId.value)
+    }
+  } catch (error: any) {
+    console.error('Failed to load assignment:', error)
+    toast.error('Không thể tải bài tập')
+    router.push('/assignments')
+  } finally {
     isLoading.value = false
-  }, 500)
+  }
 })
 </script>
 
@@ -267,7 +345,7 @@ onMounted(() => {
           Bài tập
         </NuxtLink>
         <span class="text-gray-400">/</span>
-        <span class="text-gray-900 font-medium">{{ assignment.title }}</span>
+        <span class="text-gray-900 font-medium">{{ assignment?.title || 'Bài tập' }}</span>
       </nav>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -281,28 +359,28 @@ onMounted(() => {
               <div class="relative">
                 <div class="flex items-start justify-between mb-4">
                   <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">
-                    {{ assignment.class.code }} - {{ assignment.class.name }}
+                    {{ assignment?.class?.classCode || '' }} - {{ assignment?.class?.name || 'Lớp học' }}
                   </span>
                   <span 
                     class="px-3 py-1 rounded-full text-sm font-medium"
-                    :class="assignment.status === 'open' ? 'bg-green-400/20 text-green-100' : 'bg-red-400/20 text-red-100'"
+                    :class="assignment?.isActive ? 'bg-green-400/20 text-green-100' : 'bg-red-400/20 text-red-100'"
                   >
-                    {{ assignment.status === 'open' ? 'Đang mở' : 'Đã đóng' }}
+                    {{ assignment?.isActive ? 'Đang mở' : 'Đã đóng' }}
                   </span>
                 </div>
-                <h1 class="text-2xl font-bold mb-2">{{ assignment.title }}</h1>
+                <h1 class="text-2xl font-bold mb-2">{{ assignment?.title }}</h1>
                 <div class="flex items-center gap-4 text-white/80 text-sm">
                   <div class="flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    Hạn: {{ formatDate(assignment.dueDate) }}
+                    Hạn: {{ formatDate(assignment?.deadline) }}
                   </div>
                   <div class="flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
-                    Điểm tối đa: {{ assignment.maxScore }}
+                    Điểm tối đa: {{ assignment?.maxScore || 10 }}
                   </div>
                 </div>
               </div>
@@ -310,25 +388,23 @@ onMounted(() => {
 
             <!-- Assignment Content -->
             <div class="p-6">
-              <div class="prose prose-sm max-w-none" v-html="assignment.description" />
+              <div class="prose prose-sm max-w-none" v-html="assignment?.description || 'Không có mô tả'" />
             </div>
 
             <!-- Attachments -->
-            <div v-if="assignment.attachments.length > 0" class="px-6 pb-6">
+            <div v-if="assignment?.attachmentUrl" class="px-6 pb-6">
               <h3 class="text-sm font-semibold text-gray-700 mb-3">Tệp đính kèm</h3>
               <div class="flex flex-wrap gap-2">
                 <a 
-                  v-for="file in assignment.attachments"
-                  :key="file.id"
-                  :href="file.url"
+                  :href="assignment.attachmentUrl"
+                  target="_blank"
                   class="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
                 >
                   <svg class="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                   <div>
-                    <p class="text-sm font-medium text-gray-700">{{ file.name }}</p>
-                    <p class="text-xs text-gray-500">{{ file.size }}</p>
+                    <p class="text-sm font-medium text-gray-700">Tệp đính kèm</p>
                   </div>
                   <svg class="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -345,11 +421,24 @@ onMounted(() => {
                 <div>
                   <h2 class="text-lg font-semibold text-gray-900">Danh sách bài nộp</h2>
                   <p class="text-sm text-gray-500 mt-1">
-                    {{ assignment.submissions.submitted }}/{{ assignment.submissions.total }} đã nộp • 
-                    {{ assignment.submissions.graded }} đã chấm
+                    {{ submissions?.length || 0 }} bài nộp • {{ gradedCount }} đã chấm
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
+                  <button
+                    @click="downloadAllSubmissions"
+                    :disabled="isDownloading || !submissions?.length"
+                    class="px-3 py-2 text-sm bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    <svg v-if="isDownloading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Xuất CSV
+                  </button>
                   <select 
                     v-model="submissionFilter"
                     class="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
@@ -357,8 +446,7 @@ onMounted(() => {
                     <option value="all">Tất cả</option>
                     <option value="submitted">Chờ chấm</option>
                     <option value="graded">Đã chấm</option>
-                    <option value="late">Nộp muộn</option>
-                    <option value="not_submitted">Chưa nộp</option>
+                    <option value="returned">Đã trả</option>
                   </select>
                 </div>
               </div>
@@ -373,52 +461,78 @@ onMounted(() => {
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-semibold">
-                      {{ sub.student.name.charAt(0) }}
+                      {{ sub.student?.fullName?.charAt(0) || 'S' }}
                     </div>
                     <div>
-                      <p class="font-medium text-gray-900">{{ sub.student.name }}</p>
+                      <p class="font-medium text-gray-900">{{ sub.student?.fullName || 'Học sinh' }}</p>
                       <div class="flex items-center gap-2 text-sm">
                         <span 
                           class="px-2 py-0.5 rounded-full text-xs font-medium"
-                          :class="getStatusBadge(sub.status).class"
+                          :class="getStatusBadge(sub.status || 'submitted').class"
                         >
-                          {{ getStatusBadge(sub.status).text }}
+                          {{ getStatusBadge(sub.status || 'submitted').text }}
                         </span>
                         <span class="text-gray-500">{{ formatDateShort(sub.submittedAt) }}</span>
+                        <span v-if="sub.isLate" class="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                          Muộn
+                        </span>
                       </div>
                     </div>
                   </div>
                   
-                  <div class="flex items-center gap-4">
-                    <div v-if="sub.score !== null" class="text-right">
+                  <div class="flex items-center gap-3">
+                    <!-- Score display -->
+                    <div v-if="sub.score !== null && sub.score !== undefined" class="text-right mr-2">
                       <p class="text-2xl font-bold text-primary">{{ sub.score }}</p>
-                      <p class="text-xs text-gray-500">/ {{ assignment.maxScore }}</p>
+                      <p class="text-xs text-gray-500">/ {{ assignment?.maxScore || 10 }}</p>
                     </div>
+                    
+                    <!-- Download button -->
+                    <button
+                      v-if="sub.fileUrl"
+                      @click="downloadSubmission(sub)"
+                      class="px-3 py-2 text-sm font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-1.5"
+                      title="Tải xuống bài nộp"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      <span>Tải về</span>
+                    </button>
+                    
+                    <!-- Grade/Edit button -->
                     <button 
-                      v-if="sub.status !== 'not_submitted'"
                       class="px-4 py-2 text-sm font-medium rounded-xl transition-colors"
                       :class="sub.status === 'graded' 
-                        ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' 
+                        ? 'bg-yellow-100 hover:bg-yellow-200 text-yellow-700' 
                         : 'bg-primary text-white hover:bg-primary/90'"
-                      @click="openGradeModal(sub)"
+                      @click="openGradeModal(sub, sub.status === 'graded' ? 'edit' : 'create')"
                     >
-                      {{ sub.status === 'graded' ? 'Xem lại' : 'Chấm điểm' }}
+                      {{ sub.status === 'graded' ? 'Sửa điểm' : 'Chấm điểm' }}
                     </button>
                   </div>
                 </div>
                 
+                <!-- Submission content preview -->
+                <div v-if="sub.content" class="mt-3 pl-13">
+                  <p class="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 line-clamp-2">{{ sub.content }}</p>
+                </div>
+                
                 <!-- Files preview -->
-                <div v-if="sub.files.length > 0" class="mt-3 flex flex-wrap gap-2 pl-13">
+                <div v-if="sub.fileUrl" class="mt-3 flex flex-wrap gap-2 pl-13">
                   <a 
-                    v-for="file in sub.files" 
-                    :key="file.id"
-                    href="#"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-700 transition-colors"
+                    :href="getFileUrl(sub.fileUrl)"
+                    :download="sub.originalFileName || sub.fileUrl.split('/').pop()"
+                    target="_blank"
+                    class="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg text-sm text-blue-700 transition-colors group"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
-                    {{ file.name }}
+                    <span class="font-medium">{{ sub.originalFileName || sub.fileUrl.split('/').pop() }}</span>
+                    <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
                   </a>
                 </div>
               </div>
@@ -441,7 +555,7 @@ onMounted(() => {
             </div>
 
             <!-- Not submitted -->
-            <div v-if="submission.status === 'not_submitted'" class="p-12 text-center">
+            <div v-if="!mySubmission" class="p-12 text-center">
               <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary/10 to-purple-100 rounded-full flex items-center justify-center">
                 <svg class="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -468,13 +582,13 @@ onMounted(() => {
                   </div>
                   <div>
                     <p class="font-semibold text-gray-900">Đã nộp bài</p>
-                    <p class="text-sm text-gray-500">{{ formatDateShort(submission.submittedAt) }}</p>
+                    <p class="text-sm text-gray-500">{{ formatDateShort(mySubmission.submittedAt) }}</p>
                   </div>
                 </div>
                 
-                <div v-if="submission.score !== null" class="text-center">
-                  <p class="text-3xl font-bold text-primary">{{ submission.score }}</p>
-                  <p class="text-sm text-gray-500">/ {{ assignment.maxScore }}</p>
+                <div v-if="mySubmission.score !== null && mySubmission.score !== undefined" class="text-center">
+                  <p class="text-3xl font-bold text-primary">{{ mySubmission.score }}</p>
+                  <p class="text-sm text-gray-500">/ {{ assignment?.maxScore || 10 }}</p>
                 </div>
                 <span v-else class="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-xl text-sm font-medium">
                   Đang chờ chấm
@@ -482,28 +596,36 @@ onMounted(() => {
               </div>
 
               <!-- Files -->
-              <div class="mb-4">
+              <div v-if="mySubmission.fileUrl" class="mb-4">
                 <p class="text-sm font-medium text-gray-700 mb-2">Tệp đã nộp</p>
                 <div class="flex flex-wrap gap-2">
                   <a 
-                    v-for="file in submission.files" 
-                    :key="file.id"
-                    href="#"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                    :href="getFileUrl(mySubmission.fileUrl)"
+                    :download="mySubmission.originalFileName || mySubmission.fileUrl.split('/').pop()"
+                    target="_blank"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors group"
                   >
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
-                    <span class="text-sm font-medium text-gray-700">{{ file.name }}</span>
-                    <span class="text-xs text-gray-500">{{ file.size }}</span>
+                    <span class="text-sm font-medium text-blue-700">{{ mySubmission.originalFileName || mySubmission.fileUrl.split('/').pop() }}</span>
+                    <svg class="w-4 h-4 text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
                   </a>
                 </div>
               </div>
+              
+              <!-- Content -->
+              <div v-if="mySubmission.content" class="mb-4">
+                <p class="text-sm font-medium text-gray-700 mb-2">Nội dung</p>
+                <p class="text-sm text-gray-600">{{ mySubmission.content }}</p>
+              </div>
 
               <!-- Feedback -->
-              <div v-if="submission.feedback" class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+              <div v-if="mySubmission.feedback" class="p-4 bg-blue-50 rounded-xl border border-blue-100">
                 <p class="text-sm font-medium text-blue-800 mb-1">Nhận xét từ giáo viên</p>
-                <p class="text-sm text-blue-700">{{ submission.feedback }}</p>
+                <p class="text-sm text-blue-700">{{ mySubmission.feedback }}</p>
               </div>
             </div>
           </div>
@@ -532,11 +654,11 @@ onMounted(() => {
             <div class="mt-4 pt-4 border-t border-gray-100">
               <div class="flex justify-between text-sm">
                 <span class="text-gray-500">Ngày giao</span>
-                <span class="text-gray-900">{{ formatDateShort(assignment.createdAt) }}</span>
+                <span class="text-gray-900">{{ formatDateShort(assignment?.createdAt) }}</span>
               </div>
               <div class="flex justify-between text-sm mt-2">
                 <span class="text-gray-500">Hạn nộp</span>
-                <span class="text-gray-900">{{ formatDateShort(assignment.dueDate) }}</span>
+                <span class="text-gray-900">{{ formatDateShort(assignment?.deadline) }}</span>
               </div>
             </div>
           </div>
@@ -549,12 +671,12 @@ onMounted(() => {
               <div>
                 <div class="flex justify-between text-sm mb-2">
                   <span class="text-gray-600">Đã nộp</span>
-                  <span class="font-medium text-gray-900">{{ assignment.submissions.submitted }}/{{ assignment.submissions.total }}</span>
+                  <span class="font-medium text-gray-900">{{ submissions?.length || 0 }}</span>
                 </div>
                 <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
                     class="h-full bg-gradient-to-r from-primary to-purple-600 rounded-full transition-all"
-                    :style="{ width: `${(assignment.submissions.submitted / assignment.submissions.total) * 100}%` }"
+                    :style="{ width: submissions?.length ? '100%' : '0%' }"
                   />
                 </div>
               </div>
@@ -562,12 +684,12 @@ onMounted(() => {
               <div>
                 <div class="flex justify-between text-sm mb-2">
                   <span class="text-gray-600">Đã chấm</span>
-                  <span class="font-medium text-gray-900">{{ assignment.submissions.graded }}/{{ assignment.submissions.submitted }}</span>
+                  <span class="font-medium text-gray-900">{{ gradedCount }}/{{ submissions?.length || 0 }}</span>
                 </div>
                 <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
                     class="h-full bg-gradient-to-r from-green-500 to-emerald-600 rounded-full transition-all"
-                    :style="{ width: `${assignment.submissions.submitted > 0 ? (assignment.submissions.graded / assignment.submissions.submitted) * 100 : 0}%` }"
+                    :style="{ width: `${submissions?.length > 0 ? (gradedCount / submissions.length) * 100 : 0}%` }"
                   />
                 </div>
               </div>
@@ -575,12 +697,12 @@ onMounted(() => {
 
             <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-gray-100">
               <div class="p-3 bg-gray-50 rounded-xl text-center">
-                <p class="text-2xl font-bold text-gray-900">{{ assignment.submissions.total - assignment.submissions.submitted }}</p>
-                <p class="text-xs text-gray-500">Chưa nộp</p>
+                <p class="text-2xl font-bold text-gray-900">{{ pendingCount }}</p>
+                <p class="text-xs text-gray-500">Chờ chấm</p>
               </div>
               <div class="p-3 bg-gray-50 rounded-xl text-center">
-                <p class="text-2xl font-bold text-gray-900">{{ assignment.submissions.submitted - assignment.submissions.graded }}</p>
-                <p class="text-xs text-gray-500">Chờ chấm</p>
+                <p class="text-2xl font-bold text-gray-900">{{ gradedCount }}</p>
+                <p class="text-xs text-gray-500">Đã chấm</p>
               </div>
             </div>
           </div>
@@ -590,7 +712,7 @@ onMounted(() => {
             <h3 class="font-semibold text-gray-900 mb-4">Hành động</h3>
             <div class="space-y-2">
               <NuxtLink 
-                :to="`/classes/${assignment.class.id}`"
+                :to="`/classes/${assignment?.class?.id || assignment?.classId}`"
                 class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group"
               >
                 <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
@@ -600,12 +722,12 @@ onMounted(() => {
                 </div>
                 <div>
                   <p class="text-sm font-medium text-gray-900">Đến lớp học</p>
-                  <p class="text-xs text-gray-500">{{ assignment.class.name }}</p>
+                  <p class="text-xs text-gray-500">{{ assignment?.class?.name || 'Lớp học' }}</p>
                 </div>
               </NuxtLink>
 
               <button 
-                v-if="!isTeacher && submission.status === 'not_submitted'"
+                v-if="!isTeacher && !mySubmission"
                 class="w-full flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white hover:shadow-lg hover:shadow-primary/25 transition-all"
                 @click="showSubmitModal = true"
               >
@@ -745,7 +867,7 @@ onMounted(() => {
                 </button>
                 <button 
                   class="flex-1 px-4 py-3 bg-gradient-to-r from-primary to-purple-600 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all disabled:opacity-50"
-                  :disabled="isSubmitting || submitForm.files.length === 0"
+                  :disabled="isSubmitting || (!submitForm.content?.trim() && submitForm.files.length === 0)"
                   @click="handleSubmit"
                 >
                   <span v-if="isSubmitting" class="flex items-center justify-center gap-2">
@@ -791,8 +913,10 @@ onMounted(() => {
               <div class="p-6 border-b border-gray-100">
                 <div class="flex items-center justify-between">
                   <div>
-                    <h2 class="text-xl font-bold text-gray-900">Chấm điểm</h2>
-                    <p class="text-sm text-gray-500 mt-1">{{ selectedSubmission.student.name }}</p>
+                    <h2 class="text-xl font-bold text-gray-900">
+                      {{ gradeMode === 'edit' ? 'Sửa điểm' : 'Chấm điểm' }}
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-1">{{ selectedSubmission.student?.fullName || 'Học sinh' }}</p>
                   </div>
                   <button 
                     class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
@@ -805,57 +929,83 @@ onMounted(() => {
                 </div>
               </div>
 
-              <div class="p-6 space-y-4">
-                <!-- Files -->
+              <div class="p-6 space-y-5">
+                <!-- Submission preview -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Bài nộp</label>
-                  <div class="flex flex-wrap gap-2">
+                  <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+                    <div v-if="selectedSubmission.content" class="text-sm text-gray-600">
+                      {{ selectedSubmission.content }}
+                    </div>
                     <a 
-                      v-for="file in selectedSubmission.files" 
-                      :key="file.id"
-                      href="#"
-                      class="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                      v-if="selectedSubmission.fileUrl"
+                      :href="getFileUrl(selectedSubmission.fileUrl)"
+                      :download="selectedSubmission.originalFileName || selectedSubmission.fileUrl.split('/').pop()"
+                      target="_blank"
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors text-blue-700 group"
                     >
-                      <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                       </svg>
-                      <span class="text-sm font-medium text-gray-700">{{ file.name }}</span>
+                      <span class="text-sm font-medium">{{ selectedSubmission.originalFileName || selectedSubmission.fileUrl.split('/').pop() }}</span>
+                      <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
                     </a>
+                    <p v-if="!selectedSubmission.content && !selectedSubmission.fileUrl" class="text-sm text-gray-400 italic">
+                      Không có nội dung
+                    </p>
                   </div>
                 </div>
 
-                <!-- Score -->
+                <!-- Score input -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Điểm số</label>
-                  <div class="flex items-center gap-4">
+                  <div class="flex items-center gap-3">
                     <input 
                       v-model.number="gradeForm.score"
-                      type="range"
+                      type="number"
                       :min="0"
-                      :max="assignment.maxScore"
+                      :max="assignment?.maxScore || 10"
                       step="0.5"
-                      class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                      class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-lg font-semibold text-center"
+                      placeholder="Nhập điểm"
                     />
-                    <div class="w-20 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-center">
-                      <span class="text-lg font-bold text-primary">{{ gradeForm.score }}</span>
-                      <span class="text-gray-400">/{{ assignment.maxScore }}</span>
-                    </div>
+                    <span class="text-lg text-gray-500 font-medium">/ {{ assignment?.maxScore || 10 }}</span>
+                  </div>
+                  <div class="flex gap-2 mt-3">
+                    <button 
+                      v-for="preset in [0, 5, 7, 8, 9, assignment?.maxScore || 10]"
+                      :key="preset"
+                      @click="gradeForm.score = preset"
+                      class="px-3 py-1.5 text-sm rounded-lg transition-colors"
+                      :class="gradeForm.score === preset ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'"
+                    >
+                      {{ preset }}
+                    </button>
                   </div>
                 </div>
 
                 <!-- Feedback -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Nhận xét</label>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Nhận xét (tuỳ chọn)</label>
                   <textarea 
                     v-model="gradeForm.feedback"
                     class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none transition-all"
-                    rows="4"
+                    rows="3"
                     placeholder="Nhận xét về bài làm của học sinh..."
                   />
                 </div>
               </div>
 
               <div class="p-6 border-t border-gray-100 flex gap-3">
+                <button 
+                  v-if="gradeMode === 'edit'"
+                  class="px-4 py-3 bg-red-100 text-red-700 font-medium rounded-xl hover:bg-red-200 transition-colors"
+                  @click="showDeleteGradeConfirm = true"
+                >
+                  Xóa điểm
+                </button>
                 <button 
                   class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors"
                   @click="showGradeModal = false"
@@ -874,9 +1024,37 @@ onMounted(() => {
                     </svg>
                     Đang lưu...
                   </span>
-                  <span v-else>Lưu điểm</span>
+                  <span v-else>{{ gradeMode === 'edit' ? 'Cập nhật' : 'Lưu điểm' }}</span>
                 </button>
               </div>
+              
+              <!-- Delete confirmation -->
+              <Transition name="fade">
+                <div v-if="showDeleteGradeConfirm" class="absolute inset-0 bg-white/95 rounded-2xl flex flex-col items-center justify-center p-6">
+                  <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-2">Xóa điểm?</h3>
+                  <p class="text-sm text-gray-500 text-center mb-6">Bài nộp sẽ được trả lại để học sinh nộp lại.</p>
+                  <div class="flex gap-3 w-full max-w-xs">
+                    <button 
+                      class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors"
+                      @click="showDeleteGradeConfirm = false"
+                    >
+                      Huỷ
+                    </button>
+                    <button 
+                      class="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50"
+                      :disabled="isSubmitting"
+                      @click="handleDeleteGrade"
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                </div>
+              </Transition>
             </div>
           </Transition>
         </div>

@@ -102,6 +102,32 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
+
+const { toast } = useToast()
+
+// Delete live session
+const deleteLiveSession = async (sessionId: number) => {
+  if (!confirm('Bạn có chắc muốn xóa phiên live này?')) return
+  try {
+    await liveSessionsStore.deleteSession(sessionId)
+    await liveSessionsStore.fetchSessions()
+    toast.success('Đã xóa phiên live')
+  } catch (error: any) {
+    toast.error('Không thể xóa phiên live')
+  }
+}
+
+// End live session
+const endLiveSession = async (sessionId: number) => {
+  if (!confirm('Bạn có chắc muốn kết thúc phiên live này?')) return
+  try {
+    await liveSessionsStore.endSession(sessionId)
+    await liveSessionsStore.fetchSessions()
+    toast.success('Đã kết thúc phiên live')
+  } catch (error: any) {
+    toast.error('Không thể kết thúc phiên live')
+  }
+}
 </script>
 
 <template>
@@ -208,6 +234,110 @@ onMounted(async () => {
               <line x1="12" y1="20" x2="12" y2="4"/>
               <line x1="6" y1="20" x2="6" y2="14"/>
             </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Live Sessions Section -->
+    <div v-if="liveSessionsStore.activeSessions?.length > 0" class="rounded-2xl border-2 border-red-500/30 bg-gradient-to-r from-red-500/5 to-orange-500/5 overflow-hidden">
+      <div class="flex items-center justify-between p-5 border-b border-red-500/20">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <span class="flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-foreground">Phiên live đang diễn ra</h2>
+            <p class="text-sm text-muted-foreground">{{ liveSessionsStore.activeSessions.length }} phiên live</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          v-for="session in liveSessionsStore.activeSessions"
+          :key="session.id"
+          class="group relative rounded-xl border border-red-500/20 bg-card p-4 hover:shadow-lg hover:border-red-500/40 transition-all duration-200"
+        >
+          <!-- Live Badge -->
+          <div class="absolute top-3 right-3">
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-500 text-white text-xs font-bold">
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-white"></span>
+              </span>
+              LIVE
+            </span>
+          </div>
+          
+          <div class="flex items-start gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="23 7 16 12 23 17 23 7"/>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0 pr-12">
+              <h3 class="font-semibold text-foreground truncate">{{ session.title }}</h3>
+              <p class="text-sm text-muted-foreground truncate">
+                {{ classesStore.classes?.find(c => c.id === session.classId)?.name || 'Lớp học' }}
+              </p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3 text-xs text-muted-foreground mb-4">
+            <span class="flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+              {{ session.participantCount || 0 }} tham gia
+            </span>
+            <span class="flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              {{ session.startedAt ? new Date(session.startedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '' }}
+            </span>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <NuxtLink
+              :to="`/live/${session.id}`"
+              class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-red-500 to-orange-500 text-white font-medium hover:from-red-600 hover:to-orange-600 transition-all shadow-md"
+            >
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              Tham gia
+            </NuxtLink>
+            
+            <!-- Teacher actions -->
+            <template v-if="authStore.isTeacher">
+              <button
+                @click="endLiveSession(session.id)"
+                class="p-2.5 rounded-lg bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 transition-colors"
+                title="Kết thúc phiên"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <rect x="6" y="4" width="4" height="16" rx="1"/>
+                  <rect x="14" y="4" width="4" height="16" rx="1"/>
+                </svg>
+              </button>
+              <button
+                @click="deleteLiveSession(session.id)"
+                class="p-2.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                title="Xóa phiên"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </template>
           </div>
         </div>
       </div>
@@ -356,10 +486,11 @@ onMounted(async () => {
                     <p class="text-xs text-muted-foreground mt-1 truncate">{{ assignment.class?.name }}</p>
                   </div>
                   <span
+                    v-if="assignment.deadline"
                     class="flex-shrink-0 text-xs font-medium px-2 py-1 rounded-full"
-                    :class="getUrgencyColor(assignment.dueDate)"
+                    :class="getUrgencyColor(assignment.deadline)"
                   >
-                    {{ formatDueDate(assignment.dueDate) }}
+                    {{ formatDueDate(assignment.deadline) }}
                   </span>
                 </div>
               </NuxtLink>

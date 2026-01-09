@@ -56,6 +56,13 @@ export class FilesController {
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: User,
   ) {
+    console.log('Upload request received:', {
+      hasFile: !!file,
+      fileName: file?.originalname,
+      fileSize: file?.size,
+      mimeType: file?.mimetype,
+      userId: user?.id
+    });
     return this.filesService.upload(file, user);
   }
 

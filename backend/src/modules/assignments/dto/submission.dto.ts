@@ -18,6 +18,12 @@ export class CreateSubmissionDto {
   @MaxLength(500)
   fileUrl?: string;
 
+  @ApiProperty({ example: 'myfile.pdf', required: false })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  originalFileName?: string;
+
   @ApiProperty({ example: 'Nội dung bài làm của sinh viên...', required: false })
   @ValidateIf((o) => !o.fileUrl)
   @IsNotEmpty({ message: 'Phải có file hoặc nội dung bài làm' })

@@ -37,6 +37,7 @@ export const useLiveSessionsStore = defineStore('liveSessions', {
 
   getters: {
     liveSessions: (state) => state.sessions.filter(s => s.status === 'live'),
+    activeSessions: (state) => state.sessions.filter(s => s.status === 'live'),
     scheduledSessions: (state) => state.sessions.filter(s => s.status === 'scheduled'),
     endedSessions: (state) => state.sessions.filter(s => s.status === 'ended'),
     isHost: (state) => {
@@ -61,7 +62,17 @@ export const useLiveSessionsStore = defineStore('liveSessions', {
           status: params.status,
         })
         
-        this.sessions = response.data
+        // If fetching for specific class, merge with existing sessions
+        if (params.classId) {
+          // Remove old sessions from this class
+          const otherSessions = this.sessions.filter(s => s.classId !== params.classId)
+          // Add new sessions from this class
+          this.sessions = [...otherSessions, ...response.data]
+        } else {
+          // If fetching all sessions, replace
+          this.sessions = response.data
+        }
+        
         this.meta = response.meta
         return response
       } finally {

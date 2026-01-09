@@ -82,8 +82,10 @@ export const useAuthStore = defineStore('auth', {
         }
         
         return true
-      } catch {
-        this.clearAuthData()
+      } catch (error) {
+        console.error('Token refresh failed:', error)
+        // Don't automatically clear auth data here
+        // Let the calling code decide what to do
         return false
       }
     },
@@ -103,8 +105,12 @@ export const useAuthStore = defineStore('auth', {
         
         this.user = user
         return user
-      } catch {
-        this.clearAuthData()
+      } catch (error: any) {
+        console.error('Failed to fetch current user:', error)
+        // Only clear auth on 401/403, not on network errors
+        if (error.statusCode === 401 || error.statusCode === 403) {
+          this.clearAuthData()
+        }
         return null
       }
     },
