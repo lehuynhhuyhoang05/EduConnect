@@ -1,0 +1,1320 @@
+[2026-01-14T06:44:56.950Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest0@test.com"
+  }
+[2026-01-14T06:44:56.970Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest1@test.com"
+  }
+[2026-01-14T06:44:56.988Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest2@test.com"
+  }
+[2026-01-14T06:44:57.001Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest3@test.com"
+  }
+[2026-01-14T06:44:57.014Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest4@test.com"
+  }
+[2026-01-14T06:44:57.028Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest5@test.com"
+  }
+[2026-01-14T06:44:57.041Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest6@test.com"
+  }
+[2026-01-14T06:44:57.054Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest7@test.com"
+  }
+[2026-01-14T06:44:57.066Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest8@test.com"
+  }
+[2026-01-14T06:44:57.078Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest9@test.com"
+  }
+[2026-01-14T06:44:57.089Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest10@test.com"
+  }
+[2026-01-14T06:44:57.101Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest11@test.com"
+  }
+[2026-01-14T06:44:57.113Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest12@test.com"
+  }
+[2026-01-14T06:44:57.124Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest13@test.com"
+  }
+[2026-01-14T06:44:57.133Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest14@test.com"
+  }
+[2026-01-14T06:44:57.141Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest15@test.com"
+  }
+[2026-01-14T06:44:57.152Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest16@test.com"
+  }
+[2026-01-14T06:44:57.163Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest17@test.com"
+  }
+[2026-01-14T06:44:57.175Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest18@test.com"
+  }
+[2026-01-14T06:44:57.185Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest19@test.com"
+  }
+[2026-01-14T06:44:57.195Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest20@test.com"
+  }
+[2026-01-14T06:44:57.208Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest21@test.com"
+  }
+[2026-01-14T06:44:57.221Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest22@test.com"
+  }
+[2026-01-14T06:44:57.232Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest23@test.com"
+  }
+[2026-01-14T06:44:57.243Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest24@test.com"
+  }
+[2026-01-14T06:44:57.255Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest25@test.com"
+  }
+[2026-01-14T06:44:57.265Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest26@test.com"
+  }
+[2026-01-14T06:44:57.277Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest27@test.com"
+  }
+[2026-01-14T06:44:57.286Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest28@test.com"
+  }
+[2026-01-14T06:44:57.295Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest29@test.com"
+  }
+[2026-01-14T06:47:19.439Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 29,
+    "email": "loadtest_1768373239316_0@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:19.546Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 30,
+    "email": "loadtest_1768373239465_1@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:19.642Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 31,
+    "email": "loadtest_1768373239560_2@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:19.736Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 32,
+    "email": "loadtest_1768373239654_3@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:19.832Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 33,
+    "email": "loadtest_1768373239747_4@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:19.926Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 34,
+    "email": "loadtest_1768373239844_5@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.019Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 35,
+    "email": "loadtest_1768373239938_6@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.115Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 36,
+    "email": "loadtest_1768373240032_7@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.207Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 37,
+    "email": "loadtest_1768373240126_8@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.296Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 38,
+    "email": "loadtest_1768373240218_9@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.384Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 39,
+    "email": "loadtest_1768373240306_10@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.481Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 40,
+    "email": "loadtest_1768373240402_11@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.570Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 41,
+    "email": "loadtest_1768373240491_12@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.662Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 42,
+    "email": "loadtest_1768373240581_13@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.753Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 43,
+    "email": "loadtest_1768373240672_14@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.843Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 44,
+    "email": "loadtest_1768373240764_15@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:20.934Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 45,
+    "email": "loadtest_1768373240853_16@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.026Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 46,
+    "email": "loadtest_1768373240944_17@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.117Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 47,
+    "email": "loadtest_1768373241037_18@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.208Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 48,
+    "email": "loadtest_1768373241127_19@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.298Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 49,
+    "email": "loadtest_1768373241217_20@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.387Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 50,
+    "email": "loadtest_1768373241308_21@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.477Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 51,
+    "email": "loadtest_1768373241398_22@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.571Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 52,
+    "email": "loadtest_1768373241490_23@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.663Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 53,
+    "email": "loadtest_1768373241583_24@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.758Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 54,
+    "email": "loadtest_1768373241677_25@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.849Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 55,
+    "email": "loadtest_1768373241768_26@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:21.941Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 56,
+    "email": "loadtest_1768373241861_27@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.035Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 57,
+    "email": "loadtest_1768373241953_28@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.126Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 58,
+    "email": "loadtest_1768373242045_29@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.216Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 59,
+    "email": "loadtest_1768373242135_30@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.311Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 60,
+    "email": "loadtest_1768373242230_31@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.403Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 61,
+    "email": "loadtest_1768373242322_32@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.493Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 62,
+    "email": "loadtest_1768373242414_33@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.584Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 63,
+    "email": "loadtest_1768373242504_34@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.677Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 64,
+    "email": "loadtest_1768373242596_35@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.772Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 65,
+    "email": "loadtest_1768373242692_36@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.865Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 66,
+    "email": "loadtest_1768373242783_37@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:22.955Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 67,
+    "email": "loadtest_1768373242875_38@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.047Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 68,
+    "email": "loadtest_1768373242967_39@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.137Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 69,
+    "email": "loadtest_1768373243057_40@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.225Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 70,
+    "email": "loadtest_1768373243147_41@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.324Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 71,
+    "email": "loadtest_1768373243245_42@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.414Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 72,
+    "email": "loadtest_1768373243334_43@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.501Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 73,
+    "email": "loadtest_1768373243423_44@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.593Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 74,
+    "email": "loadtest_1768373243513_45@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.685Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 75,
+    "email": "loadtest_1768373243604_46@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.774Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 76,
+    "email": "loadtest_1768373243694_47@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.873Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 77,
+    "email": "loadtest_1768373243786_48@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:23.964Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 78,
+    "email": "loadtest_1768373243884_49@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.056Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 79,
+    "email": "loadtest_1768373243975_50@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.148Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 80,
+    "email": "loadtest_1768373244067_51@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.243Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 81,
+    "email": "loadtest_1768373244162_52@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.332Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 82,
+    "email": "loadtest_1768373244252_53@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.422Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 83,
+    "email": "loadtest_1768373244343_54@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.510Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 84,
+    "email": "loadtest_1768373244432_55@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.601Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 85,
+    "email": "loadtest_1768373244523_56@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.689Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 86,
+    "email": "loadtest_1768373244611_57@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.779Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 87,
+    "email": "loadtest_1768373244698_58@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.866Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 88,
+    "email": "loadtest_1768373244788_59@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:24.955Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 89,
+    "email": "loadtest_1768373244875_60@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.045Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 90,
+    "email": "loadtest_1768373244966_61@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.134Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 91,
+    "email": "loadtest_1768373245055_62@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.227Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 92,
+    "email": "loadtest_1768373245145_63@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.315Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 93,
+    "email": "loadtest_1768373245237_64@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.410Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 94,
+    "email": "loadtest_1768373245329_65@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.501Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 95,
+    "email": "loadtest_1768373245422_66@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.588Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 96,
+    "email": "loadtest_1768373245510_67@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.679Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 97,
+    "email": "loadtest_1768373245599_68@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.768Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 98,
+    "email": "loadtest_1768373245688_69@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.859Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 99,
+    "email": "loadtest_1768373245779_70@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:25.949Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 100,
+    "email": "loadtest_1768373245869_71@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.039Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 101,
+    "email": "loadtest_1768373245960_72@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.130Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 102,
+    "email": "loadtest_1768373246050_73@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.219Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 103,
+    "email": "loadtest_1768373246141_74@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.305Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 104,
+    "email": "loadtest_1768373246228_75@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.392Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 105,
+    "email": "loadtest_1768373246314_76@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.490Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 106,
+    "email": "loadtest_1768373246403_77@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.595Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 107,
+    "email": "loadtest_1768373246515_78@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.686Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 108,
+    "email": "loadtest_1768373246605_79@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.773Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 109,
+    "email": "loadtest_1768373246695_80@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.864Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 110,
+    "email": "loadtest_1768373246783_81@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:26.955Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 111,
+    "email": "loadtest_1768373246875_82@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.046Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 112,
+    "email": "loadtest_1768373246966_83@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.137Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 113,
+    "email": "loadtest_1768373247057_84@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.253Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 114,
+    "email": "loadtest_1768373247146_85@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.349Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 115,
+    "email": "loadtest_1768373247268_86@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.440Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 116,
+    "email": "loadtest_1768373247359_87@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.531Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 117,
+    "email": "loadtest_1768373247453_88@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.622Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 118,
+    "email": "loadtest_1768373247541_89@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.712Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 119,
+    "email": "loadtest_1768373247633_90@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.803Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 120,
+    "email": "loadtest_1768373247722_91@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.891Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 121,
+    "email": "loadtest_1768373247813_92@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:27.982Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 122,
+    "email": "loadtest_1768373247902_93@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.073Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 123,
+    "email": "loadtest_1768373247993_94@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.162Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 124,
+    "email": "loadtest_1768373248082_95@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.255Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 125,
+    "email": "loadtest_1768373248174_96@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.346Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 126,
+    "email": "loadtest_1768373248266_97@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.433Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 127,
+    "email": "loadtest_1768373248356_98@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.524Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 128,
+    "email": "loadtest_1768373248444_99@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.613Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 129,
+    "email": "loadtest_1768373248533_100@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.702Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 130,
+    "email": "loadtest_1768373248623_101@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.791Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 131,
+    "email": "loadtest_1768373248711_102@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.885Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 132,
+    "email": "loadtest_1768373248804_103@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:28.976Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 133,
+    "email": "loadtest_1768373248896_104@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.068Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 134,
+    "email": "loadtest_1768373248987_105@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.166Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 135,
+    "email": "loadtest_1768373249084_106@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.257Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 136,
+    "email": "loadtest_1768373249176_107@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.347Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 137,
+    "email": "loadtest_1768373249268_108@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.438Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 138,
+    "email": "loadtest_1768373249359_109@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.530Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 139,
+    "email": "loadtest_1768373249450_110@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.617Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 140,
+    "email": "loadtest_1768373249540_111@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.707Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 141,
+    "email": "loadtest_1768373249630_112@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.794Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 142,
+    "email": "loadtest_1768373249716_113@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.884Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 143,
+    "email": "loadtest_1768373249806_114@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:29.972Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 144,
+    "email": "loadtest_1768373249893_115@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.063Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 145,
+    "email": "loadtest_1768373249983_116@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.153Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 146,
+    "email": "loadtest_1768373250074_117@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.247Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 147,
+    "email": "loadtest_1768373250168_118@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.335Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 148,
+    "email": "loadtest_1768373250258_119@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.425Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 149,
+    "email": "loadtest_1768373250346_120@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.513Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 150,
+    "email": "loadtest_1768373250435_121@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.600Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 151,
+    "email": "loadtest_1768373250522_122@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.691Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 152,
+    "email": "loadtest_1768373250611_123@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.782Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 153,
+    "email": "loadtest_1768373250703_124@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.873Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 154,
+    "email": "loadtest_1768373250793_125@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:30.965Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 155,
+    "email": "loadtest_1768373250883_126@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.055Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 156,
+    "email": "loadtest_1768373250975_127@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.145Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 157,
+    "email": "loadtest_1768373251067_128@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.236Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 158,
+    "email": "loadtest_1768373251156_129@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.324Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 159,
+    "email": "loadtest_1768373251245_130@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.412Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 160,
+    "email": "loadtest_1768373251334_131@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.505Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 161,
+    "email": "loadtest_1768373251425_132@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.597Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 162,
+    "email": "loadtest_1768373251516_133@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.688Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 163,
+    "email": "loadtest_1768373251609_134@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.777Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 164,
+    "email": "loadtest_1768373251698_135@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.868Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 165,
+    "email": "loadtest_1768373251787_136@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:31.959Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 166,
+    "email": "loadtest_1768373251878_137@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.052Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 167,
+    "email": "loadtest_1768373251970_138@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.142Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 168,
+    "email": "loadtest_1768373252063_139@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.230Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 169,
+    "email": "loadtest_1768373252152_140@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.317Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 170,
+    "email": "loadtest_1768373252239_141@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.405Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 171,
+    "email": "loadtest_1768373252328_142@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.499Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 172,
+    "email": "loadtest_1768373252420_143@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.587Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 173,
+    "email": "loadtest_1768373252508_144@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.677Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 174,
+    "email": "loadtest_1768373252597_145@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.766Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 175,
+    "email": "loadtest_1768373252686_146@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.856Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 176,
+    "email": "loadtest_1768373252777_147@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:32.944Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 177,
+    "email": "loadtest_1768373252867_148@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.033Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 178,
+    "email": "loadtest_1768373252954_149@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.118Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 179,
+    "email": "loadtest_1768373253041_150@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.206Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 180,
+    "email": "loadtest_1768373253128_151@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.299Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 181,
+    "email": "loadtest_1768373253216_152@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.390Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 182,
+    "email": "loadtest_1768373253310_153@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.482Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 183,
+    "email": "loadtest_1768373253403_154@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.572Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 184,
+    "email": "loadtest_1768373253492_155@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.662Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 185,
+    "email": "loadtest_1768373253582_156@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.755Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 186,
+    "email": "loadtest_1768373253674_157@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.850Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 187,
+    "email": "loadtest_1768373253770_158@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:33.952Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 188,
+    "email": "loadtest_1768373253868_159@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.042Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 189,
+    "email": "loadtest_1768373253962_160@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.134Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 190,
+    "email": "loadtest_1768373254053_161@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.223Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 191,
+    "email": "loadtest_1768373254145_162@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.315Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 192,
+    "email": "loadtest_1768373254237_163@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.405Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 193,
+    "email": "loadtest_1768373254325_164@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.494Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 194,
+    "email": "loadtest_1768373254414_165@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.586Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 195,
+    "email": "loadtest_1768373254504_166@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.677Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 196,
+    "email": "loadtest_1768373254596_167@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.768Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 197,
+    "email": "loadtest_1768373254686_168@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.859Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 198,
+    "email": "loadtest_1768373254778_169@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:34.948Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 199,
+    "email": "loadtest_1768373254868_170@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.036Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 200,
+    "email": "loadtest_1768373254958_171@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.122Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 201,
+    "email": "loadtest_1768373255045_172@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.208Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 202,
+    "email": "loadtest_1768373255130_173@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.297Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 203,
+    "email": "loadtest_1768373255216_174@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.390Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 204,
+    "email": "loadtest_1768373255308_175@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.484Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 205,
+    "email": "loadtest_1768373255403_176@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.573Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 206,
+    "email": "loadtest_1768373255493_177@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.666Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 207,
+    "email": "loadtest_1768373255586_178@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.760Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 208,
+    "email": "loadtest_1768373255677_179@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.848Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 209,
+    "email": "loadtest_1768373255770_180@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:35.939Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 210,
+    "email": "loadtest_1768373255859_181@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.031Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 211,
+    "email": "loadtest_1768373255952_182@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.120Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 212,
+    "email": "loadtest_1768373256042_183@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.208Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 213,
+    "email": "loadtest_1768373256130_184@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.296Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 214,
+    "email": "loadtest_1768373256217_185@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.388Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 215,
+    "email": "loadtest_1768373256306_186@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.480Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 216,
+    "email": "loadtest_1768373256400_187@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.573Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 217,
+    "email": "loadtest_1768373256493_188@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.666Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 218,
+    "email": "loadtest_1768373256583_189@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.755Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 219,
+    "email": "loadtest_1768373256675_190@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.844Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 220,
+    "email": "loadtest_1768373256765_191@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:36.934Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 221,
+    "email": "loadtest_1768373256853_192@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:37.021Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 222,
+    "email": "loadtest_1768373256944_193@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:37.108Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 223,
+    "email": "loadtest_1768373257031_194@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:37.197Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 224,
+    "email": "loadtest_1768373257117_195@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:37.289Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 225,
+    "email": "loadtest_1768373257207_196@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:37.380Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 226,
+    "email": "loadtest_1768373257298_197@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:37.473Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 227,
+    "email": "loadtest_1768373257392_198@test.com",
+    "role": "STUDENT"
+  }
+[2026-01-14T06:47:37.564Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 228,
+    "email": "loadtest_1768373257484_199@test.com",
+    "role": "STUDENT"
+  }

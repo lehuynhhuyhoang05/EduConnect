@@ -1,0 +1,120 @@
+[2026-01-14T06:44:56.950Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest0@test.com"
+  }
+[2026-01-14T06:44:56.970Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest1@test.com"
+  }
+[2026-01-14T06:44:56.988Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest2@test.com"
+  }
+[2026-01-14T06:44:57.001Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest3@test.com"
+  }
+[2026-01-14T06:44:57.014Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest4@test.com"
+  }
+[2026-01-14T06:44:57.028Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest5@test.com"
+  }
+[2026-01-14T06:44:57.041Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest6@test.com"
+  }
+[2026-01-14T06:44:57.054Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest7@test.com"
+  }
+[2026-01-14T06:44:57.066Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest8@test.com"
+  }
+[2026-01-14T06:44:57.078Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest9@test.com"
+  }
+[2026-01-14T06:44:57.089Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest10@test.com"
+  }
+[2026-01-14T06:44:57.101Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest11@test.com"
+  }
+[2026-01-14T06:44:57.113Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest12@test.com"
+  }
+[2026-01-14T06:44:57.124Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest13@test.com"
+  }
+[2026-01-14T06:44:57.133Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest14@test.com"
+  }
+[2026-01-14T06:44:57.141Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest15@test.com"
+  }
+[2026-01-14T06:44:57.152Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest16@test.com"
+  }
+[2026-01-14T06:44:57.163Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest17@test.com"
+  }
+[2026-01-14T06:44:57.175Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest18@test.com"
+  }
+[2026-01-14T06:44:57.185Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest19@test.com"
+  }
+[2026-01-14T06:44:57.195Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest20@test.com"
+  }
+[2026-01-14T06:44:57.208Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest21@test.com"
+  }
+[2026-01-14T06:44:57.221Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest22@test.com"
+  }
+[2026-01-14T06:44:57.232Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest23@test.com"
+  }
+[2026-01-14T06:44:57.243Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest24@test.com"
+  }
+[2026-01-14T06:44:57.255Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest25@test.com"
+  }
+[2026-01-14T06:44:57.265Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest26@test.com"
+  }
+[2026-01-14T06:44:57.277Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest27@test.com"
+  }
+[2026-01-14T06:44:57.286Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest28@test.com"
+  }
+[2026-01-14T06:44:57.295Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "loadtest29@test.com"
+  }

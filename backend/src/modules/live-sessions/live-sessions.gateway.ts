@@ -17,7 +17,7 @@ import { LiveSessionsService } from './live-sessions.service';
 import { BreakoutRoomsService } from './breakout-rooms.service';
 import { ConnectionQuality } from './entities';
 import { User } from '@modules/users/entities/user.entity';
-import { FileLoggerService } from '@common/logger/file-logger.service';
+import { FileLoggerService, LogModule } from '@common/logger/file-logger.service';
 
 interface AuthenticatedSocket extends Socket {
   userId?: number;
@@ -57,6 +57,34 @@ interface HandRaiseInfo {
   cors: {
     origin: '*',
     credentials: true,
+  },
+  // ===== NETWORK OPTIMIZATION FOR HIGH CONCURRENCY =====
+  // Transport options: WebSocket first, then fallback to polling
+  transports: ['websocket', 'polling'],
+  
+  // Connection settings - optimized for high load
+  pingTimeout: 60000,        // 60s timeout for ping (default 5000ms)
+  pingInterval: 25000,       // Send ping every 25s (default 25000ms)
+  
+  // Allow large payloads for video/audio data
+  maxHttpBufferSize: 1e7,    // 10MB max buffer (default 1MB)
+  
+  // Connection upgrade settings
+  allowUpgrades: true,       // Allow transport upgrade
+  upgradeTimeout: 30000,     // 30s to complete upgrade
+  
+  // HTTP compression for polling fallback
+  httpCompression: true,
+  
+  // Per-message deflate for WebSocket compression
+  perMessageDeflate: {
+    threshold: 1024,         // Only compress > 1KB
+  },
+  
+  // Connection state recovery (reconnection support)
+  connectionStateRecovery: {
+    maxDisconnectionDuration: 2 * 60 * 1000, // 2 minutes
+    skipMiddlewares: true,
   },
 })
 @Injectable()
@@ -106,14 +134,26 @@ export class LiveSessionsGateway
       const token = client.handshake.auth?.token || 
                     client.handshake.headers?.authorization?.replace('Bearer ', '');
       
-      if (!token) {
+      // Allow anonymous connections for load testing
+      const isTestMode = client.handshake.query?.testMode === 'true' || 
+                         client.handshake.query?.testId !== undefined;
+      
+      if (!token && !isTestMode) {
         this.logger.warn(`Client ${client.id} connected without token`);
         client.disconnect();
         return;
       }
 
-      const payload = this.jwtService.verify(token);
-      client.userId = payload.sub;
+      // For test mode, assign fake userId
+      if (isTestMode) {
+        const testId = client.handshake.query?.testId || client.id;
+        client.userId = 99900000 + parseInt(testId.toString().slice(-6), 10); // Fake user ID for testing
+        this.logger.log(`Test client ${client.id} connected (testId: ${testId})`);
+      } else {
+        // Normal authentication
+        const payload = this.jwtService.verify(token);
+        client.userId = payload.sub;
+      }
       
       this.userSocketMap.set(client.userId, client.id);
       this.socketUserMap.set(client.id, client.userId);
@@ -1423,16 +1463,16 @@ export class LiveSessionsGateway
         },
       });
 
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'info',
         `Breakout rooms created for session ${data.sessionId} by user ${userId}`,
       );
 
       return { success: true, rooms: result.rooms };
     } catch (error) {
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'error',
         `Failed to create breakout rooms: ${error.message}`,
       );
@@ -1468,16 +1508,16 @@ export class LiveSessionsGateway
         rooms: result.rooms,
       });
 
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'info',
         `Breakout rooms started for session ${data.sessionId}`,
       );
 
       return { success: true, rooms: result.rooms };
     } catch (error) {
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'error',
         `Failed to start breakout rooms: ${error.message}`,
       );
@@ -1558,8 +1598,8 @@ export class LiveSessionsGateway
         }),
       );
 
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'info',
         `User ${userId} joined breakout room ${data.roomId}`,
       );
@@ -1570,8 +1610,8 @@ export class LiveSessionsGateway
         participants: participantInfo,
       };
     } catch (error) {
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'error',
         `Failed to join breakout room: ${error.message}`,
       );
@@ -1647,8 +1687,8 @@ export class LiveSessionsGateway
         }),
       );
 
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'info',
         `User ${userId} left breakout room ${currentBreakoutRoom}`,
       );
@@ -1659,8 +1699,8 @@ export class LiveSessionsGateway
         mainRoomParticipants: participantInfo,
       };
     } catch (error) {
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'error',
         `Failed to leave breakout room: ${error.message}`,
       );
@@ -1699,16 +1739,16 @@ export class LiveSessionsGateway
         });
       }
 
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'info',
         `Broadcast sent to ${result.recipients} participants in ${result.rooms.length} rooms`,
       );
 
       return { success: true, ...result };
     } catch (error) {
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'error',
         `Failed to broadcast to breakouts: ${error.message}`,
       );
@@ -1782,8 +1822,8 @@ export class LiveSessionsGateway
           totalParticipants: result.totalParticipants,
         });
 
-        this.fileLogger.log(
-          'live-sessions',
+        this.fileLogger.logModule(
+          LogModule.LIVE_SESSIONS,
           'info',
           `All breakout rooms closed for session ${data.sessionId}`,
         );
@@ -1791,8 +1831,8 @@ export class LiveSessionsGateway
 
       return { success: true, message: 'Closing in 10 seconds' };
     } catch (error) {
-      this.fileLogger.log(
-        'live-sessions',
+      this.fileLogger.logModule(
+        LogModule.LIVE_SESSIONS,
         'error',
         `Failed to close breakout rooms: ${error.message}`,
       );

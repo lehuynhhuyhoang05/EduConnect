@@ -16,7 +16,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, RefreshTokenDto } from './dto';
+import { RegisterDto, LoginDto, RefreshTokenDto, BulkCreateUsersDto } from './dto';
 import { Public } from './decorators';
 import { JwtAuthGuard } from './guards';
 import { CurrentUser } from './decorators';
@@ -166,5 +166,69 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getMe(@CurrentUser() user: User) {
     return this.usersService.sanitizeUser(user);
+  }
+
+  /**
+   * LOAD TEST ONLY: Bulk create test users
+   * ⚠️ This endpoint should be disabled in production
+   */
+  @Public()
+  @Post('test/bulk-create-users')
+  @ApiOperation({ 
+    summary: '[LOAD TEST] Bulk create test users',
+    description: '⚠️ For load testing only. Creates multiple test users at once without rate limiting.'
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Test users created successfully',
+    schema: {
+      example: {
+        success: true,
+        created: 100,
+        users: [
+          {
+            id: 1,
+            username: 'loadtest_user_0',
+            email: 'loadtest0@test.com',
+            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+          }
+        ]
+      }
+    }
+  })
+  async bulkCreateTestUsers(@Body() bulkCreateDto: BulkCreateUsersDto) {
+    const users = [];
+    const password = 'Test123!@#';
+
+    for (let i = 0; i < bulkCreateDto.count; i++) {
+      try {
+        const username = `loadtest_user_${Date.now()}_${i}`;
+        const email = `loadtest_${Date.now()}_${i}@test.com`;
+
+        const result = await this.authService.register({
+          username,
+          email,
+          password,
+          fullName: `Load Test User ${i}`,
+          role: 'student',
+        }, {});
+
+        users.push({
+          id: result.user.id,
+          username,
+          email,
+          token: result.tokens.accessToken,
+        });
+      } catch (error) {
+        // Continue on error
+        console.error(`Failed to create user ${i}:`, error.message);
+      }
+    }
+
+    return {
+      success: true,
+      created: users.length,
+      users,
+    };
   }
 }

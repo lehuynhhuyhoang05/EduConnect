@@ -1,0 +1,6 @@
+[2026-01-10T05:29:44.581Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }

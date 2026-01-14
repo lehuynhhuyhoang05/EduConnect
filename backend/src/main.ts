@@ -5,12 +5,29 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import helmet from 'helmet';
+import * as compression from 'compression';
 import { AppModule } from './app.module';
+import { HighPerformanceIoAdapter } from './config/socket-adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
+
+  // ===== HIGH PERFORMANCE WEBSOCKET ADAPTER =====
+  // Custom Socket.IO adapter with network optimizations
+  app.useWebSocketAdapter(new HighPerformanceIoAdapter(app));
+
+  // Compression middleware - reduce response size by 60-80%
+  app.use(compression({
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) {
+        return false;
+      }
+      return compression.filter(req, res);
+    },
+    threshold: 1024, // Only compress responses > 1KB
+  }));
 
   // Security headers with Helmet
   app.use(helmet({
