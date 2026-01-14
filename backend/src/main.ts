@@ -6,8 +6,14 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import helmet from 'helmet';
 import * as compression from 'compression';
+import * as crypto from 'crypto';
 import { AppModule } from './app.module';
 import { HighPerformanceIoAdapter } from './config/socket-adapter';
+
+// Polyfill for Node.js crypto in webpack bundle
+if (typeof global !== 'undefined' && !global.crypto) {
+  global.crypto = crypto.webcrypto as any;
+}
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

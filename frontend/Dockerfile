@@ -1,8 +1,8 @@
 # Dockerfile for Frontend Nuxt.js
 # Multi-stage build for production
 
-# Stage 1: Build
-FROM node:18-alpine AS builder
+# Stage 1: Build (Nuxt 4 requires Node 20+)
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -19,13 +19,12 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Copy package files and install production deps
-COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+# Copy built application from builder (no need to reinstall deps)
+COPY --from=builder /app/.output ./.output
 
 # Copy built application from builder
 COPY --from=builder /app/.output ./.output
