@@ -45,11 +45,11 @@ export class RegisterDto {
   @ApiProperty({
     example: 'STUDENT',
     enum: UserRole,
-    description: 'User role: STUDENT or TEACHER',
+    description: 'User role: STUDENT, TEACHER, or ADMIN',
     required: false,
     default: 'STUDENT',
   })
   @IsOptional()
-  @IsEnum(UserRole, { message: 'Role phải là STUDENT hoặc TEACHER' })
+  @IsEnum(UserRole, { message: 'Role phải là STUDENT, TEACHER hoặc ADMIN' })
   role?: UserRole;
 }

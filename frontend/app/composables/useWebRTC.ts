@@ -113,7 +113,9 @@ export function useWebRTC() {
   }
   
   // Start screen sharing
-  const startScreenShare = async (): Promise<MediaStream | null> => {
+  const startScreenShare = async (
+    onStopped?: () => void | Promise<void>,
+  ): Promise<MediaStream | null> => {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
@@ -139,6 +141,7 @@ export function useWebRTC() {
       if (videoTrack) {
         videoTrack.onended = () => {
           stopScreenShare()
+          void onStopped?.()
         }
       }
       
@@ -197,6 +200,10 @@ export function useWebRTC() {
   const stopScreenShare = () => {
     if (localScreenStream.value) {
       // Stop all tracks
+      // Clear onended handlers first: prevents duplicate stop callbacks when we stop programmatically
+      localScreenStream.value.getTracks().forEach(track => {
+        track.onended = null
+      })
       localScreenStream.value.getTracks().forEach(track => track.stop())
       
       // Remove screen tracks from all peer connections
@@ -314,19 +321,37 @@ export function useWebRTC() {
           remoteScreenStreams.value.set(userId, screenStream)
         }
         screenStream.addTrack(event.track)
-        
-        // Listen for track ended to clean up
-        event.track.onended = () => {
-          console.log('Remote screen track ended for user:', userId)
+
+        const cleanupRemoteScreenStream = () => {
           const stream = remoteScreenStreams.value.get(userId)
-          if (stream) {
-            stream.getTracks().forEach(t => {
+          if (!stream) return
+          stream.getTracks().forEach(t => {
+            try {
               stream.removeTrack(t)
               t.stop()
-            })
-            remoteScreenStreams.value.delete(userId)
-            remoteScreenStreams.value = new Map(remoteScreenStreams.value)
-          }
+            } catch {
+              // ignore
+            }
+          })
+          remoteScreenStreams.value.delete(userId)
+          remoteScreenStreams.value = new Map(remoteScreenStreams.value)
+        }
+
+        // Some browsers keep the track "live" but stop producing frames.
+        // React to ended/mute/inactive to avoid the viewer being stuck on the last frame.
+        event.track.onended = () => {
+          console.log('Remote screen track ended for user:', userId)
+          cleanupRemoteScreenStream()
+        }
+
+        event.track.onmute = () => {
+          // Delay a bit: transient mute can happen; but if it stays muted, treat as stopped.
+          window.setTimeout(() => {
+            if (event.track.readyState !== 'live' || event.track.muted) {
+              console.log('Remote screen track muted/inactive for user:', userId)
+              cleanupRemoteScreenStream()
+            }
+          }, 1500)
         }
         
         remoteScreenStreams.value = new Map(remoteScreenStreams.value)
@@ -354,6 +379,35 @@ export function useWebRTC() {
               remoteScreenStreams.value.set(userId, screenStream)
             }
             screenStream.addTrack(event.track)
+            // Cleanup in case the sender stops sharing without renegotiation fully removing tracks
+            event.track.onended = () => {
+              const stream = remoteScreenStreams.value.get(userId)
+              if (stream) {
+                try {
+                  stream.removeTrack(event.track)
+                } catch {
+                  // ignore
+                }
+                remoteScreenStreams.value.delete(userId)
+                remoteScreenStreams.value = new Map(remoteScreenStreams.value)
+              }
+            }
+            event.track.onmute = () => {
+              window.setTimeout(() => {
+                if (event.track.readyState !== 'live' || event.track.muted) {
+                  const stream = remoteScreenStreams.value.get(userId)
+                  if (stream) {
+                    try {
+                      stream.removeTrack(event.track)
+                    } catch {
+                      // ignore
+                    }
+                    remoteScreenStreams.value.delete(userId)
+                    remoteScreenStreams.value = new Map(remoteScreenStreams.value)
+                  }
+                }
+              }, 1500)
+            }
             remoteScreenStreams.value = new Map(remoteScreenStreams.value)
             return
           }

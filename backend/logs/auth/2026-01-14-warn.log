@@ -122,3 +122,23 @@
   Data: {
     "email": "teacher@test.com"
   }
+[2026-01-14T10:33:54.761Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-14T10:33:56.548Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-14T10:34:14.908Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-14T10:36:40.281Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }

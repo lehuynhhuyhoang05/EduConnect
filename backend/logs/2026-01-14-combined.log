@@ -1520,3 +1520,99 @@
     "email": "superadmin@test.com",
     "ipAddress": "::1"
   }
+[2026-01-14T10:33:54.761Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-14T10:33:56.548Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-14T10:34:04.122Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:34:14.908Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-14T10:36:40.281Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-14T10:38:23.854Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:39:24.428Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 37,
+    "teacherId": 27
+  }
+[2026-01-14T10:39:24.540Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 37,
+    "roomId": "d37cbded-d0a7-4f03-b6f2-805c3eafe1ad"
+  }
+[2026-01-14T10:39:26.538Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 38,
+    "roomId": "0cf6f7b1-8bbb-4866-9487-0e2cc8f4c13e",
+    "classId": 8,
+    "hostId": 27,
+    "title": "Buổi học - 14/1/2026"
+  }
+[2026-01-14T10:40:25.237Z] [LOG] [whiteboard] [WhiteboardModule] Whiteboard state loaded
+  Data: {
+    "roomId": "session-38",
+    "strokeCount": 0,
+    "userId": 27
+  }
+[2026-01-14T10:40:25.242Z] [LOG] [whiteboard] [WhiteboardModule] User joined whiteboard room
+  Data: {
+    "roomId": "session-38",
+    "userId": 27
+  }
+[2026-01-14T10:40:26.886Z] [LOG] [whiteboard] [WhiteboardModule] startStroke
+  Data: {
+    "strokeId": "ggn0q253qtqmkdw3h1h",
+    "roomId": "session-38",
+    "userId": 27,
+    "tool": "pen"
+  }
+[2026-01-14T10:40:27.343Z] [LOG] [whiteboard] [WhiteboardModule] Stroke saved
+  Data: {
+    "strokeId": "ggn0q253qtqmkdw3h1h",
+    "points": 37
+  }
+[2026-01-14T10:40:27.939Z] [LOG] [whiteboard] [WhiteboardModule] startStroke
+  Data: {
+    "strokeId": "yl04616qf4omkdw3huo",
+    "roomId": "session-38",
+    "userId": 27,
+    "tool": "pen"
+  }
+[2026-01-14T10:40:28.073Z] [LOG] [whiteboard] [WhiteboardModule] Stroke saved
+  Data: {
+    "strokeId": "yl04616qf4omkdw3huo",
+    "points": 1
+  }
+[2026-01-14T10:40:29.594Z] [LOG] [whiteboard] [WhiteboardModule] Whiteboard state loaded
+  Data: {
+    "roomId": "session-38",
+    "strokeCount": 2,
+    "userId": 26
+  }
+[2026-01-14T10:40:29.599Z] [LOG] [whiteboard] [WhiteboardModule] User joined whiteboard room
+  Data: {
+    "roomId": "session-38",
+    "userId": 26
+  }

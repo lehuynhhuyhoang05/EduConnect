@@ -296,7 +296,7 @@ const setupSocketHandlers = () => {
   // Handle media state changes
   liveSocket.onMediaState.value = (data) => {
     console.log('Media state update:', data)
-    const { userId, userName, audio, video } = data
+    const { userId, userName, audio, video, screen } = data
     
     const participant = participants.value.get(userId)
     if (participant) {
@@ -314,6 +314,15 @@ const setupSocketHandlers = () => {
         isCameraOn: video,
       })
       participants.value = new Map(participants.value)
+    }
+
+    // If a user stops screen sharing, aggressively clear any stale screen stream.
+    // Otherwise the viewer can keep the last rendered frame.
+    if (screen === false) {
+      if (webRTC.remoteScreenStreams.value.has(userId)) {
+        webRTC.remoteScreenStreams.value.delete(userId)
+        webRTC.remoteScreenStreams.value = new Map(webRTC.remoteScreenStreams.value)
+      }
     }
   }
   
@@ -569,7 +578,21 @@ const toggleScreenShare = async () => {
       (userId, offer) => liveSocket.sendOffer(userId, offer)
     )
   } else {
-    const stream = await webRTC.startScreenShare()
+    const stream = await webRTC.startScreenShare(async () => {
+      // Screen share might be stopped via browser/OS UI (not our toggle button).
+      // In that case we still need to renegotiate and notify peers.
+      await webRTC.renegotiateAfterStopScreenShare(
+        (userId, candidate) => liveSocket.sendIceCandidate(userId, candidate),
+        (userId, offer) => liveSocket.sendOffer(userId, offer),
+      )
+
+      liveSocket.updateMediaState(
+        roomId.value,
+        webRTC.isAudioEnabled.value,
+        webRTC.isVideoEnabled.value,
+        webRTC.isScreenSharing.value,
+      )
+    })
     
     // If screen share started, renegotiate with all peers
     if (stream) {
@@ -669,7 +692,8 @@ const endSession = async () => {
 const remoteScreenShareUserId = computed(() => {
   // Find user who has screen share stream
   for (const [userId, stream] of webRTC.remoteScreenStreams.value) {
-    if (stream && stream.getTracks().length > 0) {
+    const hasLiveVideo = !!stream?.getVideoTracks().some(t => t.readyState === 'live')
+    if (hasLiveVideo) {
       return userId
     }
   }
@@ -706,6 +730,13 @@ watch(remoteScreenStream, (stream) => {
       if (remoteScreenVideoRef.value) {
         remoteScreenVideoRef.value.srcObject = stream
         console.log('Remote screen share attached to video element')
+      }
+    })
+  } else {
+    // Important: when screen share stops, clear srcObject so the viewer doesn't keep the last frame.
+    nextTick(() => {
+      if (remoteScreenVideoRef.value) {
+        remoteScreenVideoRef.value.srcObject = null
       }
     })
   }
