@@ -144,21 +144,16 @@ export class AdminService {
     sortBy?: string;
     sortOrder?: 'ASC' | 'DESC';
   }) {
-    const {
-      page = 1,
-      limit = 20,
-      search,
-      role,
-      isActive,
-      sortBy = 'createdAt',
-      sortOrder = 'DESC',
-    } = options;
+    const page = Number(options.page) || 1;
+    const limit = Number(options.limit) || 20;
+    const { search, role, isActive } = options;
+    const sortOrder = options.sortOrder || 'DESC';
 
     const queryBuilder = this.userRepository.createQueryBuilder('user');
 
     if (search) {
       queryBuilder.where(
-        '(user.email LIKE :search OR user.fullName LIKE :search)',
+        '(user.email LIKE :search OR user.full_name LIKE :search)',
         { search: `%${search}%` },
       );
     }
@@ -168,28 +163,26 @@ export class AdminService {
     }
 
     if (isActive !== undefined) {
-      queryBuilder.andWhere('user.isActive = :isActive', { isActive });
+      queryBuilder.andWhere('user.is_active = :isActive', { isActive });
     }
 
     const [users, total] = await queryBuilder
-      .select([
-        'user.id',
-        'user.email',
-        'user.fullName',
-        'user.role',
-        'user.avatarUrl',
-        'user.isVerified',
-        'user.isActive',
-        'user.createdAt',
-        'user.updatedAt',
-      ])
-      .orderBy(`user.${sortBy}`, sortOrder)
+      .orderBy('user.created_at', sortOrder)
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
 
     return {
-      data: users,
+      data: users.map(u => ({
+        id: u.id,
+        email: u.email,
+        fullName: u.fullName,
+        role: u.role,
+        avatarUrl: u.avatarUrl,
+        isVerified: u.isVerified,
+        isActive: u.isActive,
+        createdAt: u.createdAt,
+      })),
       meta: {
         total,
         page,
@@ -233,38 +226,33 @@ export class AdminService {
     sortBy?: string;
     sortOrder?: 'ASC' | 'DESC';
   }) {
-    const {
-      page = 1,
-      limit = 20,
-      search,
-      isActive,
-      sortBy = 'createdAt',
-      sortOrder = 'DESC',
-    } = options;
+    const page = Number(options.page) || 1;
+    const limit = Number(options.limit) || 20;
+    const skip = (page - 1) * limit;
 
-    const queryBuilder = this.classRepository
-      .createQueryBuilder('class')
-      .leftJoinAndSelect('class.teacher', 'teacher');
-
-    if (search) {
-      queryBuilder.where(
-        '(class.name LIKE :search OR class.description LIKE :search)',
-        { search: `%${search}%` },
-      );
-    }
-
-    if (isActive !== undefined) {
-      queryBuilder.andWhere('class.isActive = :isActive', { isActive });
-    }
-
-    const [classes, total] = await queryBuilder
-      .orderBy(`class.${sortBy}`, sortOrder)
-      .skip((page - 1) * limit)
-      .take(limit)
-      .getManyAndCount();
+    const [classes, total] = await this.classRepository.findAndCount({
+      relations: ['teacher'],
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
+    });
 
     return {
-      data: classes,
+      data: classes.map(c => ({
+        id: c.id,
+        name: c.name,
+        description: c.description,
+        classCode: c.classCode,
+        subject: c.subject,
+        memberCount: c.memberCount,
+        isActive: c.isActive,
+        createdAt: c.createdAt,
+        teacher: c.teacher ? {
+          id: c.teacher.id,
+          fullName: c.teacher.fullName,
+          email: c.teacher.email,
+        } : null,
+      })),
       meta: {
         total,
         page,
@@ -373,33 +361,43 @@ export class AdminService {
    * Get top teachers by class count
    */
   async getTopTeachers(limit: number = 10) {
-    return this.userRepository
-      .createQueryBuilder('user')
-      .leftJoin('user.teachingClasses', 'class')
-      .where('user.role = :role', { role: UserRole.TEACHER })
+    const result = await this.classRepository
+      .createQueryBuilder('class')
+      .leftJoin('class.teacher', 'teacher')
       .select([
-        'user.id',
-        'user.fullName',
-        'user.email',
-        'user.avatarUrl',
+        'teacher.id as id',
+        'teacher.full_name as fullName',
+        'teacher.email as email',
+        'teacher.avatar_url as avatarUrl',
         'COUNT(class.id) as classCount',
       ])
-      .groupBy('user.id')
+      .groupBy('teacher.id')
       .orderBy('classCount', 'DESC')
       .limit(limit)
       .getRawMany();
+    
+    return result;
   }
 
   /**
    * Get top active classes
    */
   async getTopClasses(limit: number = 10) {
-    return this.classRepository
-      .createQueryBuilder('class')
-      .leftJoinAndSelect('class.teacher', 'teacher')
-      .where('class.isActive = :isActive', { isActive: true })
-      .orderBy('class.memberCount', 'DESC')
-      .limit(limit)
-      .getMany();
+    const classes = await this.classRepository.find({
+      relations: ['teacher'],
+      where: { isActive: true },
+      order: { memberCount: 'DESC' },
+      take: limit,
+    });
+
+    return classes.map(c => ({
+      id: c.id,
+      name: c.name,
+      memberCount: c.memberCount,
+      teacher: c.teacher ? {
+        id: c.teacher.id,
+        fullName: c.teacher.fullName,
+      } : null,
+    }));
   }
 }

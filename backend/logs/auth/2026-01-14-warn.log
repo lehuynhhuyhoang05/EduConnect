@@ -118,3 +118,7 @@
   Data: {
     "email": "loadtest29@test.com"
   }
+[2026-01-14T09:43:36.137Z] [WARN] [auth] [AuthModule] Login failed - user not found
+  Data: {
+    "email": "teacher@test.com"
+  }

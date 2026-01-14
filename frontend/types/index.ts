@@ -14,7 +14,8 @@ export interface User {
 
 export enum UserRole {
   STUDENT = 'STUDENT',
-  TEACHER = 'TEACHER'
+  TEACHER = 'TEACHER',
+  ADMIN = 'ADMIN'
 }
 
 export interface AuthTokens {

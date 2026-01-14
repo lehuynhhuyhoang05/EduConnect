@@ -13,10 +13,12 @@ import { Exclude } from 'class-transformer';
  * User roles in the system
  * - STUDENT: Can join classes, submit assignments, participate in sessions
  * - TEACHER: Can create classes, assignments, host live sessions
+ * - ADMIN: System administrator with full access
  */
 export enum UserRole {
   STUDENT = 'STUDENT',
   TEACHER = 'TEACHER',
+  ADMIN = 'ADMIN',
 }
 
 @Entity('users')

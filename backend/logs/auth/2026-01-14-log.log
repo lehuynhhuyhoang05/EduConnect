@@ -1204,3 +1204,167 @@
     "email": "hoanglhh0026@ut.edu.vn",
     "ipAddress": "::1"
   }
+[2026-01-14T09:43:45.839Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 229,
+    "email": "admin@test.com",
+    "role": "TEACHER",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:46:27.758Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "role": "ADMIN",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:46:53.045Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:47:36.874Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:49:15.448Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 229,
+    "email": "admin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:51:42.289Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:52:06.152Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:52:17.733Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:52:33.586Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:52:47.859Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:52:56.688Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:54:29.416Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:54:59.018Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:56:47.712Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:00:53.686Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:01:05.972Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:02:39.402Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:02:49.328Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:02:58.657Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:03:46.281Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:03:56.972Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:04:05.385Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:04:18.923Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:05:33.866Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:05:53.578Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:06:16.406Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }
+[2026-01-14T10:06:36.541Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 230,
+    "email": "superadmin@test.com",
+    "ipAddress": "::1"
+  }

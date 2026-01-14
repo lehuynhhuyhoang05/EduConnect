@@ -27,7 +27,7 @@ import { UpdateUserStatusDto, UpdateUserRoleDto, BulkUpdateUsersDto } from './dt
 @ApiTags('Admin')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.TEACHER) // Sử dụng TEACHER thay vì ADMIN (hệ thống không có role ADMIN)
+@Roles(UserRole.ADMIN)
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
