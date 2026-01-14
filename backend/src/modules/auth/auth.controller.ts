@@ -20,7 +20,7 @@ import { RegisterDto, LoginDto, RefreshTokenDto, BulkCreateUsersDto } from './dt
 import { Public } from './decorators';
 import { JwtAuthGuard } from './guards';
 import { CurrentUser } from './decorators';
-import { User } from '../users/entities/user.entity';
+import { User, UserRole } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 
 @ApiTags('Auth')
@@ -202,20 +202,19 @@ export class AuthController {
 
     for (let i = 0; i < bulkCreateDto.count; i++) {
       try {
-        const username = `loadtest_user_${Date.now()}_${i}`;
-        const email = `loadtest_${Date.now()}_${i}@test.com`;
+        const uniqueId = `${Date.now()}_${i}`;
+        const email = `loadtest_${uniqueId}@test.com`;
 
         const result = await this.authService.register({
-          username,
           email,
           password,
           fullName: `Load Test User ${i}`,
-          role: 'student',
+          role: UserRole.STUDENT,
         }, {});
 
         users.push({
           id: result.user.id,
-          username,
+          username: `loadtest_user_${uniqueId}`,
           email,
           token: result.tokens.accessToken,
         });

@@ -43,6 +43,10 @@ export enum NotificationType {
   NEW_MESSAGE = 'new_message',
   MENTIONED = 'mentioned',
 
+  // Calendar notifications
+  REMINDER = 'reminder',
+  EVENT_REMINDER = 'event_reminder',
+
   // System notifications
   SYSTEM_ANNOUNCEMENT = 'system_announcement',
   ACCOUNT_UPDATED = 'account_updated',

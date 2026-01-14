@@ -1318,3 +1318,37 @@
     "email": "loadtest_1768373257484_199@test.com",
     "role": "STUDENT"
   }
+[2026-01-14T07:51:29.729Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 73,
+    "teacherId": 27
+  }
+[2026-01-14T07:51:29.807Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 73,
+    "roomId": "46833c35-51ae-4be6-994e-ae9afb31ff4a"
+  }
+[2026-01-14T07:52:14.612Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 74,
+    "roomId": "86e3e1d6-d394-49da-9fd4-9a9742834b00",
+    "classId": 10,
+    "hostId": 27,
+    "title": "Buổi học - 14/1/2026"
+  }
+[2026-01-14T08:24:15.354Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-14T09:01:21.738Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 74,
+    "teacherId": 27
+  }
+[2026-01-14T09:01:21.788Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 74,
+    "roomId": "86e3e1d6-d394-49da-9fd4-9a9742834b00"
+  }

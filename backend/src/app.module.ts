@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { typeOrmConfig } from './config/typeorm.config';
 import { AppController } from './app.controller';
@@ -20,6 +21,13 @@ import { LiveSessionsModule } from './modules/live-sessions/live-sessions.module
 import { ChatModule } from './modules/chat/chat.module';
 import { WhiteboardModule } from './modules/whiteboard/whiteboard.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+
+// New Feature modules
+import { PollsModule } from './modules/polls/polls.module';
+import { GradebookModule } from './modules/gradebook/gradebook.module';
+import { ProgressModule } from './modules/progress/progress.module';
+import { CalendarModule } from './modules/calendar/calendar.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -49,6 +57,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     TypeOrmModule.forRootAsync({
       useFactory: typeOrmConfig,
     }),
+    ScheduleModule.forRoot(),
     LoggerModule,
     AuthModule,
     UsersModule,
@@ -59,6 +68,12 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     ChatModule,
     WhiteboardModule,
     NotificationsModule,
+    // New Feature modules
+    PollsModule,
+    GradebookModule,
+    ProgressModule,
+    CalendarModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

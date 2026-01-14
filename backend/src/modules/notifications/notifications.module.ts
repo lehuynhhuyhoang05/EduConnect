@@ -4,10 +4,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersModule } from '@modules/users/users.module';
 import { User } from '@modules/users/entities/user.entity';
-import { Notification } from './entities';
+import { Notification, PushSubscription } from './entities';
 import { NotificationsService } from './notifications.service';
 import { NotificationsGateway } from './notifications.gateway';
 import { NotificationsController } from './notifications.controller';
+import { PushNotificationService } from './push-notification.service';
+import { PushNotificationController } from './push-notification.controller';
 
 /**
  * Notifications Module
@@ -15,10 +17,11 @@ import { NotificationsController } from './notifications.controller';
  * - WebSocket gateway for real-time delivery
  * - REST controller for notification management
  * - Database persistence for notification history
+ * - Web Push API for offline notifications
  */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Notification, User]),
+    TypeOrmModule.forFeature([Notification, PushSubscription, User]),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
@@ -30,8 +33,8 @@ import { NotificationsController } from './notifications.controller';
     }),
     forwardRef(() => UsersModule),
   ],
-  controllers: [NotificationsController],
-  providers: [NotificationsService, NotificationsGateway],
-  exports: [NotificationsService, NotificationsGateway],
+  controllers: [NotificationsController, PushNotificationController],
+  providers: [NotificationsService, NotificationsGateway, PushNotificationService],
+  exports: [NotificationsService, NotificationsGateway, PushNotificationService],
 })
 export class NotificationsModule {}

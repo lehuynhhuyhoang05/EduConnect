@@ -17,7 +17,7 @@ const navigation = computed(() => {
   }
 
   items.push(
-    { name: 'Lịch học', href: '/schedule', icon: 'calendar' },
+    { name: 'Lịch', href: '/calendar', icon: 'calendar' },
     { name: 'Thông báo', href: '/notifications', icon: 'bell' },
   )
 

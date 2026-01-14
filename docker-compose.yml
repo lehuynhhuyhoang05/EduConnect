@@ -9,9 +9,10 @@ services:
       MYSQL_USER: educonnect_user
       MYSQL_PASSWORD: educonnect_password
     ports:
-      - "3307:3306"  # Changed to 3307 to avoid conflict
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
     networks:
       - educonnect-network
     healthcheck:
@@ -32,34 +33,55 @@ services:
     environment:
       ADMINER_DEFAULT_SERVER: mysql
 
-  # Backend NestJS - Không cần rebuild khi sửa code nhờ volumes!
-  # Uncomment khi muốn chạy backend trong Docker
-  # backend:
-  #   build: 
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: educonnect-backend
-  #   restart: unless-stopped
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - NODE_ENV=development
-  #     - DB_HOST=mysql
-  #     - DB_PORT=3306
-  #   depends_on:
-  #     mysql:
-  #       condition: service_healthy
-  #   volumes:
-  #     # Mount code vào container - HOT RELOAD, KHÔNG CẦN REBUILD!
-  #     - ./backend:/app
-  #     - /app/node_modules
-  #     - /app/dist
-  #   networks:
-  #     - educonnect-network
-  #   command: npm run start:dev
+  # Backend NestJS
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: educonnect-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=educonnect_user
+      - DB_PASSWORD=educonnect_password
+      - DB_DATABASE=educonnect_db
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - JWT_EXPIRES_IN=7d
+      - UPLOAD_DIR=./uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - backend_uploads:/app/uploads
+    networks:
+      - educonnect-network
+
+  # Frontend Nuxt.js
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: educonnect-frontend
+    restart: unless-stopped
+    ports:
+      - "4000:3000"
+    environment:
+      - NODE_ENV=production
+      - NUXT_PUBLIC_API_BASE_URL=http://backend:3000
+    depends_on:
+      - backend
+    networks:
+      - educonnect-network
 
 volumes:
   mysql_data:
+    driver: local
+  backend_uploads:
     driver: local
 
 networks:

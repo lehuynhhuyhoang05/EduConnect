@@ -34,21 +34,30 @@ const classLiveSessions = computed(() => {
 const newPost = ref('')
 const isPostingAnnouncement = ref(false)
 
-const tabs = computed(() => {
-  const baseTabs = [
-    { id: 'stream', label: 'Bảng tin', icon: 'stream', count: announcements.value.length },
-    { id: 'assignments', label: 'Bài tập', icon: 'assignment', count: assignmentsStore.assignments?.length || 0 },
-    { id: 'live', label: 'Phiên live', icon: 'video', count: classLiveSessions.value.length },
-    { id: 'materials', label: 'Tài liệu', icon: 'folder', count: 0 },
-    { id: 'members', label: 'Thành viên', icon: 'users', count: currentClass.value?.memberCount || 0 },
-    { id: 'attendance', label: 'Điểm danh', icon: 'attendance', count: 0 },
+// Main tabs
+const tabs = computed(() => [
+  { id: 'stream', label: 'Bảng tin', icon: 'stream', count: announcements.value.length },
+  { id: 'assignments', label: 'Bài tập', icon: 'assignment', count: assignmentsStore.assignments?.length || 0 },
+  { id: 'live', label: 'Phiên live', icon: 'video', count: classLiveSessions.value.length },
+  { id: 'materials', label: 'Tài liệu', icon: 'folder', count: 0 },
+  { id: 'members', label: 'Thành viên', icon: 'users', count: currentClass.value?.memberCount || 0 },
+])
+
+// Quick links menu
+const showQuickMenu = ref(false)
+const quickLinks = computed(() => {
+  const links: Array<{ label: string; route: string; icon: string; action?: string; danger?: boolean }> = [
+    { label: 'Polls & Quiz', route: `/classes/${classId.value}/polls`, icon: 'poll' },
+    { label: 'Bảng điểm', route: `/classes/${classId.value}/gradebook`, icon: 'grade' },
+    { label: 'Tiến độ học tập', route: `/classes/${classId.value}/progress`, icon: 'progress' },
   ]
-
   if (isTeacher.value) {
-    baseTabs.push({ id: 'settings', label: 'Cài đặt', icon: 'settings', count: 0 })
+    links.push(
+      { label: 'Cài đặt lớp', route: '#', icon: 'settings', action: 'settings' },
+      { label: 'Xóa lớp học', route: '#', icon: 'delete', action: 'delete', danger: true }
+    )
   }
-
-  return baseTabs
+  return links
 })
 
 // Color palette for class cover
@@ -82,7 +91,7 @@ const editForm = reactive({
   subject: '',
 })
 
-const classCode = computed(() => currentClass.value?.classCode || currentClass.value?.code || '')
+const classCode = computed(() => currentClass.value?.classCode || '')
 const qrCodeUrl = computed(() => {
   if (!classCode.value) return ''
   return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(classCode.value)}`
@@ -116,7 +125,7 @@ const saveClassChanges = async () => {
     toast.success('Đã cập nhật lớp học')
     showEditDialog.value = false
   } catch (error: any) {
-    toast.error('Không thể cập nhật lớp học', error.message)
+    toast.error('Không thể cập nhật lớp học')
   } finally {
     isSaving.value = false
   }
@@ -129,7 +138,7 @@ const deleteClass = async () => {
     toast.success('Đã xóa lớp học')
     router.push('/classes')
   } catch (error: any) {
-    toast.error('Không thể xóa lớp học', error.message)
+    toast.error('Không thể xóa lớp học')
     showDeleteDialog.value = false
   } finally {
     isDeleting.value = false
@@ -149,7 +158,7 @@ const postAnnouncement = async () => {
     newPost.value = ''
     toast.success('Đã đăng thông báo')
   } catch (error: any) {
-    toast.error('Không thể đăng thông báo', error.message)
+    toast.error('Không thể đăng thông báo')
   } finally {
     isPostingAnnouncement.value = false
   }
@@ -202,7 +211,7 @@ const startLiveSession = async () => {
     createdLiveSession.value = { id: session.id, title: session.title }
     showLiveShareDialog.value = true
   } catch (error: any) {
-    toast.error('Không thể bắt đầu buổi học', error.message)
+    toast.error('Không thể bắt đầu buổi học')
   } finally {
     isCreatingSession.value = false
   }
@@ -215,7 +224,7 @@ const startExistingSession = async (sessionId: number) => {
     toast.success('Đã bắt đầu phiên live')
     router.push(`/live/${sessionId}`)
   } catch (error: any) {
-    toast.error('Không thể bắt đầu phiên live', error.message)
+    toast.error('Không thể bắt đầu phiên live')
   }
 }
 
@@ -226,7 +235,7 @@ const endLiveSession = async (sessionId: number) => {
     await liveSessionsStore.fetchSessions({ classId: classId.value })
     toast.success('Đã kết thúc phiên live')
   } catch (error: any) {
-    toast.error('Không thể kết thúc phiên live', error.message)
+    toast.error('Không thể kết thúc phiên live')
   }
 }
 
@@ -237,7 +246,7 @@ const deleteLiveSession = async (sessionId: number) => {
     await liveSessionsStore.fetchSessions({ classId: classId.value })
     toast.success('Đã xóa phiên live')
   } catch (error: any) {
-    toast.error('Không thể xóa phiên live', error.message)
+    toast.error('Không thể xóa phiên live')
   }
 }
 
@@ -255,7 +264,15 @@ const formatRelativeTime = (date: Date) => {
   return new Date(date).toLocaleDateString('vi-VN')
 }
 
+const copyClassCode = () => {
+  navigator.clipboard.writeText(classCode.value)
+  toast.success('Đã sao chép mã lớp')
+}
+
 onMounted(async () => {
+  // Close quick menu when clicking outside
+  document.addEventListener('click', () => { showQuickMenu.value = false })
+  
   try {
     await classesStore.fetchClass(classId.value)
     await Promise.all([
@@ -280,6 +297,8 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
+
+// Clean up on unmount if needed
 </script>
 
 <template>
@@ -311,6 +330,77 @@ onMounted(async () => {
         
         <!-- Quick actions floating -->
         <div class="absolute top-4 right-4 flex gap-2">
+          <!-- Quick Menu Dropdown -->
+          <div class="relative">
+            <button
+              class="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm font-medium transition-all flex items-center gap-2"
+              @click.stop="showQuickMenu = !showQuickMenu"
+            >
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+              </svg>
+              <span class="hidden sm:inline">Công cụ</span>
+            </button>
+            
+            <Transition
+              enter-active-class="transition-all duration-200"
+              enter-from-class="opacity-0 scale-95 translate-y-2"
+              enter-to-class="opacity-100 scale-100 translate-y-0"
+              leave-active-class="transition-all duration-150"
+              leave-from-class="opacity-100 scale-100 translate-y-0"
+              leave-to-class="opacity-0 scale-95 translate-y-2"
+            >
+              <div
+                v-if="showQuickMenu"
+                class="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50"
+                @click.stop
+              >
+                <template v-for="link in quickLinks" :key="link.label">
+                  <div v-if="link.danger" class="border-t border-gray-100 mt-2 pt-2">
+                    <button
+                      @click="link.action === 'delete' ? (showDeleteDialog = true, showQuickMenu = false) : null"
+                      class="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                      </svg>
+                      <span class="font-medium">{{ link.label }}</span>
+                    </button>
+                  </div>
+                  <NuxtLink
+                    v-else
+                    :to="link.route"
+                    class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    @click="link.action === 'settings' ? (showEditDialog = true, showQuickMenu = false) : (showQuickMenu = false)"
+                  >
+                  <svg v-if="link.icon === 'poll'" class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 20V10M12 20V4M6 20v-6"/>
+                  </svg>
+                  <svg v-else-if="link.icon === 'grade'" class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                    <path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/>
+                  </svg>
+                  <svg v-else-if="link.icon === 'progress'" class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"/>
+                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                  </svg>
+                  <svg v-else-if="link.icon === 'settings'" class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                  </svg>
+                  <span class="font-medium">{{ link.label }}</span>
+                </NuxtLink>
+                </template>
+              </div>
+            </Transition>
+          </div>
+          
           <button
             v-if="isTeacher"
             class="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm font-medium transition-all flex items-center gap-2"
@@ -356,20 +446,15 @@ onMounted(async () => {
               </div>
               <span class="text-gray-700">{{ currentClass.teacher?.fullName }}</span>
             </div>
-            <span class="text-gray-300">•</span>
-            <div class="flex items-center gap-1.5 text-gray-600">
+            
+            <div class="flex items-center gap-1.5 text-gray-500">
               <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
               </svg>
               <span>{{ currentClass.memberCount }} thành viên</span>
-            </div>
-            <span class="text-gray-300">•</span>
-            <div class="flex items-center gap-1.5 text-gray-600">
-              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-              </svg>
-              <span>{{ assignmentsStore.assignments?.length || 0 }} bài tập</span>
             </div>
           </div>
         </div>
@@ -411,13 +496,14 @@ onMounted(async () => {
       </div>
     </Transition>
 
-    <!-- Tabs - Enhanced -->
+    <!-- Tabs - Simplified -->
+    <ClientOnly>
     <div class="bg-white rounded-2xl shadow-sm p-2">
       <nav class="flex gap-1">
         <button
           v-for="tab in tabs"
           :key="tab.id"
-          class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all"
+          class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
           :class="activeTab === tab.id
             ? 'bg-primary text-white shadow-lg shadow-primary/25'
             : 'text-gray-600 hover:bg-gray-100'"
@@ -447,15 +533,6 @@ onMounted(async () => {
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
-          <!-- Attendance icon -->
-          <svg v-else-if="tab.icon === 'attendance'" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-          </svg>
-          <!-- Settings icon -->
-          <svg v-else-if="tab.icon === 'settings'" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
           <span class="hidden sm:inline">{{ tab.label }}</span>
           <span 
             v-if="tab.count && tab.count > 0" 
@@ -467,11 +544,11 @@ onMounted(async () => {
         </button>
       </nav>
     </div>
+    </ClientOnly>
 
     <!-- Tab Content -->
     <div>
-      <!-- Stream Tab - Enhanced -->
-      <!-- Stream Tab - Enhanced -->
+      <!-- Stream Tab -->
       <div v-if="activeTab === 'stream'" class="space-y-6">
         <!-- Post Announcement Box -->
         <div v-if="isTeacher" class="bg-white rounded-2xl shadow-sm p-4">
@@ -645,8 +722,8 @@ onMounted(async () => {
         >
           <div class="p-5">
             <div class="flex items-start gap-4">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" :class="new Date(assignment.dueDate) < new Date() ? 'bg-red-100' : 'bg-primary/10'">
-                <svg class="w-6 h-6" :class="new Date(assignment.dueDate) < new Date() ? 'text-red-600' : 'text-primary'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" :class="assignment.deadline && new Date(assignment.deadline) < new Date() ? 'bg-red-100' : 'bg-primary/10'">
+                <svg class="w-6 h-6" :class="assignment.deadline && new Date(assignment.deadline) < new Date() ? 'text-red-600' : 'text-primary'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                   <path d="M9 12h6M9 16h6"/>
                 </svg>
@@ -657,18 +734,19 @@ onMounted(async () => {
                   {{ assignment.description || 'Không có mô tả' }}
                 </p>
                 <div class="flex items-center gap-4 mt-3 text-sm">
-                  <div class="flex items-center gap-1.5" :class="new Date(assignment.dueDate) < new Date() ? 'text-red-600' : 'text-gray-500'">
+                  <div v-if="assignment.deadline" class="flex items-center gap-1.5" :class="new Date(assignment.deadline) < new Date() ? 'text-red-600' : 'text-gray-500'">
                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <circle cx="12" cy="12" r="10"/>
                       <polyline points="12 6 12 12 16 14"/>
                     </svg>
-                    <span>{{ new Date(assignment.dueDate).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) }}</span>
+                    <span>{{ new Date(assignment.deadline).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) }}</span>
                   </div>
                   <span
+                    v-if="assignment.deadline"
                     class="px-2.5 py-1 rounded-full text-xs font-medium"
-                    :class="new Date(assignment.dueDate) < new Date() ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'"
+                    :class="new Date(assignment.deadline) < new Date() ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'"
                   >
-                    {{ new Date(assignment.dueDate) < new Date() ? 'Quá hạn' : 'Còn hạn' }}
+                    {{ new Date(assignment.deadline) < new Date() ? 'Quá hạn' : 'Còn hạn' }}
                   </span>
                 </div>
               </div>
@@ -862,11 +940,11 @@ onMounted(async () => {
             <!-- Real students from API -->
             <div v-else v-for="member in members.filter((m: any) => m.role === 'STUDENT')" :key="member.id" class="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium">
-                {{ (member.user?.fullName || member.fullName || 'S').charAt(0).toUpperCase() }}
+                {{ (member.user?.fullName || 'S').charAt(0).toUpperCase() }}
               </div>
               <div class="flex-1">
-                <p class="font-medium text-gray-900">{{ member.user?.fullName || member.fullName || 'Học sinh' }}</p>
-                <p class="text-sm text-gray-500">{{ member.user?.email || member.email || '' }}</p>
+                <p class="font-medium text-gray-900">{{ member.user?.fullName || 'Học sinh' }}</p>
+                <p class="text-sm text-gray-500">{{ member.user?.email || '' }}</p>
               </div>
               <button 
                 v-if="isTeacher"
@@ -883,13 +961,62 @@ onMounted(async () => {
         </div>
       </div>
 
+      <!-- Polls/Quiz Tab -->
+      <div v-else-if="activeTab === 'polls'" class="space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm p-8 text-center">
+          <div class="text-6xl mb-4">📊</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Polls & Quiz</h3>
+          <p class="text-gray-500 mb-6">
+            {{ isTeacher ? 'Tạo polls và quiz để tương tác với học sinh' : 'Tham gia polls và quiz của lớp' }}
+          </p>
+          <NuxtLink :to="`/classes/${classId}/polls`">
+            <button class="px-6 py-3 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-colors">
+              Đi tới Polls & Quiz
+            </button>
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- Gradebook Tab -->
+      <div v-else-if="activeTab === 'gradebook'" class="space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm p-8 text-center">
+          <div class="text-6xl mb-4">📝</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Bảng điểm</h3>
+          <p class="text-gray-500 mb-6">
+            {{ isTeacher ? 'Quản lý điểm số của học sinh trong lớp' : 'Xem điểm số các môn học của bạn' }}
+          </p>
+          <NuxtLink :to="`/classes/${classId}/gradebook`">
+            <button class="px-6 py-3 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-colors">
+              Đi tới Bảng điểm
+            </button>
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- Progress Tab -->
+      <div v-else-if="activeTab === 'progress'" class="space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm p-8 text-center">
+          <div class="text-6xl mb-4">📈</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Tiến độ học tập</h3>
+          <p class="text-gray-500 mb-6">
+            {{ isTeacher ? 'Theo dõi tiến độ và bảng xếp hạng học sinh' : 'Xem tiến độ học tập và thành tích của bạn' }}
+          </p>
+          <NuxtLink :to="`/classes/${classId}/progress`">
+            <button class="px-6 py-3 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-colors">
+              Đi tới Tiến độ
+            </button>
+          </NuxtLink>
+        </div>
+      </div>
+
       <!-- Attendance Tab - Giống Moodle -->
       <div v-else-if="activeTab === 'attendance' && isTeacher" class="space-y-6">
         <ClassAttendanceManager :class-id="classId" :members="members" />
       </div>
 
-      <!-- Settings Tab - Enhanced -->
+      <!-- Settings Tab - Enhanced với nhiều tùy chọn -->
       <div v-else-if="activeTab === 'settings' && isTeacher" class="space-y-6">
+        <!-- Thông tin cơ bản -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div class="px-6 py-4 border-b flex items-center justify-between">
             <h2 class="text-lg font-bold text-gray-900">Thông tin lớp học</h2>
@@ -901,39 +1028,134 @@ onMounted(async () => {
             </button>
           </div>
           <div class="p-6 space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-500 mb-1">Tên lớp</label>
-              <p class="text-gray-900 font-medium">{{ currentClass.name }}</p>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Tên lớp</label>
+                <p class="text-gray-900 font-medium">{{ currentClass.name }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Môn học</label>
+                <p class="text-gray-900">{{ currentClass.subject || 'Chưa xác định' }}</p>
+              </div>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-500 mb-1">Mô tả</label>
               <p class="text-gray-900">{{ currentClass.description || 'Chưa có mô tả' }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-500 mb-1">Môn học</label>
-              <p class="text-gray-900">{{ currentClass.subject || 'Chưa xác định' }}</p>
-            </div>
-            <div>
               <label class="block text-sm font-medium text-gray-500 mb-1">Mã lớp</label>
-              <p class="font-mono text-lg font-bold text-primary">{{ classCode }}</p>
+              <div class="flex items-center gap-2">
+                <p class="font-mono text-lg font-bold text-primary">{{ classCode }}</p>
+                <button
+                  @click="copyClassCode"
+                  class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  title="Sao chép mã lớp"
+                >
+                  <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
+        <!-- Cài đặt quyền -->
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-gray-900">Quyền và bảo mật</h2>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-gray-900">Cho phép học sinh tạo thảo luận</p>
+                <p class="text-sm text-gray-500">Học sinh có thể tạo bài đăng trong lớp</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-gray-900">Yêu cầu phê duyệt khi tham gia</p>
+                <p class="text-sm text-gray-500">Giáo viên phải chấp thuận học sinh tham gia lớp</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-gray-900">Cho phép mời thành viên qua link</p>
+                <p class="text-sm text-gray-500">Bất kỳ ai có link đều có thể tham gia lớp</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cài đặt thông báo -->
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-gray-900">Thông báo</h2>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-gray-900">Thông báo qua email</p>
+                <p class="text-sm text-gray-500">Nhận thông báo về bài tập mới, phiên live</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-gray-900">Thông báo đẩy</p>
+                <p class="text-sm text-gray-500">Nhận thông báo trên thiết bị di động</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vùng nguy hiểm -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden border-2 border-red-100">
           <div class="px-6 py-4 border-b border-red-100 bg-red-50">
             <h2 class="text-lg font-bold text-red-600">Vùng nguy hiểm</h2>
           </div>
-          <div class="p-6">
-            <p class="text-sm text-gray-600 mb-4">
-              Xóa lớp học sẽ xóa tất cả dữ liệu liên quan bao gồm bài tập, tài liệu và thông báo. Hành động này không thể hoàn tác.
-            </p>
-            <button
-              @click="showDeleteDialog = true"
-              class="px-6 py-3 rounded-xl border-2 border-red-500 text-red-600 font-medium hover:bg-red-500 hover:text-white transition-colors"
-            >
-              Xóa lớp học
-            </button>
+          <div class="p-6 space-y-4">
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-2">Đóng lớp học</h3>
+              <p class="text-sm text-gray-600 mb-3">
+                Đóng lớp sẽ không cho phép học sinh mới tham gia. Có thể mở lại bất kỳ lúc nào.
+              </p>
+              <button class="px-4 py-2 rounded-lg border-2 border-yellow-500 text-yellow-600 font-medium hover:bg-yellow-50 transition-colors">
+                Đóng lớp học
+              </button>
+            </div>
+            <div class="pt-4 border-t">
+              <h3 class="font-semibold text-gray-900 mb-2">Xóa lớp học</h3>
+              <p class="text-sm text-gray-600 mb-3">
+                Xóa lớp học sẽ xóa tất cả dữ liệu liên quan bao gồm bài tập, tài liệu và thông báo. Hành động này không thể hoàn tác.
+              </p>
+              <button
+                @click="showDeleteDialog = true"
+                class="px-6 py-3 rounded-xl border-2 border-red-500 text-red-600 font-medium hover:bg-red-500 hover:text-white transition-colors"
+              >
+                Xóa lớp học
+              </button>
+            </div>
           </div>
         </div>
       </div>

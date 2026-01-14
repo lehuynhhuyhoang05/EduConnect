@@ -34,6 +34,7 @@
     "@nestjs/passport": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/platform-socket.io": "^10.0.0",
+    "@nestjs/schedule": "^6.1.0",
     "@nestjs/swagger": "^7.4.2",
     "@nestjs/terminus": "^11.0.0",
     "@nestjs/throttler": "^6.5.0",
@@ -58,7 +59,8 @@
     "socket.io": "^4.6.0",
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.17",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -74,6 +76,7 @@
     "@types/sanitize-html": "^2.16.0",
     "@types/supertest": "^2.0.12",
     "@types/uuid": "^10.0.0",
+    "@types/web-push": "^3.6.4",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "autocannon": "^8.0.0",

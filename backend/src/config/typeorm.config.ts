@@ -10,7 +10,12 @@ import { Submission } from '@modules/assignments/entities/submission.entity';
 import { LiveSession, LiveSessionParticipant } from '@modules/live-sessions/entities';
 import { ChatMessage } from '@modules/chat/entities/chat-message.entity';
 import { WhiteboardStroke } from '@modules/whiteboard/entities';
-import { Notification } from '@modules/notifications/entities';
+import { Notification, PushSubscription } from '@modules/notifications/entities';
+// New feature entities
+import { Poll, PollResponse } from '@modules/polls/entities';
+import { GradeItem, GradeEntry } from '@modules/gradebook/entities';
+import { LearningActivity, StudentProgress, DailyActivitySummary } from '@modules/progress/entities';
+import { CalendarEvent, EventReminder } from '@modules/calendar/entities';
 
 dotenv.config();
 
@@ -28,6 +33,17 @@ const entities = [
   ChatMessage,
   WhiteboardStroke,
   Notification,
+  // New feature entities
+  PushSubscription,
+  Poll,
+  PollResponse,
+  GradeItem,
+  GradeEntry,
+  LearningActivity,
+  StudentProgress,
+  DailyActivitySummary,
+  CalendarEvent,
+  EventReminder,
 ];
 
 export const typeOrmConfig = (): TypeOrmModuleOptions => ({

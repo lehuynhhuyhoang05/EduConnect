@@ -27,7 +27,7 @@ export enum PollStatus {
 
 @Entity('polls')
 export class Poll {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
   @Column({ length: 500 })
@@ -61,21 +61,21 @@ export class Poll {
   @JoinColumn({ name: 'created_by' })
   createdBy: User;
 
-  @Column({ name: 'created_by' })
+  @Column({ name: 'created_by', type: 'int', unsigned: true })
   createdById: number;
 
   @ManyToOne(() => Class, { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'class_id' })
   class: Class;
 
-  @Column({ name: 'class_id', nullable: true })
+  @Column({ name: 'class_id', type: 'int', unsigned: true, nullable: true })
   classId: number;
 
   @ManyToOne(() => LiveSession, { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'session_id' })
   session: LiveSession;
 
-  @Column({ name: 'session_id', nullable: true })
+  @Column({ name: 'session_id', type: 'int', unsigned: true, nullable: true })
   sessionId: number;
 
   @OneToMany(() => PollResponse, (response) => response.poll)
@@ -96,21 +96,21 @@ export class Poll {
 
 @Entity('poll_responses')
 export class PollResponse {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
   @ManyToOne(() => Poll, (poll) => poll.responses, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'poll_id' })
   poll: Poll;
 
-  @Column({ name: 'poll_id' })
+  @Column({ name: 'poll_id', type: 'int', unsigned: true })
   pollId: number;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ name: 'user_id' })
+  @Column({ name: 'user_id', type: 'int', unsigned: true })
   userId: number;
 
   @Column({ type: 'json', nullable: true })

@@ -1198,3 +1198,9 @@
     "email": "loadtest_1768373257484_199@test.com",
     "role": "STUDENT"
   }
+[2026-01-14T08:24:15.354Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }

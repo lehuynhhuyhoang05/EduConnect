@@ -1,0 +1,18 @@
+# Frontend .dockerignore
+node_modules
+npm-debug.log
+.nuxt
+.output
+dist
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+coverage
+*.md
+.vscode
+.idea
+*.log
+.DS_Store
+Thumbs.db
