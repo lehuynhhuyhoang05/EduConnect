@@ -160,50 +160,6 @@
           <span class="font-medium">Thống kê</span>
         </NuxtLink>
       </nav>
-
-      <!-- User Info -->
-      <div
-        class="flex-shrink-0 p-4 border-t border-gray-200 dark:border-gray-700"
-      >
-        <div
-          class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50"
-        >
-          <div
-            class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold"
-          >
-            {{ userInitial }}
-          </div>
-          <div class="flex-1 min-w-0">
-            <p
-              class="text-sm font-medium text-gray-900 dark:text-white truncate"
-            >
-              {{ authStore.user?.fullName || "Admin" }}
-            </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
-              Administrator
-            </p>
-          </div>
-        </div>
-        <button
-          @click="handleLogout"
-          class="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
-        >
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
-          Đăng xuất
-        </button>
-      </div>
     </aside>
 
     <!-- Mobile Overlay -->
@@ -250,10 +206,10 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <!-- Back to App -->
-            <NuxtLink
-              to="/dashboard"
-              class="hidden sm:flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            <!-- Logout -->
+            <button
+              @click="handleLogout"
+              class="hidden sm:flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
             >
               <svg
                 class="w-4 h-4"
@@ -265,11 +221,11 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                 />
               </svg>
-              Về App
-            </NuxtLink>
+              Đăng xuất
+            </button>
 
             <!-- Dark Mode Toggle -->
             <button
@@ -361,7 +317,7 @@ watch(
   () => route.path,
   () => {
     sidebarOpen.value = false;
-  }
+  },
 );
 
 onMounted(() => {
