@@ -58,17 +58,17 @@
       </div>
 
       <!-- Filters -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <input
           v-model="filters.search"
           type="text"
           placeholder="Tìm kiếm theo tên, email..."
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           @input="debouncedSearch"
         />
         <select
           v-model="filters.role"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          class="px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           @change="applyFilters"
         >
           <option value="">Tất cả vai trò</option>
@@ -78,44 +78,13 @@
         </select>
         <select
           v-model="filters.isActive"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          class="px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           @change="applyFilters"
         >
           <option value="">Tất cả trạng thái</option>
           <option value="true">Đang hoạt động</option>
           <option value="false">Bị khóa</option>
         </select>
-        <div class="flex gap-2">
-          <select
-            v-model="filters.sortBy"
-            class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            @change="applyFilters"
-          >
-            <option value="createdAt">Ngày tạo</option>
-            <option value="name">Tên</option>
-            <option value="email">Email</option>
-          </select>
-          <button
-            @click="toggleSort"
-            class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
-            :title="filters.sortOrder === 'ASC' ? 'Tăng dần' : 'Giảm dần'"
-          >
-            <svg
-              class="w-5 h-5 transition-transform"
-              :class="{ 'rotate-180': filters.sortOrder === 'DESC' }"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M7 11l5-5m0 0l5 5m-5-5v12"
-              />
-            </svg>
-          </button>
-        </div>
       </div>
     </div>
 
@@ -265,9 +234,10 @@
                     )
                   "
                   :class="[
-                    'px-3 py-1 text-xs font-semibold rounded-full border-0 cursor-pointer',
+                    'px-4 py-1.5 pr-8 text-xs font-semibold rounded-full border-0 cursor-pointer appearance-none bg-no-repeat bg-right',
                     getRoleBadgeClass(user.role),
                   ]"
+                  :style="getDropdownArrowStyle(user.role)"
                 >
                   <option value="ADMIN">Admin</option>
                   <option value="TEACHER">Giáo viên</option>
@@ -461,6 +431,19 @@ const getRoleBadgeClass = (role: string) => {
       "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
   };
   return classes[role] || "bg-gray-100 text-gray-800";
+};
+
+const getDropdownArrowStyle = (role: string) => {
+  const colors: Record<string, string> = {
+    ADMIN: "%23991b1b",
+    TEACHER: "%231e40af",
+    STUDENT: "%23166534",
+  };
+  const color = colors[role] || "%23666";
+  return {
+    backgroundImage: `url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22${color}%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E")`,
+    backgroundPosition: "right 8px center",
+  };
 };
 
 const updateRole = async (userId: number, role: string) => {
