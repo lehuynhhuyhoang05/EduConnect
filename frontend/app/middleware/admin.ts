@@ -1,10 +1,15 @@
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware(async (to, from) => {
+  // Skip on server-side - will re-run on client
+  if (!import.meta.client) return;
+
   const authStore = useAuthStore();
 
-  // Wait for auth to initialize
-  if (!authStore.user && authStore.token) {
-    // User data might not be loaded yet, let it through for now
-    return;
+  // Initialize auth
+  await authStore.initAuth();
+
+  // Check if user is authenticated
+  if (!authStore.isAuthenticated) {
+    return navigateTo("/auth/login");
   }
 
   // Check if user is admin
