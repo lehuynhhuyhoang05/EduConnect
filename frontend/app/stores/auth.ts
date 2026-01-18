@@ -12,6 +12,8 @@ interface AuthState {
   token: string | null;
   refreshTokenValue: string | null;
   isLoading: boolean;
+  initialized: boolean;
+  initPromise: Promise<void> | null;
 }
 
 export const useAuthStore = defineStore("auth", {
@@ -20,6 +22,8 @@ export const useAuthStore = defineStore("auth", {
     token: null,
     refreshTokenValue: null,
     isLoading: false,
+    initialized: false,
+    initPromise: null,
   }),
 
   getters: {
@@ -154,7 +158,7 @@ export const useAuthStore = defineStore("auth", {
         localStorage.setItem("refreshToken", response.tokens.refreshToken);
         localStorage.setItem(
           "tokenExpiry",
-          String(Date.now() + 7 * 24 * 60 * 60 * 1000)
+          String(Date.now() + 7 * 24 * 60 * 60 * 1000),
         ); // 7 days
       }
     },
@@ -176,6 +180,21 @@ export const useAuthStore = defineStore("auth", {
     async initAuth() {
       if (!import.meta.client) return;
 
+      // If already initialized, return immediately
+      if (this.initialized) return;
+
+      // If init is in progress, wait for it
+      if (this.initPromise) {
+        await this.initPromise;
+        return;
+      }
+
+      // Start init process
+      this.initPromise = this._doInitAuth();
+      await this.initPromise;
+    },
+
+    async _doInitAuth() {
       const accessToken = localStorage.getItem("accessToken");
       const refreshToken = localStorage.getItem("refreshToken");
       const tokenExpiry = localStorage.getItem("tokenExpiry");
@@ -183,6 +202,7 @@ export const useAuthStore = defineStore("auth", {
       // Check if token expired
       if (tokenExpiry && Date.now() > Number(tokenExpiry)) {
         this.clearAuthData();
+        this.initialized = true;
         return;
       }
 
@@ -201,6 +221,8 @@ export const useAuthStore = defineStore("auth", {
           }
         }
       }
+
+      this.initialized = true;
     },
   },
 });
