@@ -58,7 +58,7 @@
       </div>
 
       <!-- Filters -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           v-model="filters.search"
           type="text"
@@ -75,15 +75,6 @@
           <option value="true">Đang hoạt động</option>
           <option value="false">Đã đóng</option>
         </select>
-        <select
-          v-model="filters.sortBy"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          @change="applyFilters"
-        >
-          <option value="createdAt">Ngày tạo</option>
-          <option value="name">Tên lớp</option>
-          <option value="memberCount">Số học viên</option>
-        </select>
       </div>
     </div>
 
@@ -95,7 +86,7 @@
       <SkeletonCard v-for="i in 6" :key="i" />
     </div>
     <div
-      v-else-if="adminStore.classes.length === 0"
+      v-else-if="filteredClasses.length === 0"
       class="bg-white dark:bg-gray-800 rounded-xl p-12 text-center shadow-lg border border-gray-100 dark:border-gray-700"
     >
       <svg
@@ -120,7 +111,7 @@
     </div>
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div
-        v-for="cls in adminStore.classes"
+        v-for="cls in filteredClasses"
         :key="cls.id"
         class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-shadow"
       >
@@ -269,7 +260,7 @@
 
     <!-- Pagination -->
     <div
-      v-if="adminStore.classes.length > 0"
+      v-if="filteredClasses.length > 0"
       class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 px-6 py-4 flex items-center justify-between"
     >
       <div class="text-sm text-gray-600 dark:text-gray-300">
@@ -507,6 +498,15 @@ const detailsModal = ref<{
   class: null,
 });
 
+// Computed để filter classes theo isActive nếu cần
+const filteredClasses = computed(() => {
+  if (filters.value.isActive === "") {
+    return adminStore.classes;
+  }
+  const isActiveFilter = filters.value.isActive === "true";
+  return adminStore.classes.filter((c) => c.isActive === isActiveFilter);
+});
+
 // Debounced search
 let searchTimeout: ReturnType<typeof setTimeout>;
 const debouncedSearch = () => {
@@ -522,17 +522,24 @@ const viewClassDetails = (cls: AdminClass) => {
 // Actions
 const fetchClasses = async () => {
   try {
-    await adminStore.fetchClasses({
+    const params: any = {
       page: page.value,
       limit: limit.value,
-      search: filters.value.search || undefined,
-      isActive:
-        filters.value.isActive === ""
-          ? undefined
-          : filters.value.isActive === "true",
       sortBy: filters.value.sortBy,
       sortOrder: filters.value.sortOrder,
-    });
+    };
+
+    // Only add search if not empty
+    if (filters.value.search) {
+      params.search = filters.value.search;
+    }
+
+    // Only add isActive if not "all"
+    if (filters.value.isActive !== "") {
+      params.isActive = filters.value.isActive === "true";
+    }
+
+    await adminStore.fetchClasses(params);
   } catch {
     toast.error("Không thể tải danh sách lớp học");
   }
@@ -556,11 +563,12 @@ const confirmDelete = (cls: AdminClass) => {
 
 const handleDelete = async () => {
   try {
-    await adminStore.deleteClass(deleteDialog.value.classId);
+    const classIdToDelete = deleteDialog.value.classId;
+    await adminStore.deleteClass(classIdToDelete);
     deleteDialog.value.show = false;
     toast.success("Xóa lớp học thành công");
-    await fetchClasses();
-  } catch {
+  } catch (error) {
+    console.error("Delete error:", error);
     toast.error("Không thể xóa lớp học");
   }
 };
