@@ -13,6 +13,9 @@ const isLoading = ref(true)
 // Current view mode
 const viewMode = ref<'list' | 'calendar'>('list')
 
+// Import modal state
+const showImportModal = ref(false)
+
 // Selected week offset (0 = current week)
 const weekOffset = ref(0)
 
@@ -150,6 +153,17 @@ onMounted(async () => {
             <h1 class="text-2xl font-bold">Lịch học</h1>
             <p class="text-white/80 mt-1">Các buổi học trực tiếp sắp tới</p>
           </div>
+          
+          <!-- Import button -->
+          <button 
+            class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium transition-colors mr-4"
+            @click="showImportModal = true"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Import lịch
+          </button>
           
           <!-- View mode toggle -->
           <div class="flex gap-2 bg-white/10 p-1.5 rounded-xl backdrop-blur">
@@ -360,5 +374,28 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+
+    <!-- Import Calendar Modal -->
+    <Teleport to="body">
+      <div v-if="showImportModal" class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/50" @click="showImportModal = false" />
+        <div class="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
+          <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
+            <h2 class="text-xl font-bold text-gray-900">Import lịch học</h2>
+            <button 
+              class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center"
+              @click="showImportModal = false"
+            >
+              <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="p-6">
+            <CalendarImport @close="showImportModal = false" />
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>

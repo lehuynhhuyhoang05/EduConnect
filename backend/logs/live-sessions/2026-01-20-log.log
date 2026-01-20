@@ -70,3 +70,21 @@
     "hostId": 27,
     "title": "Buổi học - 20/1/2026"
   }
+[2026-01-20T07:42:10.131Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 42,
+    "teacherId": 27
+  }
+[2026-01-20T07:42:10.179Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 42,
+    "roomId": "6fee7268-d21f-4940-99ea-3f688cab4856"
+  }
+[2026-01-20T07:42:55.686Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 43,
+    "roomId": "e741a001-21f9-4488-8141-d8f647f03fb6",
+    "classId": 8,
+    "hostId": 27,
+    "title": "Buổi học - 20/1/2026"
+  }
