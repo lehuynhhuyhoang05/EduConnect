@@ -1,32 +1,37 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { DataSource, DataSourceOptions } from 'typeorm';
-import * as dotenv from 'dotenv';
-import { User } from '@modules/users/entities/user.entity';
-import { RefreshToken } from '@modules/auth/entities/refresh-token.entity';
-import { Class, ClassMember } from '@modules/classes/entities';
-import { File } from '@modules/files/entities';
 import { Assignment } from '@modules/assignments/entities/assignment.entity';
 import { Submission } from '@modules/assignments/entities/submission.entity';
-import { LiveSession, LiveSessionParticipant } from '@modules/live-sessions/entities';
+import { RefreshToken } from '@modules/auth/entities/refresh-token.entity';
 import { ChatMessage } from '@modules/chat/entities/chat-message.entity';
-import { WhiteboardStroke } from '@modules/whiteboard/entities';
+import { Class, ClassMember } from '@modules/classes/entities';
+import { File } from '@modules/files/entities';
+import { LiveSession, LiveSessionParticipant } from '@modules/live-sessions/entities';
 import { Notification, PushSubscription } from '@modules/notifications/entities';
+import { User } from '@modules/users/entities/user.entity';
+import { WhiteboardStroke } from '@modules/whiteboard/entities';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import * as dotenv from 'dotenv';
+import { DataSource, DataSourceOptions } from 'typeorm';
 // New feature entities
-import { Poll, PollResponse } from '@modules/polls/entities';
-import { GradeItem, GradeEntry } from '@modules/gradebook/entities';
-import { LearningActivity, StudentProgress, DailyActivitySummary } from '@modules/progress/entities';
 import { CalendarEvent, EventReminder } from '@modules/calendar/entities';
+import { GradeEntry, GradeItem } from '@modules/gradebook/entities';
+import { Material } from '@modules/materials/entities';
+import { Poll, PollResponse } from '@modules/polls/entities';
+import {
+  DailyActivitySummary,
+  LearningActivity,
+  StudentProgress,
+} from '@modules/progress/entities';
 
 dotenv.config();
 
 // Explicitly list entities to avoid path issues with non-ASCII characters
 const entities = [
-  User, 
-  RefreshToken, 
-  Class, 
-  ClassMember, 
-  File, 
-  Assignment, 
+  User,
+  RefreshToken,
+  Class,
+  ClassMember,
+  File,
+  Assignment,
   Submission,
   LiveSession,
   LiveSessionParticipant,
@@ -44,6 +49,7 @@ const entities = [
   DailyActivitySummary,
   CalendarEvent,
   EventReminder,
+  Material,
 ];
 
 export const typeOrmConfig = (): TypeOrmModuleOptions => ({

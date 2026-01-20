@@ -1,33 +1,34 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
-import { typeOrmConfig } from './config/typeorm.config';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { typeOrmConfig } from './config/typeorm.config';
 
 // Common modules
 import { LoggerModule } from './common/logger/logger.module';
 
 // Feature modules
+import { AssignmentsModule } from './modules/assignments/assignments.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
+import { ChatModule } from './modules/chat/chat.module';
 import { ClassesModule } from './modules/classes/classes.module';
 import { FilesModule } from './modules/files/files.module';
-import { AssignmentsModule } from './modules/assignments/assignments.module';
 import { LiveSessionsModule } from './modules/live-sessions/live-sessions.module';
-import { ChatModule } from './modules/chat/chat.module';
-import { WhiteboardModule } from './modules/whiteboard/whiteboard.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { UsersModule } from './modules/users/users.module';
+import { WhiteboardModule } from './modules/whiteboard/whiteboard.module';
 
 // New Feature modules
-import { PollsModule } from './modules/polls/polls.module';
-import { GradebookModule } from './modules/gradebook/gradebook.module';
-import { ProgressModule } from './modules/progress/progress.module';
-import { CalendarModule } from './modules/calendar/calendar.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { CalendarModule } from './modules/calendar/calendar.module';
+import { GradebookModule } from './modules/gradebook/gradebook.module';
+import { MaterialsModule } from './modules/materials/materials.module';
+import { PollsModule } from './modules/polls/polls.module';
+import { ProgressModule } from './modules/progress/progress.module';
 
 @Module({
   imports: [
@@ -40,13 +41,13 @@ import { AdminModule } from './modules/admin/admin.module';
     ThrottlerModule.forRoot([
       {
         name: 'short',
-        ttl: 1000,  // 1 second
-        limit: 30,  // 30 requests per second
+        ttl: 1000, // 1 second
+        limit: 30, // 30 requests per second
       },
       {
         name: 'medium',
         ttl: 10000, // 10 seconds
-        limit: 150,  // 150 requests per 10 seconds
+        limit: 150, // 150 requests per 10 seconds
       },
       {
         name: 'long',
@@ -74,6 +75,7 @@ import { AdminModule } from './modules/admin/admin.module';
     ProgressModule,
     CalendarModule,
     AdminModule,
+    MaterialsModule,
   ],
   controllers: [AppController],
   providers: [
