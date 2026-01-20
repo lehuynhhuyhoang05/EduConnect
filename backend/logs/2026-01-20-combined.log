@@ -1,0 +1,125 @@
+[2026-01-20T07:13:53.493Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 38,
+    "teacherId": 27
+  }
+[2026-01-20T07:13:53.538Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 38,
+    "roomId": "0cf6f7b1-8bbb-4866-9487-0e2cc8f4c13e"
+  }
+[2026-01-20T07:13:59.162Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 39,
+    "roomId": "07a34dea-8734-4415-8f3c-468b8a97a2ca",
+    "classId": 8,
+    "hostId": 27,
+    "title": "Buổi học - 20/1/2026"
+  }
+[2026-01-20T07:17:09.219Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 39,
+    "teacherId": 27
+  }
+[2026-01-20T07:17:09.247Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 39,
+    "roomId": "07a34dea-8734-4415-8f3c-468b8a97a2ca"
+  }
+[2026-01-20T07:17:16.948Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 40,
+    "roomId": "a3bf74f0-0c29-4fd0-b980-4a3d692c3d22",
+    "classId": 8,
+    "hostId": 27,
+    "title": "Buổi học - 20/1/2026"
+  }
+[2026-01-20T07:21:12.269Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-20T07:21:14.869Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 40,
+    "teacherId": 27
+  }
+[2026-01-20T07:21:14.894Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 40,
+    "roomId": "a3bf74f0-0c29-4fd0-b980-4a3d692c3d22"
+  }
+[2026-01-20T07:21:21.110Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 41,
+    "roomId": "e21a0508-ac97-43f8-8a28-70fb9ac5daeb",
+    "classId": 8,
+    "hostId": 27,
+    "title": "Buổi học - 20/1/2026"
+  }
+[2026-01-20T07:21:44.811Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-20T07:29:29.197Z] [LOG] [whiteboard] [WhiteboardModule] Whiteboard state loaded
+  Data: {
+    "roomId": "session-41",
+    "strokeCount": 0,
+    "userId": 26
+  }
+[2026-01-20T07:29:29.200Z] [LOG] [whiteboard] [WhiteboardModule] User joined whiteboard room
+  Data: {
+    "roomId": "session-41",
+    "userId": 26
+  }
+[2026-01-20T07:29:30.141Z] [LOG] [whiteboard] [WhiteboardModule] startStroke
+  Data: {
+    "strokeId": "qmg99u8smqmkm9x0yk",
+    "roomId": "session-41",
+    "userId": 26,
+    "tool": "pen"
+  }
+[2026-01-20T07:29:30.634Z] [LOG] [whiteboard] [WhiteboardModule] Stroke saved
+  Data: {
+    "strokeId": "qmg99u8smqmkm9x0yk",
+    "points": 21
+  }
+[2026-01-20T07:29:36.064Z] [LOG] [whiteboard] [WhiteboardModule] startStroke
+  Data: {
+    "strokeId": "51aoaiekdo2mkm9x5j3",
+    "roomId": "session-41",
+    "userId": 26,
+    "tool": "eraser"
+  }
+[2026-01-20T07:29:36.438Z] [LOG] [whiteboard] [WhiteboardModule] Stroke saved
+  Data: {
+    "strokeId": "51aoaiekdo2mkm9x5j3",
+    "points": 21
+  }
+[2026-01-20T07:31:03.798Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 41,
+    "teacherId": 27
+  }
+[2026-01-20T07:31:03.827Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 41,
+    "roomId": "e21a0508-ac97-43f8-8a28-70fb9ac5daeb"
+  }
+[2026-01-20T07:31:10.601Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 42,
+    "roomId": "6fee7268-d21f-4940-99ea-3f688cab4856",
+    "classId": 8,
+    "hostId": 27,
+    "title": "Buổi học - 20/1/2026"
+  }
+[2026-01-20T07:31:36.005Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }

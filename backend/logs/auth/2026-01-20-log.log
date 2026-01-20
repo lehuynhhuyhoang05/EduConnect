@@ -1,0 +1,18 @@
+[2026-01-20T07:21:12.269Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-20T07:21:44.811Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-20T07:31:36.005Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }

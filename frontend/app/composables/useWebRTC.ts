@@ -225,9 +225,44 @@ export function useWebRTC() {
   }
   
   // Toggle audio
-  const toggleAudio = () => {
+  const toggleAudio = async () => {
     if (localStream.value) {
       const audioTracks = localStream.value.getAudioTracks()
+      
+      // If no audio tracks exist, try to request microphone
+      if (audioTracks.length === 0) {
+        try {
+          console.log('No audio tracks, requesting microphone...')
+          const audioStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+            }
+          })
+          
+          const audioTrack = audioStream.getAudioTracks()[0]
+          if (audioTrack) {
+            // Add to local stream
+            localStream.value.addTrack(audioTrack)
+            
+            // Add to all existing peer connections
+            peerConnections.value.forEach((peerConn) => {
+              console.log('Adding new audio track to peer:', peerConn.userId)
+              peerConn.pc.addTrack(audioTrack, localStream.value!)
+            })
+            
+            isAudioEnabled.value = true
+            console.log('Audio track added and enabled')
+          }
+        } catch (error) {
+          console.error('Failed to request microphone:', error)
+          toast.error('Không thể truy cập microphone')
+        }
+        return
+      }
+      
+      // Toggle existing tracks
       audioTracks.forEach(track => {
         track.enabled = !track.enabled
       })
@@ -235,11 +270,47 @@ export function useWebRTC() {
       console.log('Audio toggled:', isAudioEnabled.value)
     }
   }
-  
+
   // Toggle video
-  const toggleVideo = () => {
+  const toggleVideo = async () => {
     if (localStream.value) {
       const videoTracks = localStream.value.getVideoTracks()
+      
+      // If no video tracks exist, try to request camera
+      if (videoTracks.length === 0) {
+        try {
+          console.log('No video tracks, requesting camera...')
+          const videoStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 1280, max: 1920 },
+              height: { ideal: 720, max: 1080 },
+              frameRate: { ideal: 30, max: 60 },
+              facingMode: 'user',
+            }
+          })
+          
+          const videoTrack = videoStream.getVideoTracks()[0]
+          if (videoTrack) {
+            // Add to local stream
+            localStream.value.addTrack(videoTrack)
+            
+            // Add to all existing peer connections
+            peerConnections.value.forEach((peerConn) => {
+              console.log('Adding new video track to peer:', peerConn.userId)
+              peerConn.pc.addTrack(videoTrack, localStream.value!)
+            })
+            
+            isVideoEnabled.value = true
+            console.log('Video track added and enabled')
+          }
+        } catch (error) {
+          console.error('Failed to request camera:', error)
+          toast.error('Không thể truy cập camera')
+        }
+        return
+      }
+      
+      // Toggle existing tracks
       videoTracks.forEach(track => {
         track.enabled = !track.enabled
       })

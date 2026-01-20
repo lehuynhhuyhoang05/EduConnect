@@ -36,7 +36,10 @@ const isRecordingOpen = ref(false)
 const isWaitingRoomOpen = ref(false)
 
 // Feature panel state - tracks active right panel
-const activePanel = ref<'chat' | 'participants' | 'attendance' | 'recording' | 'waitingRoom' | null>('chat')
+const activePanel = ref<'chat' | 'participants' | 'attendance' | 'recording' | 'waitingRoom' | 'transcription' | null>('chat')
+
+// Transcription state
+const isTranscriptionOpen = ref(false)
 
 // Toggle panel helper
 const togglePanel = (panel: typeof activePanel.value) => {
@@ -47,6 +50,7 @@ const togglePanel = (panel: typeof activePanel.value) => {
     isAttendanceOpen.value = false
     isRecordingOpen.value = false
     isWaitingRoomOpen.value = false
+    isTranscriptionOpen.value = false
   } else {
     activePanel.value = panel
     isChatOpen.value = panel === 'chat'
@@ -54,6 +58,7 @@ const togglePanel = (panel: typeof activePanel.value) => {
     isAttendanceOpen.value = panel === 'attendance'
     isRecordingOpen.value = panel === 'recording'
     isWaitingRoomOpen.value = panel === 'waitingRoom'
+    isTranscriptionOpen.value = panel === 'transcription'
   }
 }
 
@@ -546,8 +551,8 @@ const joinSession = async () => {
 }
 
 // Toggle mic
-const toggleMic = () => {
-  webRTC.toggleAudio()
+const toggleMic = async () => {
+  await webRTC.toggleAudio()
   liveSocket.updateMediaState(
     roomId.value,
     webRTC.isAudioEnabled.value,
@@ -557,8 +562,8 @@ const toggleMic = () => {
 }
 
 // Toggle camera
-const toggleCamera = () => {
-  webRTC.toggleVideo()
+const toggleCamera = async () => {
+  await webRTC.toggleVideo()
   liveSocket.updateMediaState(
     roomId.value,
     webRTC.isAudioEnabled.value,
@@ -1400,6 +1405,22 @@ onBeforeRouteLeave((_to, _from, next) => {
               </svg>
             </button>
 
+            <!-- AI Transcription - Ghi chép tự động -->
+            <button
+              class="w-12 h-12 rounded-full flex items-center justify-center transition-all relative"
+              :class="activePanel === 'transcription' ? 'bg-purple-500 hover:bg-purple-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
+              title="AI Transcription - Ghi chép tự động"
+              @click="togglePanel('transcription')"
+            >
+              <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+              <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-purple-400 text-white text-[10px] flex items-center justify-center font-bold">AI</span>
+            </button>
+
             <!-- Attendance - Điểm danh (cả teacher và student) -->
             <button
               class="w-12 h-12 rounded-full flex items-center justify-center transition-all"
@@ -1505,7 +1526,8 @@ onBeforeRouteLeave((_to, _from, next) => {
                   activePanel === 'participants' ? 'Người tham gia' :
                   activePanel === 'attendance' ? 'Điểm danh' :
                   activePanel === 'recording' ? 'Ghi hình' :
-                  activePanel === 'waitingRoom' ? 'Phòng chờ' : ''
+                  activePanel === 'waitingRoom' ? 'Phòng chờ' :
+                  activePanel === 'transcription' ? '🎤 AI Transcription' : ''
                 }}
               </h3>
               <button
@@ -1640,6 +1662,13 @@ onBeforeRouteLeave((_to, _from, next) => {
                 :session-id="sessionId"
                 :is-host="authStore.isTeacher"
                 :user-id="authStore.user?.id || 0"
+              />
+            </div>
+
+            <!-- AI Transcription Panel -->
+            <div v-if="activePanel === 'transcription'" class="flex-1 overflow-y-auto p-2">
+              <LiveTranscriptionPanel
+                :session-id="sessionId"
               />
             </div>
           </div>

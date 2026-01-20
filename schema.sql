@@ -184,7 +184,7 @@ CREATE TABLE `class_members` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `class_id` int unsigned NOT NULL,
   `user_id` int unsigned NOT NULL,
-  `role` enum('TEACHER','STUDENT') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'STUDENT',
+  `role` enum('TEACHER','STUDENT','ADMIN') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'STUDENT',
   `joined_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_class_user` (`class_id`,`user_id`),
@@ -563,7 +563,7 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` enum('STUDENT','TEACHER') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'STUDENT',
+  `role` enum('STUDENT','TEACHER','ADMIN') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'STUDENT',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `avatar_url` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
