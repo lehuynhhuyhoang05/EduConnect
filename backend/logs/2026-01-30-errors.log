@@ -1,0 +1,25 @@
+[2026-01-30T11:23:23.224Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-30T11:23:24.836Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-30T11:23:29.325Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-30T11:23:33.400Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-30T11:24:11.580Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }

@@ -1,17 +1,4 @@
-/**
- * AI TRANSCRIPTION COMPOSABLE
- * ===========================
- * Tự động chuyển đổi giọng nói thành văn bản real-time
- * 
- * Phương án 1: Web Speech API (Browser-based, miễn phí)
- * Phương án 2: OpenAI Whisper API (Độ chính xác cao)
- * 
- * Features:
- * - Real-time transcription
- * - Speaker identification
- * - Timestamp tracking
- * - Export to TXT/SRT format
- */
+
 
 export interface TranscriptEntry {
   id: string

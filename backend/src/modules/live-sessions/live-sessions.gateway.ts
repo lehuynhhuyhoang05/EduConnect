@@ -106,6 +106,8 @@ export class LiveSessionsGateway
   private waitingRoom = new Map<string, WaitingUser[]>();
   // Map roomId -> rooms that have waiting room enabled
   private waitingRoomEnabled = new Map<string, boolean>();
+  // Map roomId -> Set of userIds that have been admitted (don't need to wait again)
+  private admittedUsers = new Map<string, Set<number>>();
   // Map roomId -> users with raised hands
   private raisedHands = new Map<string, HandRaiseInfo[]>();
   // Map sessionId -> breakout room status
@@ -256,7 +258,11 @@ export class LiveSessionsGateway
       const session = await this.liveSessionsService.findById(sessionId);
       const isHost = session && session.hostId === userId;
       
-      if (this.waitingRoomEnabled.get(roomId) && !isHost) {
+      // Check if user was already admitted before (skip waiting room)
+      const admittedSet = this.admittedUsers.get(roomId);
+      const wasAdmittedBefore = admittedSet?.has(userId) || false;
+      
+      if (this.waitingRoomEnabled.get(roomId) && !isHost && !wasAdmittedBefore) {
         // Add to waiting room
         if (!this.waitingRoom.has(roomId)) {
           this.waitingRoom.set(roomId, []);
@@ -634,6 +640,7 @@ export class LiveSessionsGateway
     this.roomParticipants.delete(data.roomId);
     this.waitingRoom.delete(data.roomId);
     this.waitingRoomEnabled.delete(data.roomId);
+    this.admittedUsers.delete(data.roomId); // Clear admitted users when session ends
     this.raisedHands.delete(data.roomId);
 
     this.logger.log(`Session ${data.sessionId} ended by host ${hostId}`);
@@ -1001,6 +1008,13 @@ export class LiveSessionsGateway
 
     const admittedUser = waitingUsers[userIndex];
     waitingUsers.splice(userIndex, 1);
+
+    // Add user to admitted list so they don't need approval next time
+    if (!this.admittedUsers.has(roomId)) {
+      this.admittedUsers.set(roomId, new Set());
+    }
+    this.admittedUsers.get(roomId).add(userId);
+    this.logger.log(`User ${userId} added to admitted list for room ${roomId}`);
 
     // Get the user's socket and admit them to the room
     const sockets = await this.server.in(admittedUser.socketId).fetchSockets();

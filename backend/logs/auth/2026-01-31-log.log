@@ -1,0 +1,25 @@
+[2026-01-31T05:27:46.590Z] [LOG] [auth] [AuthModule] User registered
+  Data: {
+    "userId": 28,
+    "email": "admin@gmail.com",
+    "role": "STUDENT",
+    "ipAddress": "::1"
+  }
+[2026-01-31T05:28:32.957Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 28,
+    "email": "admin@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-31T05:29:03.552Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-31T06:38:42.009Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }

@@ -1,0 +1,18 @@
+[2026-01-24T05:16:45.690Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 37,
+    "teacherId": 27
+  }
+[2026-01-24T05:16:45.761Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 37,
+    "roomId": "d37cbded-d0a7-4f03-b6f2-805c3eafe1ad"
+  }
+[2026-01-24T05:17:00.809Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 38,
+    "roomId": "a58985e5-0835-443d-8c31-ffb6b91506d5",
+    "classId": 8,
+    "hostId": 27,
+    "title": "Buổi học - 24/1/2026"
+  }

@@ -1,0 +1,14 @@
+[2026-01-31T06:39:22.439Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 10,
+    "name": "Lập Trình Web",
+    "classCode": "ZVRP1K",
+    "teacherId": 27
+  }
+[2026-01-31T06:39:26.089Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 11,
+    "name": "Lập Trình Web",
+    "classCode": "LOE47A",
+    "teacherId": 27
+  }

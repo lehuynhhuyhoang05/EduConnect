@@ -1,0 +1,7 @@
+[2026-01-30T11:41:14.088Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 9,
+    "name": "Clean Code",
+    "classCode": "ZJD89Q",
+    "teacherId": 27
+  }

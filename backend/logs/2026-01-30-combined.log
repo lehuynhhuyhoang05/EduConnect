@@ -1,0 +1,90 @@
+[2026-01-30T11:07:14.274Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 26,
+    "email": "lehuynhhuyhoang05@gmail.com",
+    "ipAddress": "::1"
+  }
+[2026-01-30T11:23:23.224Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-30T11:23:24.836Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-30T11:23:29.325Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-30T11:23:33.400Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-30T11:24:11.580Z] [WARN] [auth] [AuthModule] Login failed - wrong password
+  Data: {
+    "email": "hoanglhh0026@ut.edu.vn",
+    "userId": 27
+  }
+[2026-01-30T11:24:58.611Z] [LOG] [auth] [AuthModule] User logged in
+  Data: {
+    "userId": 27,
+    "email": "hoanglhh0026@ut.edu.vn",
+    "ipAddress": "::1"
+  }
+[2026-01-30T11:31:15.874Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 38,
+    "teacherId": 27
+  }
+[2026-01-30T11:31:15.922Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 38,
+    "roomId": "a58985e5-0835-443d-8c31-ffb6b91506d5"
+  }
+[2026-01-30T11:31:21.665Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 39,
+    "roomId": "9a947716-8eea-4521-8191-37f41633e478",
+    "classId": 8,
+    "hostId": 27,
+    "title": "Buổi học - 30/1/2026"
+  }
+[2026-01-30T11:41:14.088Z] [LOG] [classes] [ClassesModule] Class created
+  Data: {
+    "classId": 9,
+    "name": "Clean Code",
+    "classCode": "ZJD89Q",
+    "teacherId": 27
+  }
+[2026-01-30T11:49:08.926Z] [LOG] [live-sessions] [LiveSessionsModule] Session created
+  Data: {
+    "sessionId": 40,
+    "roomId": "75e68438-38cc-4804-aa07-227efd639bfe",
+    "classId": 9,
+    "hostId": 27,
+    "title": "Buổi học - 30/1/2026"
+  }
+[2026-01-30T11:51:17.209Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 39,
+    "teacherId": 27
+  }
+[2026-01-30T11:51:17.238Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 39,
+    "roomId": "9a947716-8eea-4521-8191-37f41633e478"
+  }
+[2026-01-30T11:51:19.521Z] [LOG] [live-sessions] [LiveSessionsModule] endSession called
+  Data: {
+    "sessionId": 40,
+    "teacherId": 27
+  }
+[2026-01-30T11:51:19.552Z] [LOG] [live-sessions] [LiveSessionsModule] Session ended successfully
+  Data: {
+    "sessionId": 40,
+    "roomId": "75e68438-38cc-4804-aa07-227efd639bfe"
+  }

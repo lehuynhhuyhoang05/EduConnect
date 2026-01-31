@@ -1,0 +1,46 @@
+[2026-01-24T05:18:02.126Z] [LOG] [whiteboard] [WhiteboardModule] Whiteboard state loaded
+  Data: {
+    "roomId": "session-38",
+    "strokeCount": 0,
+    "userId": 26
+  }
+[2026-01-24T05:18:02.132Z] [LOG] [whiteboard] [WhiteboardModule] User joined whiteboard room
+  Data: {
+    "roomId": "session-38",
+    "userId": 26
+  }
+[2026-01-24T05:18:04.182Z] [LOG] [whiteboard] [WhiteboardModule] Whiteboard state loaded
+  Data: {
+    "roomId": "session-38",
+    "strokeCount": 0,
+    "userId": 27
+  }
+[2026-01-24T05:18:04.186Z] [LOG] [whiteboard] [WhiteboardModule] User joined whiteboard room
+  Data: {
+    "roomId": "session-38",
+    "userId": 27
+  }
+[2026-01-24T05:18:05.021Z] [LOG] [whiteboard] [WhiteboardModule] startStroke
+  Data: {
+    "strokeId": "fvp3ct0b89omkruzffe",
+    "roomId": "session-38",
+    "userId": 26,
+    "tool": "pen"
+  }
+[2026-01-24T05:18:06.880Z] [LOG] [whiteboard] [WhiteboardModule] Stroke saved
+  Data: {
+    "strokeId": "fvp3ct0b89omkruzffe",
+    "points": 103
+  }
+[2026-01-24T05:18:08.783Z] [LOG] [whiteboard] [WhiteboardModule] startStroke
+  Data: {
+    "strokeId": "qdnmnff6bwamkruzibw",
+    "roomId": "session-38",
+    "userId": 26,
+    "tool": "pen"
+  }
+[2026-01-24T05:18:11.407Z] [LOG] [whiteboard] [WhiteboardModule] Stroke saved
+  Data: {
+    "strokeId": "qdnmnff6bwamkruzibw",
+    "points": 151
+  }
